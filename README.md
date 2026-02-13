@@ -70,7 +70,7 @@ python manage.py shell
 ## run application with gunicorn
 
 ```shell 
-gunicorn config.wsgi:application 
+gunicorn _config.wsgi:application 
 ```
 
 ## Using Postgres

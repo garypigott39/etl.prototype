@@ -3,7 +3,7 @@
  * @file
  * l_com_type.sql
  *
- * Lookup table - frequency lookup.
+ * Lookup table - commodity type lookup.
  ***********************************************************************************************************
  */
 
@@ -12,7 +12,7 @@
 CREATE TABLE IF NOT EXISTS core.l_com_type
 (
     code TEXT NOT NULL CHECK (code ~ '^[A-Z][a-z0-9 ]*$'), -- Single uppercase letter
-    PRIMARY KEY (id),
+    PRIMARY KEY (code),
 );
 
 COMMENT ON TABLE core.l_com_type
@@ -23,8 +23,8 @@ COMMENT ON TABLE core.l_com_type
  */
 INSERT INTO core.l_com_type
 VALUES
-('Agriculturals'),
-('Commodity index'),
-('Energy'),
-('Industrial metals'),
-('Precious metals');
+    ('Agriculturals'),
+    ('Commodity index'),
+    ('Energy'),
+    ('Industrial metals'),
+    ('Precious metals');

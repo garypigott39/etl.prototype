@@ -11,7 +11,7 @@
 
 CREATE TABLE IF NOT EXISTS core.l_com_type
 (
-    code TEXT NOT NULL CHECK (code ~ '^[A-Z][a-z0-9 ]*$'), -- Single uppercase letter
+    code TEXT NOT NULL CHECK (code ~ '^[A-Z][a-z0-9 ]*$'),
     PRIMARY KEY (code),
 );
 

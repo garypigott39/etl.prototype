@@ -7,11 +7,11 @@
  ***********************************************************************************************************
  */
 
--- DROP VIEW IF EXISTS ce_core.v_date;
+-- DROP VIEW IF EXISTS core.v_date;
 
-CREATE OR REPLACE VIEW ce_core.v_date AS
+CREATE OR REPLACE VIEW core.v_date AS
 SELECT
-    pk_d                                                                            AS pk_d,
+    id                                                                              AS pk_d,
     d_date                                                                          AS d_date,
 
     /* ================================================================
@@ -76,7 +76,7 @@ SELECT
         ELSE EXTRACT(YEAR FROM d_date)::INT
     END                                                                             AS d_yyyy_fy
 
-FROM ce_core.date d;
+FROM core.l_date d;
 
-COMMENT ON VIEW ce_core.v_date
+COMMENT ON VIEW core.v_date
     IS 'View - generated dates';

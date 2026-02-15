@@ -3,7 +3,7 @@
  * @file
  * mv_period.sql
  *
- * MaterialiZed View - generated periods.
+ * Materialized View - generated periods.
  ***********************************************************************************************************
  */
 
@@ -11,50 +11,54 @@
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS core.mv_period
 WITH _base AS (
+    SELECT
+        id,
+        p_freq,
+        p_start_of_period,
+        CASE
+            WHEN p_freq = 1 THEN 1
+            WHEN p_freq = 2 THEN 7
+            WHEN p_freq = 3 THEN
+                (p_start_of_period + INTERVAL '1 MONTH' - INTERVAL '1 DAY')::DATE - p_start_of_period + 1
+            WHEN p_freq = 4 THEN core.fx_ut_get_quarter_length(p_start_of_period)
+                (p_start_of_period + INTERVAL '3 MONTHS' - INTERVAL '1 DAY')::DATE - p_start_of_period + 1
+            WHEN p_freq = 5 THEN core.fx_ut_get_year_length(p_start_of_period)
+                (p_start_of_period + INTERVAL '1 YEAR' - INTERVAL '1 DAY')::DATE - p_start_of_period + 1
+        END AS p_days_in_period,
+        CASE
+            WHEN p_freq = 1 THEN TO_CHAR(p_start_of_period, 'DD/MM/YYYY')
+            WHEN p_freq = 2 THEN 'w' || TO_CHAR(p_start_of_period, 'IYYYIW')
+            WHEN p_freq = 3 THEN TO_CHAR(p_start_of_period, 'MM YYYY')
+            WHEN p_freq = 4 THEN 'Q' || TO_CHAR(p_start_of_period, 'Q YYYY')
+            WHEN p_freq = 5 THEN TO_CHAR(p_start_of_period, 'YYYY')
+        END AS p_period_name,
+        SUBSTR(EXTRACT(YEAR FROM p_start_of_period)::TEXT, 1, 3) || '0s' AS p_decade_name
 
+    FROM core.l_period
+),
+WITH _lag  AS (
+    SELECT
+        id,
+        ROW_NUMBER() OVER (
+            PARTITION BY p_freq
+            ORDER BY p_start_of_period
+        ) AS p_lag
+    FROM _base
+)
+WITH _eop AS (
+    SELECT
+       id,
+       (p_start_of_period + ((p_days_in_period - 1) / 2))::DATE AS p_mid_of_period,
+       (p_start_of_period + p_days_in_period - 1)::DATE AS p_end_of_period
+    FROM _base
 )
 SELECT
-    id                                                                     AS pk_p,
-
-    p_period,
-    p_freq,
-    p_start_of_period,
-    (p_start_of_period + ((p_end_of_period - p_start_of_period)/2))::DATE  AS p_mid_of_period,
-    p_end_of_period,
-    (p_end_of_period - p_start_of_period + 1)::INT                         AS p_days_in_period,
-    p_date_range,
-
-    CASE
-        WHEN p_freq = 1 THEN TO_CHAR(p_start_of_period, 'DD/MM/YYYY')
-        WHEN p_freq = 2 THEN 'w' || TO_CHAR(p_start_of_period, 'IW IYYY')
-        WHEN p_freq = 3 THEN TO_CHAR(p_start_of_period, 'MM YYYY')
-        WHEN p_freq = 4 THEN 'Q' || TO_CHAR(p_start_of_period, 'Q YYYY')
-        WHEN p_freq = 5 THEN TO_CHAR(p_start_of_period, 'YYYY')
-    END                                                                    AS p_period_name,
-
-    SUBSTR(EXTRACT(YEAR FROM p_start_of_period)::text, 1, 3) || '0s'       AS p_decade_name
-
-    -- Status
-    CASE
-        WHEN p_end_of_period < CURRENT_DATE THEN 'Past'
-        WHEN p_start_of_period > CURRENT_DATE THEN 'Future'
-        ELSE 'Current'
-    END                                                                    AS p_status,
-
-    -- Lag period number, frequency related
-    p_lag
-
-FROM core.l_period;
-
-COMMENT ON VIEW ce_core.v_period
-    IS 'View - generated periods';
-
-
-
-    p_mid_of_period DATE,
-    p_end_of_period DATE,
-    p_days_in_period INT,
-    p_freq INT GENERATED ALWAYS AS (id / 100000000) STORED,  -- see ce_core.freq
+    b.id,
+    b.p_freq,
+    b.p_start_of_period,
+    e.p_mid_of_period,
+    e.p_end_of_period,
+    b.p_days_in_period,
 
     -- Period range, performance related. The "half-open" range "[)" may have a massive impact on
     -- the performance of the GIST index for date range queries; the closed range "[]" is more efficient but includes the
@@ -62,19 +66,29 @@ COMMENT ON VIEW ce_core.v_period
     -- exclude that date. This is a known limitation of PostgreSQL range types when it comes to indexing and performance.
 
     -- The +1 trick is to ensure that the end date is exclusive in the range.
-    p_date_range DATERANGE GENERATED ALWAYS AS (DATERANGE(p_start_of_period, p_end_of_period + 1, '[)')) STORED,
+    DATERANGE(b.p_start_of_period, e.p_end_of_period + 1, '[)')) AS p_date_range,
 
     -- String formats
-    p_period_name TEXT,
-    p_decade_name TEXT,
+    b.p_period_name,
+    b.p_decade_name,
+    CASE
+        WHEN e.p_end_of_period < CURRENT_DATE THEN 'Past'
+        WHEN e._start_of_period > CURRENT_DATE THEN 'Future'
+        ELSE 'Current'
+    END AS p_status,
+    l.p_lag
 
-    -- Lag period number, frequency related
-    p_lag INT,
+FROM _base b
+    JOIN _eop e ON b.id = e.id
+    JOIN _lag l ON b.id = l.id;
 
-    PRIMARY KEY (id),
-    UNIQUE (p_period)
-);
+CREATE UNIQUE INDEX mv_period__id ON core.mv_period(id);
+
+CREATE UNIQUE INDEX mv_period__period_name ON core.mv_period(p_period_name);
 
 -- GIST "Generalized Search Tree" index -> performant for range queries
-CREATE INDEX IF NOT EXISTS l_period__p_date_range
-    ON core.l_period USING GIST (p_date_range);
+CREATE INDEX IF NOT EXISTS mv_period__p_date_range
+    ON core.mv_period USING GIST (p_date_range);
+
+COMMENT ON VIEW ce_core.mv_period
+    IS 'Materialized View - generated periods';

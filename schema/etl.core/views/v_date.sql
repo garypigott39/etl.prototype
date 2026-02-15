@@ -11,8 +11,8 @@
 
 CREATE OR REPLACE VIEW core.v_date AS
 SELECT
-    id                                                                              AS pk_d,
-    d_date                                                                          AS d_date,
+    d.id                                                                            AS id,
+    d.d_date                                                                        AS d_date,
 
     /* ================================================================
        YEAR

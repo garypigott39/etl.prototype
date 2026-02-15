@@ -7,10 +7,10 @@
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS core.fx_ut_dt_to_pdi;
--- DROP FUNCTION IF EXISTS core.fx_ut_dt_to_pdi;
+-- DROP FUNCTION IF EXISTS ce_etl.fx_ut_dt_to_pdi;
+-- DROP FUNCTION IF EXISTS ce_etl.fx_ut_dt_to_pdi;
 
-CREATE OR REPLACE FUNCTION core.fx_ut_dt_to_pdi(
+CREATE OR REPLACE FUNCTION ce_etl.fx_ut_dt_to_pdi(
     _dt DATE,
     _freq INT
 )
@@ -48,5 +48,5 @@ $$
         END;
 $$;
 
-COMMENT ON FUNCTION core.fx_ut_dt_to_pdi
+COMMENT ON FUNCTION ce_etl.fx_ut_dt_to_pdi
     IS 'Utility function - convert date/freq to period INT (pseudo primary key)';

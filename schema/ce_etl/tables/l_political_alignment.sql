@@ -7,21 +7,21 @@
  ***********************************************************************************************************
  */
 
--- DROP TABLE IF EXISTS core.l_politcal_alignment;
+-- DROP TABLE IF EXISTS ce_etl.l_politcal_alignment;
 
-CREATE TABLE IF NOT EXISTS core.l_politcal_alignment
+CREATE TABLE IF NOT EXISTS ce_etl.l_politcal_alignment
 (
     code TEXT NOT NULL CHECK (code ~ '^[A-Z][A-Za-z0-9 ]*$'),,
     PRIMARY KEY (code),
 );
 
-COMMENT ON TABLE core.l_politcal_alignment
+COMMENT ON TABLE ce_etl.l_politcal_alignment
     IS 'Lookup table - political alignment lookup';
 
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO core.l_politcal_alignment
+INSERT INTO ce_etl.l_politcal_alignment
 VALUES
     ('Strong US'),
     ('Leans US'),

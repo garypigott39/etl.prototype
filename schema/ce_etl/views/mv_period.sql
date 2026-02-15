@@ -7,9 +7,9 @@
  ***********************************************************************************************************
  */
 
--- DROP MATERIALIZED VIEW IF EXISTS core.mv_period;
+-- DROP MATERIALIZED VIEW IF EXISTS ce_etl.mv_period;
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS core.mv_period
+CREATE MATERIALIZED VIEW IF NOT EXISTS ce_etl.mv_period
 WITH _base AS (
     SELECT
         id,
@@ -20,9 +20,9 @@ WITH _base AS (
             WHEN p_freq = 2 THEN 7
             WHEN p_freq = 3 THEN
                 (p_start_of_period + INTERVAL '1 MONTH' - INTERVAL '1 DAY')::DATE - p_start_of_period + 1
-            WHEN p_freq = 4 THEN core.fx_ut_get_quarter_length(p_start_of_period)
+            WHEN p_freq = 4 THEN ce_etl.fx_ut_get_quarter_length(p_start_of_period)
                 (p_start_of_period + INTERVAL '3 MONTHS' - INTERVAL '1 DAY')::DATE - p_start_of_period + 1
-            WHEN p_freq = 5 THEN core.fx_ut_get_year_length(p_start_of_period)
+            WHEN p_freq = 5 THEN ce_etl.fx_ut_get_year_length(p_start_of_period)
                 (p_start_of_period + INTERVAL '1 YEAR' - INTERVAL '1 DAY')::DATE - p_start_of_period + 1
         END AS p_days_in_period,
         CASE
@@ -34,7 +34,7 @@ WITH _base AS (
         END AS p_period_name,
         SUBSTR(EXTRACT(YEAR FROM p_start_of_period)::TEXT, 1, 3) || '0s' AS p_decade_name
 
-    FROM core.l_period
+    FROM ce_etl.l_period
 ),
 WITH _lag  AS (
     SELECT
@@ -68,7 +68,7 @@ SELECT
     -- The +1 trick is to ensure that the end date is exclusive in the range.
     DATERANGE(b.p_start_of_period, e.p_end_of_period + 1, '[)')) AS p_date_range,
 
-    -- String formats
+    -- String FORMATs
     b.p_period_name,
     b.p_decade_name,
     CASE
@@ -82,13 +82,13 @@ FROM _base b
     JOIN _eop e ON b.id = e.id
     JOIN _lag l ON b.id = l.id;
 
-CREATE UNIQUE INDEX mv_period__id ON core.mv_period(id);
+CREATE UNIQUE INDEX mv_period__id ON ce_etl.mv_period(id);
 
-CREATE UNIQUE INDEX mv_period__period_name ON core.mv_period(p_period_name);
+CREATE UNIQUE INDEX mv_period__period_name ON ce_etl.mv_period(p_period_name);
 
 -- GIST "Generalized Search Tree" index -> performant for range queries
 CREATE INDEX IF NOT EXISTS mv_period__p_date_range
-    ON core.mv_period USING GIST (p_date_range);
+    ON ce_etl.mv_period USING GIST (p_date_range);
 
 COMMENT ON VIEW ce_core.mv_period
     IS 'Materialized View - generated periods';

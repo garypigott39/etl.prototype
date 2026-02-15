@@ -1,0 +1,31 @@
+/*
+ ***********************************************************************************************************
+ * @file
+ * s_sys_flags.sql
+ *
+ * System table - assorted system flags.
+ ***********************************************************************************************************
+ */
+
+-- DROP TABLE IF EXISTS ce_etl.s_sys_flags;
+
+CREATE TABLE IF NOT EXISTS ce_etl.s_sys_flags
+(
+    code TEXT NOT NULL,
+    value TEXT NOT NULL,
+    description TEXT NOT NULL,
+    PRIMARY KEY (code)
+);
+
+COMMENT ON TABLE ce_etl.s_sys_flags
+    IS 'System table - assorted system flags';
+
+/**
+ * Pre-populate with known values.
+ */
+INSERT INTO ce_etl.s_sys_flags
+VALUES
+    ('ASCII-ONLY','FALSE','If set to "TRUE" then only allow ASCII text values in CSV files etc. Default is value is "FALSE".'),
+    ('DATE.MAX','+30 YEAR','Max date for date lookup table. This should be an INTERVAL value. Default is "+30 YEAR".'),
+    ('DATE.MIN','1890-01-01','Minimum date for date lookup table, should be the beginning of a year'),
+    ('GEO.FLAG.BASEURL','https://www.capitaleconomics.com/sites/default/files/','Base URL for GEO flags. Note the trailing slash.');

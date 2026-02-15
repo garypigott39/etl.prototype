@@ -11,9 +11,9 @@
  ***********************************************************************************************************
  */
 
--- DROP TABLE IF EXISTS core.l_source;
+-- DROP TABLE IF EXISTS ce_etl.l_source;
 
-CREATE TABLE IF NOT EXISTS core.l_source
+CREATE TABLE IF NOT EXISTS ce_etl.l_source
 (
     id            TEXT NOT NULL CHECK (id ~ '^[A-WY-Z][A-Z0-9]{0,5}$'),
     name          TEXT NOT NULL,
@@ -23,13 +23,13 @@ CREATE TABLE IF NOT EXISTS core.l_source
     PRIMARY KEY(id)
 );
 
-COMMENT ON TABLE core.l_source
+COMMENT ON TABLE ce_etl.l_source
     IS 'System table - source lookup';
 
 /**
  * Pre-populate with known values. This will only change if new data sources are added!!!
  */
-INSERT INTO core.l_source (id, name, source_is, api_available)
+INSERT INTO ce_etl.l_source (id, name, source_is, api_available)
 VALUES
     ('BLS','U.S. Bureau of Labour Statistics', 'A', TRUE),
     ('DS','LSEG Data & Analytics', 'A', FALSE),
@@ -37,7 +37,7 @@ VALUES
     ('M','Manual', 'M', TRUE);
 
 -- User supplied codes.
-INSERT INTO core.l_source (id, name, source_is, api_available)
+INSERT INTO ce_etl.l_source (id, name, source_is, api_available)
 VALUES
     ('ABS', 'Australian Bureau of Statistics', 'B', TRUE),
     ('AENBS', 'National Bureau of Statistics, United Arab Emirates', 'B', TRUE),
@@ -132,8 +132,8 @@ VALUES
     ('INCSO', 'Central Statistics Office, India', 'B', TRUE),
     ('INDEC', 'INDEC - National Institute of Statistics and Censuses, Argentina', 'B', TRUE),
     ('INEC', 'INEC, Panama', 'B', TRUE),
-    ('INEGI', 'INEGI - Instituto Nacional de Estadistica, Geografia e Informatica, Mexico', 'B', TRUE),
-    ('INEI', 'INEI - Instituto Nacional de Estadistica e Informatica, Peru', 'B', TRUE),
+    ('INEGI', 'INEGI - Instituto Nacional de Estadistica, Geografia e InFORMATica, Mexico', 'B', TRUE),
+    ('INEI', 'INEI - Instituto Nacional de Estadistica e InFORMATica, Peru', 'B', TRUE),
     ('INOEA', 'Office of the Economic Adviser to the Government of India', 'B', TRUE),
     ('INRBI', 'Reserve Bank of India', 'B', TRUE),
     ('INSEE', 'INSEE', 'B', TRUE),
@@ -182,7 +182,7 @@ VALUES
     ('NOSSB', 'Statistics Norway', 'B', TRUE),
     ('NZSNZ', 'Statistics New Zealand', 'B', TRUE),
     ('OECD', 'OECD', 'B', TRUE),
-    ('OMNCS', 'National Centre For Statistics & Information, Oman', 'B', TRUE),
+    ('OMNCS', 'National Centre For Statistics & InFORMATion, Oman', 'B', TRUE),
     ('ONS', 'ONS, UK', 'B', TRUE),
     ('PBOC', 'People s Bank of China', 'B', TRUE),
     ('PEMOP', 'Ministry of Production of Peru', 'B', TRUE),

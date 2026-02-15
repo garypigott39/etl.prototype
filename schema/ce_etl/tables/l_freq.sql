@@ -7,9 +7,9 @@
  ***********************************************************************************************************
  */
 
--- DROP TABLE IF EXISTS core.l_freq;
+-- DROP TABLE IF EXISTS ce_etl.l_freq;
 
-CREATE TABLE IF NOT EXISTS core.l_freq
+CREATE TABLE IF NOT EXISTS ce_etl.l_freq
 (
     id INT
     code TEXT NOT NULL CHECK (code ~ '^[DWMQY]$'), -- Single uppercase letter
@@ -18,13 +18,13 @@ CREATE TABLE IF NOT EXISTS core.l_freq
     UNIQUE (code)
 );
 
-COMMENT ON TABLE core.l_freq
+COMMENT ON TABLE ce_etl.l_freq
     IS 'Lookup table - frequency lookup';
 
 /**
  * Pre-populate with known values. THIS WILL NEVER CHANGE!!!
  */
-INSERT INTO core.freq
+INSERT INTO ce_etl.freq
 VALUES
 (1, 'D', 'Daily'),
 (2, 'W', 'Weekly'),

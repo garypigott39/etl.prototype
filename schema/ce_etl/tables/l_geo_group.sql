@@ -7,22 +7,22 @@
  ***********************************************************************************************************
  */
 
--- DROP TABLE IF EXISTS core.l_geo_group;
+-- DROP TABLE IF EXISTS ce_etl.l_geo_group;
 
-CREATE TABLE IF NOT EXISTS core.l_geo_group
+CREATE TABLE IF NOT EXISTS ce_etl.l_geo_group
 (
     code TEXT NOT NULL CHECK (code ~ '^[A-Z][A-Za-z0-9_]*$'),,
     name TEXT NOT NULL CHECK (name ~ '^[A-Z][A-Za-z0-9 _,-]*$'),
     PRIMARY KEY (code)
 );
 
-COMMENT ON TABLE core.l_geo_group
+COMMENT ON TABLE ce_etl.l_geo_group
     IS 'Lookup table - geo group lookup';
 
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO core.l_geo_group
+INSERT INTO ce_etl.l_geo_group
 VALUES
     ('Africa_Middle_East_CE','Africa Middle East CE'),
     ('Africa_UN','Africa UN'),

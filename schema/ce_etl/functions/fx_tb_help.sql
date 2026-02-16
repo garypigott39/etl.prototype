@@ -99,4 +99,5 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION ce_etl.fx_tb_help IS 'Pseudo table function - list of/document the database _structure, based on agreed naming conventions';
+COMMENT ON FUNCTION ce_etl.fx_tb_help
+    IS 'Pseudo table function - list of/document the database _structure, based on agreed naming conventions';

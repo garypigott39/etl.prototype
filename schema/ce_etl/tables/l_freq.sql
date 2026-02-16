@@ -11,10 +11,12 @@
 
 CREATE TABLE IF NOT EXISTS ce_etl.l_freq
 (
-    id INT
-    code TEXT NOT NULL CHECK (code ~ '^[DWMQY]$'), -- Single uppercase letter
+    pk_f SMALLINT NOT NULL,
+    code TEXT NOT NULL
+        CHECK (code IN ('D','W','M','Q','Y')),  -- restrict to valid codes
     name TEXT NOT NULL,
-    PRIMARY KEY (id),
+    forecast_only_lifespan INT NOT NULL,
+    PRIMARY KEY (pk_f),
     UNIQUE (code)
 );
 
@@ -26,8 +28,8 @@ COMMENT ON TABLE ce_etl.l_freq
  */
 INSERT INTO ce_etl.freq
 VALUES
-(1, 'D', 'Daily'),
-(2, 'W', 'Weekly'),
-(3, 'M', 'Monthly'),
-(4, 'Q', 'Quarterly'),
-(5, 'Y','Yearly');
+    (1, 'D', 'Daily', 1),
+    (2, 'W', 'Weekly', 7),
+    (3, 'M', 'Monthly', 30),
+    (4, 'Q', 'Quarterly', 90),
+    (5, 'Y','Yearly', 365);

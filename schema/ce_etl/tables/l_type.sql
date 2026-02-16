@@ -1,0 +1,31 @@
+/*
+ ***********************************************************************************************************
+ * @file
+ * l_type.sql
+ *
+ * Lookup table - account type lookup.
+ ***********************************************************************************************************
+ */
+
+-- DROP TABLE IF EXISTS ce_etl.l_type;
+
+CREATE TABLE IF NOT EXISTS ce_etl.l_type
+(
+    pk_t SMALLINT NOT NULL,
+    code TEXT NOT NULL
+        CHECK (code IN ('AC','F')),  -- restrict to valid codes
+    name TEXT NOT NULL,
+    PRIMARY KEY (pk_f),
+    UNIQUE (code)
+);
+
+COMMENT ON TABLE ce_etl.l_type
+    IS 'Lookup table - account type lookup';
+
+/**
+ * Pre-populate with known values. THIS WILL NEVER CHANGE!!!
+ */
+INSERT INTO ce_etl.type
+VALUES
+    (1, 'AC', 'Actual'),
+    (2, 'F', 'Forecast');

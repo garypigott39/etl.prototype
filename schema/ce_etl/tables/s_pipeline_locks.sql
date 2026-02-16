@@ -11,8 +11,9 @@
 
 CREATE TABLE IF NOT EXISTS ce_etl.s_pipeline_locks
 (
-    name TEXT NOT NULL PRIMARY KEY,
-    locked_utc TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE('UTC'))  -- Locked timestamp
+    name TEXT NOT NULL,
+    locked_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- Locked timestamp
+    PRIMARY KEY (name)
 );
 
 COMMENT ON TABLE ce_etl.s_pipeline_locks

@@ -11,7 +11,8 @@
 
 CREATE TABLE IF NOT EXISTS ce_etl.l_com_type
 (
-    code TEXT NOT NULL CHECK (code ~ '^[A-Z][a-z0-9 ]*$'),
+    code TEXT NOT NULL
+        CHECK (code ~ '^[A-Z][a-z0-9 ]*$'),
     PRIMARY KEY (code),
 );
 

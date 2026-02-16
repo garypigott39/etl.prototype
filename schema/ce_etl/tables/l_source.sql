@@ -15,12 +15,14 @@
 
 CREATE TABLE IF NOT EXISTS ce_etl.l_source
 (
-    id            TEXT NOT NULL CHECK (id ~ '^[A-WY-Z][A-Z0-9]{0,5}$'),
+    code          TEXT NOT NULL
+        CHECK (id ~ '^[A-WY-Z][A-Z0-9]{0,5}$'),   -- restrict to valid codes (max 6 chars, starting with a letter, excluding 'X')
     name          TEXT NOT NULL,
+    source_is     TEXT NOT NULL
+        CHECK (source_is IN ('A', 'M', 'B')),     -- A=Api/M=Manual/B=Both
     active        BOOLEAN NOT NULL DEFAULT TRUE,  -- enables the source to be marked as inactive if required
-    source_is     TEXT NOT NULL CHECK (source_is IN ('A', 'M', 'B')),  -- A=Api/M=Manual/B=Both
-    api_available BOOLEAN NOT NULL DEFAULT TRUE, -- this is used to determine if the source is available for API calls (@see plugin)
-    PRIMARY KEY(id)
+    api_available BOOLEAN NOT NULL DEFAULT TRUE,  -- this is used to determine if the source is available for API calls (@see plugin)
+    PRIMARY KEY(code)
 );
 
 COMMENT ON TABLE ce_etl.l_source

@@ -12,7 +12,7 @@
 CREATE MATERIALIZED VIEW IF NOT EXISTS ce_etl.mv_period
 WITH _base AS (
     SELECT
-        id,
+        pk_p,
         p_freq,
         p_start_of_period,
         CASE
@@ -38,7 +38,7 @@ WITH _base AS (
 ),
 WITH _lag  AS (
     SELECT
-        id,
+        pk_p,
         ROW_NUMBER() OVER (
             PARTITION BY p_freq
             ORDER BY p_start_of_period
@@ -47,7 +47,7 @@ WITH _lag  AS (
 )
 WITH _eop AS (
     SELECT
-       id,
+       pk_p,
        (p_start_of_period + ((p_days_in_period - 1) / 2))::DATE AS p_mid_of_period,
        (p_start_of_period + p_days_in_period - 1)::DATE AS p_end_of_period
     FROM _base

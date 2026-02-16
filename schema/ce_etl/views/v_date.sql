@@ -11,7 +11,7 @@
 
 CREATE OR REPLACE VIEW ce_etl.v_date AS
 SELECT
-    d.id                                                                            AS id,
+    d.pk_d                                                                          AS pk_d,
     d.d_date                                                                        AS d_date,
 
     /* ================================================================

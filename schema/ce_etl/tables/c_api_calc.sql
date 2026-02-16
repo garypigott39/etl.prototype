@@ -3,7 +3,7 @@
  * @file
  * c_api_calc.sql
  *
- * Control table - calculated values/series, API (& manual) table.
+ * Control table - "rules" for calculated values (AC-only).
  ***********************************************************************************************************
  */
 
@@ -30,4 +30,4 @@ CREATE TABLE IF NOT EXISTS ce_etl.c_api_calc
 );
 
 COMMENT ON TABLE ce_etl.c_api_calc
-    IS 'Control table - calculated values/series, API (& manual) table';
+    IS 'Control table - "rules" for calculated values (AC-only)';

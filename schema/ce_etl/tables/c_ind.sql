@@ -40,8 +40,5 @@ CREATE TABLE IF NOT EXISTS ce_etl.c_ind
     UNIQUE (i_code)
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS c_ind__code_index
-    ON ce_etl.c_ind (i_code);
-
 COMMENT ON TABLE ce_etl.c_ind
     IS 'Control table - indicator details, used for validation & lookup';

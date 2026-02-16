@@ -3,9 +3,9 @@
  * @file
  * c_calc.sql
  *
- * Control table - calculated values/series.
+ * Control table - "rules" for calculated values (AC/F/BLENDED).
  *
- * This replaces the old c_ctl1/ctl2 tables. Initially the supported calculations will be:
+ * Initially the supported calculations will be:
  *
  * - simple calculations, e.g. #ABC_XYZ# * 2, multiple series can be specified
  ***********************************************************************************************************
@@ -28,4 +28,4 @@ CREATE TABLE IF NOT EXISTS ce_etl.c_calc
 );
 
 COMMENT ON TABLE ce_etl.c_calc
-    IS 'Control table - calculated values/series control table';
+    IS 'Control table - "rules" for calculated values (AC/F/BLENDED)';

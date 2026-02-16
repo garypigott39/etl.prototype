@@ -53,7 +53,7 @@ WITH _eop AS (
     FROM _base
 )
 SELECT
-    b.id,
+    b.pk_p,
     b.p_freq,
     b.p_start_of_period,
     e.p_mid_of_period,
@@ -82,12 +82,14 @@ FROM _base b
     JOIN _eop e ON b.id = e.id
     JOIN _lag l ON b.id = l.id;
 
-CREATE UNIQUE INDEX mv_period__id ON ce_etl.mv_period(id);
+CREATE UNIQUE INDEX mv_period__id
+    ON ce_etl.mv_period(pk_p);
 
-CREATE UNIQUE INDEX mv_period__period_name ON ce_etl.mv_period(p_period_name);
+CREATE UNIQUE INDEX mv_period__period_name
+    ON ce_etl.mv_period(p_period_name);
 
 -- GIST "Generalized Search Tree" index -> performant for range queries
-CREATE INDEX IF NOT EXISTS mv_period__p_date_range
+CREATE INDEX IF NOT EXISTS mv_period__date_range__idx
     ON ce_etl.mv_period USING GIST (p_date_range);
 
 COMMENT ON VIEW ce_core.mv_period

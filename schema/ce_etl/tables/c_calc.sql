@@ -24,11 +24,8 @@ CREATE TABLE IF NOT EXISTS ce_etl.c_calc
     error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (pk_calc),
-    UNIQUE (con_code)
+    UNIQUE (calc_series,  calc_freq, calc_type)
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS c_calc__unique_index
-    ON ce_data.c_calc (calc_series,  calc_freq, calc_type);
-
-COMMENT ON TABLE ce_data.c_calc
+COMMENT ON TABLE ce_etl.c_calc
     IS 'Control table - calculated values/series control table';

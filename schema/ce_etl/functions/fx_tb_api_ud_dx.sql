@@ -112,7 +112,7 @@ BEGIN
                 17
             )                 AS value,
             r.regen           AS regen
-        FROM ce_etl.mv_x_api x
+        FROM ce_etl.mv_xvalue x
         JOIN t__rules r
           ON r.src_pk_s = x.fk_pk_s
          AND r.src_freq = x.src_freq
@@ -130,7 +130,7 @@ BEGIN
     ELSE
         --------------------------------------------------------------------------------
         -- Generate period lookup table with x & y PDIs as this greatly speeds up the
-        -- subsequent JOINs against x_api.
+        -- subsequent JOINs against datapoint values.
         --------------------------------------------------------------------------------
         CREATE TEMP TABLE t__period ON COMMIT DROP AS
         SELECT
@@ -176,8 +176,8 @@ BEGIN
                 17
             )                 AS value,
             r.regen           AS regen
-        FROM ce_etl.x_api x
-        JOIN ce_etl.x_api y
+        FROM ce_etl.x_value x
+        JOIN ce_etl.x_value y
           ON x.fk_pk_s = y.fk_pk_s
          AND x.freq = y.freq
          AND y.value <> 0  -- Prevent division by zero

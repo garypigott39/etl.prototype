@@ -26,7 +26,7 @@ COMMENT ON TABLE ce_etl.l_freq
 /**
  * Pre-populate with known values. THIS WILL NEVER CHANGE!!!
  */
-INSERT INTO ce_etl.freq
+INSERT INTO ce_etl.l_freq
 VALUES
     (1, 'D', 'Daily', 1),
     (2, 'W', 'Weekly', 7),

@@ -18,7 +18,7 @@ AS
 $$
 BEGIN
     IF _include_time THEN
-        _msg := _msg || '  (@ ' || ce_core.fx_ut_utc() || ')';
+        _msg := _msg || '  (@ ' || ce_etl.fx_ut_utc() || ')';
     END IF;
     RAISE INFO '# %', _msg;
 END

@@ -80,8 +80,8 @@ SELECT
     l.p_lag
 
 FROM _base b
-    JOIN _eop e ON b.id = e.id
-    JOIN _lag l ON b.id = l.id;
+    JOIN _eop e ON b.pk_p = e.pk_p
+    JOIN _lag l ON b.pk_p = l.pk_p;
 
 CREATE UNIQUE INDEX mv_period__id
     ON ce_etl.mv_period(pk_p);
@@ -93,5 +93,5 @@ CREATE UNIQUE INDEX mv_period__period_name
 CREATE INDEX IF NOT EXISTS mv_period__date_range__idx
     ON ce_etl.mv_period USING GIST (p_date_range);
 
-COMMENT ON VIEW ce_core.mv_period
+COMMENT ON VIEW ce_etl.mv_period
     IS 'Materialized View - generated periods';

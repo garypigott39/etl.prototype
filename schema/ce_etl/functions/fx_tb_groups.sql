@@ -29,7 +29,7 @@ $$
         g.error
     FROM ce_etl.c_geo g
     CROSS JOIN LATERAL UNNEST(g.geo_groups) AS u(gid)
-    LEFT JOIN ce_etl.s_geo_group s
+    LEFT JOIN ce_etl.l_geo_group s
         ON u.gid = s.code
     WHERE g.geo_groups IS NOT NULL;
 $$;

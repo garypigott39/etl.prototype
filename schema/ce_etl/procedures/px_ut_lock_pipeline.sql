@@ -24,7 +24,7 @@ BEGIN
 
     IF _name IS NULL THEN
         RAISE EXCEPTION 'Pipeline name must be provided';
-    ELIF _type = 'lock' THEN
+    ELSEIF _type = 'lock' THEN
         IF (SELECT COUNT(*) FROM ce_etl.s_pipeline_locks WHERE name = _name AND locked_utc > _ts) > 0 THEN
             RAISE EXCEPTION 'Pipeline "%" is already locked', _name;
         ELSE
@@ -32,7 +32,7 @@ BEGIN
             INSERT INTO ce_etl.s_pipeline_locks(name) VALUES (_name);
             RAISE INFO 'Pipeline "%" locked', _name;
         END IF;
-    ELIF _type = 'unlock' THEN
+    ELSEIF _type = 'unlock' THEN
         -- Unlock the pipeline
         DELETE FROM ce_etl.s_pipeline_locks WHERE name = _name;
         RAISE INFO 'Pipeline "%" unlocked', _name;

@@ -6,8 +6,7 @@
  * Lookup table - source lookup.
  *
  * NOTE, unlike the other lookup tables where the INT primary key is used in the linked tables, this is
- * basically an annotation table where the code value is used in associated table (e.g. x_api); and as such
- * the PRIMARY KEY here can be auto-generated (used in PowerBi only).
+ * basically an annotation table where the code value is used in associated table, e.g. datapoint values.
  ***********************************************************************************************************
  */
 
@@ -16,10 +15,10 @@
 CREATE TABLE IF NOT EXISTS ce_etl.l_source
 (
     code          TEXT NOT NULL
-        CHECK (id ~ '^[A-WY-Z][A-Z0-9]{0,5}$'),   -- restrict to valid codes (max 6 chars, starting with a letter, excluding 'X')
+        CHECK (code ~ '^[A-WY-Z][A-Z0-9]{0,5}$'),   -- restrict to valid codes (max 6 chars, starting with a letter, excluding 'X')
     name          TEXT NOT NULL,
     source_is     TEXT NOT NULL
-        CHECK (source_is IN ('A', 'M', 'B')),     -- A=Api/M=Manual/B=Both
+        CHECK (source_is IN ('A', 'M', 'B', '-')),     -- A=Api/M=Manual/B=Both/-=N/A
     active        BOOLEAN NOT NULL DEFAULT TRUE,  -- enables the source to be marked as inactive if required
     api_available BOOLEAN NOT NULL DEFAULT TRUE,  -- this is used to determine if the source is available for API calls (@see plugin)
     PRIMARY KEY(code)
@@ -31,7 +30,7 @@ COMMENT ON TABLE ce_etl.l_source
 /**
  * Pre-populate with known values. This will only change if new data sources are added!!!
  */
-INSERT INTO ce_etl.l_source (id, name, source_is, api_available)
+INSERT INTO ce_etl.l_source (code, name, source_is, api_available)
 VALUES
     ('BLS','U.S. Bureau of Labour Statistics', 'A', TRUE),
     ('DS','LSEG Data & Analytics', 'A', FALSE),
@@ -39,7 +38,7 @@ VALUES
     ('M','Manual', 'M', TRUE);
 
 -- User supplied codes.
-INSERT INTO ce_etl.l_source (id, name, source_is, api_available)
+INSERT INTO ce_etl.l_source (code, name, source_is, api_available)
 VALUES
     ('ABS', 'Australian Bureau of Statistics', 'B', TRUE),
     ('AENBS', 'National Bureau of Statistics, United Arab Emirates', 'B', TRUE),

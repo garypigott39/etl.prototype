@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS ce_etl.l_date
 (
     -- Pseudo index: see app code for details
     pk_d INT NOT NULL GENERATED ALWAYS
-        AS (core.fx_ut_dt_to_dti(d_date)) STORED,
+        AS (ce_etl.fx_ut_date_to_dti(d_date)) STORED,
     d_date DATE NOT NULL,
     PRIMARY KEY (pk_d),
     UNIQUE (d_date)

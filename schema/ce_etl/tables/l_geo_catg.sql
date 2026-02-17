@@ -22,7 +22,7 @@ COMMENT ON TABLE ce_etl.l_geo_catg
  * Pre-populate with known values. Update as required.
  */
 
- INSERT INTO ce_etl.s_geo_catg
+ INSERT INTO ce_etl.l_geo_catg
  VALUES
     ('Country'),
     ('Region'),

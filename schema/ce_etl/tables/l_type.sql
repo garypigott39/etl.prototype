@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS ce_etl.l_type
     code TEXT NOT NULL
         CHECK (code IN ('AC','F')),  -- restrict to valid codes
     name TEXT NOT NULL,
-    PRIMARY KEY (pk_f),
+    PRIMARY KEY (pk_t),
     UNIQUE (code)
 );
 
@@ -25,7 +25,7 @@ COMMENT ON TABLE ce_etl.l_type
 /**
  * Pre-populate with known values. THIS WILL NEVER CHANGE!!!
  */
-INSERT INTO ce_etl.type
+INSERT INTO ce_etl.l_type
 VALUES
     (1, 'AC', 'Actual'),
     (2, 'F', 'Forecast');

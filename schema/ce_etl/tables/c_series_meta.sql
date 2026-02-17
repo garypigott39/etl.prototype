@@ -26,5 +26,5 @@ CREATE TABLE IF NOT EXISTS ce_etl.c_series_meta
     UNIQUE (sm_gcode, sm_icode, sm_freq, sm_type)
 );
 
-COMMENT ON TABLE ce_etl.c_series_metad
+COMMENT ON TABLE ce_etl.c_series_meta
     IS 'Control table - series metadata, additional information on a series/freq/type basis';

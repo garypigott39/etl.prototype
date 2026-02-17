@@ -9,7 +9,8 @@
 
 -- DROP FUNCTION IF EXISTS ce_etl.fx_tb_groups;
 
-CREATE OR REPLACE FUNCTION ce_etl.fx_tb_groups()
+CREATE OR REPLACE FUNCTION ce_etl.fx_tb_groups(
+)
     RETURNS TABLE (
         fk_pk_g INT,
         gp_id TEXT,

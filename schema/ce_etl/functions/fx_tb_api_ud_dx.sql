@@ -117,7 +117,7 @@ BEGIN
           ON r.src_pk_s = x.fk_pk_s
          AND r.src_freq = x.src_freq
          AND x.tgt_freq = r.tgt_freq
-        JOIN ce_etl.mv_period p
+        JOIN ce_etl.mv_xperiod p
           ON p.src_pdi  = x.src_pdi
          AND p.src_freq = x.src_freq
          AND p.tgt_freq = x.tgt_freq
@@ -139,8 +139,8 @@ BEGIN
             px.pk_p           AS x_pdi,
             py.pk_p           AS y_pdi,
             'growth'          AS formula_type
-        FROM ce_etl.period   px
-        JOIN ce_etl.period   py
+        FROM ce_etl.mv_period px
+        JOIN ce_etl.mv_period py
           ON px.p_freq = py.p_freq
          AND (
               (px.p_freq = 3 AND py.p_lag = (px.p_lag - 12)) OR
@@ -154,8 +154,8 @@ BEGIN
             px.pk_p           AS x_pdi,
             py.pk_p           AS y_pdi,
             'growth-1'        AS formula_type
-        FROM ce_etl.mv_period   px
-        JOIN ce_etl.mv_period   py
+        FROM ce_etl.mv_period px
+        JOIN ce_etl.mv_period py
           ON px.p_freq = py.p_freq
          AND py.p_lag = (px.p_lag - 1);
 

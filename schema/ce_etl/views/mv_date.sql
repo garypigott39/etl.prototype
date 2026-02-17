@@ -1,18 +1,32 @@
 /*
  ***********************************************************************************************************
  * @file
- * v_date.sql
+ * mv_date.sql
  *
- * View - generated dates.
+ * Materialized View - generated dates.
  ***********************************************************************************************************
  */
 
--- DROP VIEW IF EXISTS ce_etl.v_date;
+-- DROP MATERIALIZED VIEW IF EXISTS ce_etl.mv_date;
 
-CREATE OR REPLACE VIEW ce_etl.v_date
+CREATE MATERIALIZED VIEW ce_etl.mv_date
 AS
+WITH _range AS (
+    SELECT
+        min.value::DATE                      AS dt1,
+        CURRENT_DATE + (max.value::INTERVAL) AS dt2
+    FROM ce_etl.s_sys_flags min
+    CROSS JOIN ce_etl.s_sys_flags max
+    WHERE min.code = 'DATE.MIN'
+      AND max.code = 'DATE.MAX'
+),
+_dates AS (
+    SELECT
+        generate_series(dt1, dt2, INTERVAL '1 DAY')::DATE AS d_date
+    FROM _range
+)
 SELECT
-    d.pk_d                                                                          AS pk_d,
+    ce_etl.fx_ut_date_to_dti(d.d_date)::INT                                         AS pk_d,
     d.d_date                                                                        AS d_date,
 
     /* ================================================================
@@ -77,7 +91,13 @@ SELECT
         ELSE EXTRACT(YEAR FROM d_date)::INT
     END                                                                             AS d_yyyy_fy
 
-FROM ce_etl.l_date d;
+FROM _dates d;
 
-COMMENT ON VIEW ce_etl.v_date
-    IS 'View - generated dates';
+CREATE UNIQUE INDEX IF NOT EXISTS mv_date__pk_d__idx
+    ON ce_etl.mv_date (pk_d);
+
+CREATE UNIQUE INDEX IF NOT EXISTS mv_date__date__idx
+    ON ce_etl.mv_date (d_date);
+
+COMMENT ON MATERIALIZED VIEW ce_etl.mv_date
+    IS 'Materialized View - generated dates';

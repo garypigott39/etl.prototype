@@ -11,7 +11,51 @@
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS ce_etl.mv_period
 AS
-WITH _base AS (
+WITH _periods AS (
+    -- DAILY
+    SELECT
+        ce_etl.fx_ut_date_to_pdi(d_date, 1) AS pk_p,
+        1 AS p_freq,
+        d_date AS p_start_of_period
+    FROM ce_etl.mv_date
+    UNION ALL
+    -- WEEKLY
+    SELECT
+        ce_etl.fx_ut_date_to_pdi(d_start_of_week, 2) AS pk_p,
+        2 AS p_freq,
+        d_start_of_week AS p_start_of_period
+    FROM (
+        SELECT DISTINCT d_start_of_week FROM ce_etl.mv_date
+    ) d
+    UNION ALL
+    -- MONTHLY
+    SELECT
+        ce_etl.fx_ut_date_to_pdi(d_start_of_month, 3) AS pk_p,
+        3 AS p_freq,
+        d_start_of_month AS p_start_of_period
+    FROM (
+        SELECT DISTINCT d_start_of_month FROM ce_etl.mv_date
+    ) d
+    UNION ALL
+    -- QUARTERLY
+    SELECT
+        ce_etl.fx_ut_date_to_pdi(d_start_of_quarter, 4) AS pk_p,
+        4 AS p_freq,
+        d_start_of_quarter AS p_start_of_period
+    FROM (
+        SELECT DISTINCT d_start_of_quarter FROM ce_etl.mv_date
+    ) d
+    UNION ALL
+    -- YEARLY
+    SELECT
+        ce_etl.fx_ut_date_to_pdi(d_start_of_year, 5) AS pk_p,
+        5 AS p_freq,
+        d_start_of_year AS p_start_of_period
+    FROM (
+        SELECT DISTINCT d_start_of_year FROM ce_etl.mv_date
+    ) d
+),
+_base AS (
     SELECT
         pk_p,
         p_freq,
@@ -28,9 +72,9 @@ WITH _base AS (
         END AS p_days_in_period,
         CASE
             WHEN p_freq = 1 THEN TO_CHAR(p_start_of_period, 'YYYY-MM-DD')
-            WHEN p_freq = 2 THEN 'w' || TO_CHAR(p_start_of_period, 'IYYY-\WIW')
+            WHEN p_freq = 2 THEN TO_CHAR(p_start_of_period, 'IYYY-"W"IW')
             WHEN p_freq = 3 THEN TO_CHAR(p_start_of_period, 'YYYY-MM')
-            WHEN p_freq = 4 THEN 'Q' || TO_CHAR(p_start_of_period, 'YYYY-\QQ')
+            WHEN p_freq = 4 THEN TO_CHAR(p_start_of_period, 'YYYY-"Q"Q')
             WHEN p_freq = 5 THEN TO_CHAR(p_start_of_period, 'YYYY')
         END AS p_period,
         CASE
@@ -42,7 +86,7 @@ WITH _base AS (
         END AS p_period_name,
         SUBSTR(EXTRACT(YEAR FROM p_start_of_period)::TEXT, 1, 3) || '0s' AS p_decade_name
 
-    FROM ce_etl.l_period
+    FROM _periods
 ),
 _lag  AS (
     SELECT

@@ -37,7 +37,7 @@ FROM (
           ORDER BY x.pdi DESC
         ) AS rn
     FROM ce_etl.x_value x
-    JOIN ce_etl.mv_period p
+    JOIN ce_etl.mv_xperiod p
        ON x.pdi = p.src_pdi AND x.freq = p.src_freq
     WHERE x.type = 1  -- 'AC' only, belt & braces
 ) s

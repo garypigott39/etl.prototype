@@ -24,7 +24,7 @@ FROM ce_etl.mv_period src
      AND tgt.p_freq > src.p_freq;
 
 CREATE INDEX IF NOT EXISTS mv_xperiod__src_datapoint__idx
-    ON ce_etl.mv_period (src_pdi, src_freq);
+    ON ce_etl.mv_xperiod (src_pdi, src_freq);
 
 COMMENT ON MATERIALIZED VIEW ce_etl.mv_xperiod
     IS 'Materialized View - creates a source to target period table, for use in API calculations etc';

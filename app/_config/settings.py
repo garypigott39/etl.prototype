@@ -76,13 +76,24 @@ WSGI_APPLICATION = '_config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'etl',            # OS environment variable for database name
+        'NAME': 'prototype',      # OS environment variable for database name
         'USER': 'postgres',       # OS environment variable for database user
         'PASSWORD': 'postgres',   # OS environment variable for database password
         'HOST': 'localhost',      # OS environment variable for database host
         'PORT': '5432',           # OS environment variable for database port
         'OPTIONS': {
-            'options': '-c search_path=ce_core,public',
+            'options': '-c search_path=public',
+        }
+    },
+    'etl': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'prototype',  # OS environment variable for database name
+        'USER': 'postgres',  # OS environment variable for database user
+        'PASSWORD': 'postgres',  # OS environment variable for database password
+        'HOST': 'localhost',  # OS environment variable for database host
+        'PORT': '5432',  # OS environment variable for database port
+        'OPTIONS': {
+            'options': '-c search_path=ce_etl',
         }
     }
 }

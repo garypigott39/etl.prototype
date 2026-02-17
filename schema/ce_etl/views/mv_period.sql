@@ -10,6 +10,7 @@
 -- DROP MATERIALIZED VIEW IF EXISTS ce_etl.mv_period;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS ce_etl.mv_period
+AS
 WITH _base AS (
     SELECT
         pk_p,
@@ -20,9 +21,9 @@ WITH _base AS (
             WHEN p_freq = 2 THEN 7
             WHEN p_freq = 3 THEN
                 (p_start_of_period + INTERVAL '1 MONTH' - INTERVAL '1 DAY')::DATE - p_start_of_period + 1
-            WHEN p_freq = 4 THEN ce_etl.fx_ut_get_quarter_length(p_start_of_period)
+            WHEN p_freq = 4 THEN
                 (p_start_of_period + INTERVAL '3 MONTHS' - INTERVAL '1 DAY')::DATE - p_start_of_period + 1
-            WHEN p_freq = 5 THEN ce_etl.fx_ut_get_year_length(p_start_of_period)
+            WHEN p_freq = 5 THEN
                 (p_start_of_period + INTERVAL '1 YEAR' - INTERVAL '1 DAY')::DATE - p_start_of_period + 1
         END AS p_days_in_period,
         CASE
@@ -36,7 +37,7 @@ WITH _base AS (
 
     FROM ce_etl.l_period
 ),
-WITH _lag  AS (
+_lag  AS (
     SELECT
         pk_p,
         ROW_NUMBER() OVER (
@@ -44,8 +45,8 @@ WITH _lag  AS (
             ORDER BY p_start_of_period
         ) AS p_lag
     FROM _base
-)
-WITH _eop AS (
+),
+_eop AS (
     SELECT
        pk_p,
        (p_start_of_period + ((p_days_in_period - 1) / 2))::DATE AS p_mid_of_period,
@@ -66,14 +67,14 @@ SELECT
     -- exclude that date. This is a known limitation of PostgreSQL range types when it comes to indexing and performance.
 
     -- The +1 trick is to ensure that the end date is exclusive in the range.
-    DATERANGE(b.p_start_of_period, e.p_end_of_period + 1, '[)')) AS p_date_range,
+    DATERANGE(b.p_start_of_period, e.p_end_of_period + 1, '[)') AS p_date_range,
 
     -- String FORMATs
     b.p_period_name,
     b.p_decade_name,
     CASE
         WHEN e.p_end_of_period < CURRENT_DATE THEN 'Past'
-        WHEN e._start_of_period > CURRENT_DATE THEN 'Future'
+        WHEN e.p_start_of_period > CURRENT_DATE THEN 'Future'
         ELSE 'Current'
     END AS p_status,
     l.p_lag

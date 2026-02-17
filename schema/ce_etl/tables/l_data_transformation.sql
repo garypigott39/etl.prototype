@@ -1,27 +1,27 @@
 /*
  ***********************************************************************************************************
  * @file
- * l_data_transFORMATion.sql
+ * l_data_transformation.sql
  *
  * Lookup table - data transFORMATion lookup.
  ***********************************************************************************************************
  */
 
--- DROP TABLE IF EXISTS ce_etl.l_data_transFORMATion;
+-- DROP TABLE IF EXISTS ce_etl.l_data_transformation;
 
-CREATE TABLE IF NOT EXISTS ce_etl.l_data_transFORMATion
+CREATE TABLE IF NOT EXISTS ce_etl.l_data_transformation
 (
     code TEXT NOT NULL,
-    PRIMARY KEY (code),
+    PRIMARY KEY (code)
 );
 
-COMMENT ON TABLE ce_etl.l_data_transFORMATion
+COMMENT ON TABLE ce_etl.l_data_transformation
     IS 'Lookup table - data transFORMATion lookup';
 
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_etl.l_data_transFORMATion
+INSERT INTO ce_etl.l_data_transformation
 VALUES
     ('%'),
     ('%GDP'),

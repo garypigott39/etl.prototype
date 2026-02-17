@@ -12,8 +12,8 @@
 CREATE TABLE IF NOT EXISTS ce_etl.l_politcal_alignment
 (
     code TEXT NOT NULL
-        CHECK (code ~ '^[A-Z][A-Za-z0-9 ]*$'),,
-    PRIMARY KEY (code),
+        CHECK (code ~ '^[A-Z][A-Za-z0-9 ]*$'),
+    PRIMARY KEY (code)
 );
 
 COMMENT ON TABLE ce_etl.l_politcal_alignment

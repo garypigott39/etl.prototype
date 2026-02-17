@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_ut_dt_to_dti.sql
+ * fx_ut_date_to_dti.sql
  *
  * Utility function - convert date to date INT (pseudo primary key).
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_etl.fx_ut_dt_to_dti;
+-- DROP FUNCTION IF EXISTS ce_etl.fx_ut_date_to_dti;
 
-CREATE OR REPLACE FUNCTION ce_etl.fx_ut_dt_to_dti(
+CREATE OR REPLACE FUNCTION ce_etl.fx_ut_date_to_dti(
     _dt DATE
 )
     RETURNS INT
@@ -28,5 +28,5 @@ $$
         END;
 $$;
 
-COMMENT ON FUNCTION ce_etl.fx_ut_dt_to_pdi
+COMMENT ON FUNCTION ce_etl.fx_ut_date_to_pdi
     IS 'Utility function - convert date to date INT (pseudo primary key)';

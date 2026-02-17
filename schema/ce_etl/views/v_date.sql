@@ -9,7 +9,8 @@
 
 -- DROP VIEW IF EXISTS ce_etl.v_date;
 
-CREATE OR REPLACE VIEW ce_etl.v_date AS
+CREATE OR REPLACE VIEW ce_etl.v_date
+AS
 SELECT
     d.pk_d                                                                          AS pk_d,
     d.d_date                                                                        AS d_date,

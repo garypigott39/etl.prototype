@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS ce_etl.x_values
     fk_pk_tip INT
         REFERENCES ce_etl.x_tooltip (pk_tip),  -- optional tooltip reference
     is_calculated BOOLEAN NOT NULL GENERATED ALWAYS
-        AS (source ~ '^X'),  -- flag to indicate if the value is calculated
+        AS (source ~ '^X') STORED,  -- flag to indicate if the value is calculated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (idx),
     UNIQUE (fk_pk_s, pdi)  -- enforce only one value per period

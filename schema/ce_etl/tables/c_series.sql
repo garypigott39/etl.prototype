@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS ce_etl.c_series
     s_active BOOL NOT NULL DEFAULT TRUE,
     s_order INT NOT NULL DEFAULT 0,
     is_internal BOOLEAN NOT NULL GENERATED ALWAYS
-        AS (s_gcode = 'INTERNAL'),  -- flag to indicate if INTERNAL series
+        AS (s_gcode = 'INTERNAL') STORED,  -- flag to indicate if INTERNAL series
     internal_notes TEXT,  -- Internal notes, unvalidated!
     error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),

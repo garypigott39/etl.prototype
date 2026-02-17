@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS ce_etl.l_com_type
 (
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Z][a-z0-9 ]*$'),
-    PRIMARY KEY (code),
+    PRIMARY KEY (code)
 );
 
 COMMENT ON TABLE ce_etl.l_com_type

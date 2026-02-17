@@ -3,11 +3,12 @@
 sqlcat.py
 
 Determine dependency order of SQL files (tables, views, functions, procedures)
-without requiring a live PostgreSQL database.
-
-Uses sqlparse for token-aware parsing.
+without requiring a live PostgreSQL database. Uses sqlparse for token-aware parsing.
 
 Thanks to ChatGPT for the initial implementation!
+
+Usage:
+    py sqlcat.py <parent_sql_folder>
 """
 
 import os
@@ -355,7 +356,7 @@ def main(parent_folder):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python order_sql.py <parent_sql_folder>")
+        print("Usage: py sqlcat.py <parent_sql_folder>")
         sys.exit(1)
 
     main(sys.argv[1])

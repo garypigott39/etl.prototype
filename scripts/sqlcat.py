@@ -1,35 +1,33 @@
-#
-# @file
-# sqlcat.py
-#
-# Cat all SQL files in a folder and subfolders in dependency order.
-# Thanks to @ChatGPT - see https://chat.openai.com/share/1b9c8e7c-5a0d-4f2e-9b3c-1a0e5d8f1c6b
-#
+#!/usr/bin/env python3
+"""
+sqlcat.py
+
+Determine dependency order of SQL files (tables, views, functions, procedures)
+without requiring a live PostgreSQL database.
+
+Uses sqlparse for token-aware parsing.
+
+Thanks to ChatGPT for the initial implementation!
+"""
 
 import os
 import re
+import sys
 from collections import defaultdict, deque
+
+import sqlparse
+from sqlparse.sql import Function, Identifier, IdentifierList, Parenthesis
+from sqlparse.tokens import Keyword
+
 
 SQL_EXTENSIONS = (".sql",)
 
-CREATE_PATTERN = re.compile(
-    r"CREATE\s+(TABLE|VIEW|FUNCTION|PROCEDURE)\s+(?:IF\s+NOT\s+EXISTS\s+)?([a-zA-Z0-9_.]+)",
-    re.IGNORECASE
-)
 
-REFERENCE_PATTERN = re.compile(
-    r"REFERENCES\s+([a-zA-Z0-9_.]+)",
-    re.IGNORECASE
-)
-
-FROM_JOIN_PATTERN = re.compile(
-    r"(?:FROM|JOIN)\s+([a-zA-Z0-9_.]+)",
-    re.IGNORECASE
-)
-
+# ==========================================================
+# Utility: Scan Files
+# ==========================================================
 
 def scan_sql_files(parent_folder):
-    """Recursively find all .sql files in folder and subfolders."""
     sql_files = []
     for root, _, files in os.walk(parent_folder):
         for file in files:
@@ -38,39 +36,255 @@ def scan_sql_files(parent_folder):
     return sql_files
 
 
+# ==========================================================
+# Function Body Extraction ($$ or $tag$)
+# ==========================================================
+
+FUNCTION_BODY_PATTERN = re.compile(
+    r"AS\s+(\$.*?\$)(.*?)\1",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def extract_function_bodies(sql_text):
+    return [match[1] for match in FUNCTION_BODY_PATTERN.findall(sql_text)]
+
+
+# ==========================================================
+# Identifier Extraction
+# ==========================================================
+
+def extract_identifiers(token):
+    if isinstance(token, IdentifierList):
+        for identifier in token.get_identifiers():
+            yield identifier.get_real_name()
+    elif isinstance(token, Identifier):
+        yield token.get_real_name()
+
+
+def normalize_name(name):
+    if not name:
+        return None
+    return name.split(".")[-1].strip('"').lower()
+
+
+# ==========================================================
+# Extract Created Objects
+# ==========================================================
+
+def extract_created_objects(statement):
+    created = []
+
+    if statement.get_type() != "CREATE":
+        return created
+
+    seen_keyword = False
+
+    for token in statement.tokens:
+        if token.ttype is Keyword:
+            seen_keyword = True
+            continue
+
+        if seen_keyword and isinstance(token, Identifier):
+            name = normalize_name(token.get_real_name())
+            if name:
+                created.append(name)
+            break
+
+    return created
+
+
+# ==========================================================
+# Extract Function Calls
+# ==========================================================
+
+def extract_function_calls(statement):
+    refs = set()
+
+    tokens = list(statement.flatten())
+
+    for i, token in enumerate(tokens):
+        # Detect function call pattern: name (
+        if token.ttype is None and token.value == "(":
+            if i > 0:
+                prev = tokens[i - 1]
+
+                # Only consider identifiers
+                if isinstance(prev, Identifier):
+                    name = prev.get_real_name()
+                    if name:
+                        refs.add(normalize_name(name))
+
+                # Or plain name token (schema.func)
+                elif prev.ttype is None:
+                    name = normalize_name(prev.value)
+                    if name and name.isidentifier():
+                        refs.add(name)
+
+    return refs
+
+
+# ==========================================================
+# Extract Reference Constraints
+# ==========================================================
+
+
+def extract_reference_constraints(statement):
+    refs = set()
+    tokens = list(statement.flatten())
+
+    for i, token in enumerate(tokens):
+        if token.ttype is Keyword and token.value.upper() == "REFERENCES":
+            # Look ahead for table name
+            j = i + 1
+            while j < len(tokens):
+                next_token = tokens[j]
+
+                if next_token.is_whitespace:
+                    j += 1
+                    continue
+
+                # If schema-qualified name
+                name = normalize_name(next_token.value)
+                if name:
+                    refs.add(name)
+
+                break
+
+    return refs
+
+
+# ==========================================================
+# Extract Table & Function Usage
+# ==========================================================
+
+JOIN_KEYWORDS = {
+    "FROM",
+    "JOIN",
+    "LEFT JOIN",
+    "RIGHT JOIN",
+    "INNER JOIN",
+    "OUTER JOIN",
+    "FULL JOIN",
+    "CROSS JOIN",
+}
+
+
+def extract_references_from_statement(statement):
+    refs = set()
+    tokens = list(statement.tokens)
+
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
+
+        # Detect FROM / JOIN keywords
+        if token.ttype is Keyword and "JOIN" in token.value.upper() or token.value.upper() == "FROM":
+            # Look ahead for next meaningful token
+            j = i + 1
+            while j < len(tokens):
+                next_token = tokens[j]
+
+                # Skip whitespace & noise
+                if next_token.is_whitespace:
+                    j += 1
+                    continue
+
+                # Skip LATERAL
+                if next_token.ttype is Keyword and next_token.value.upper() == "LATERAL":
+                    j += 1
+                    continue
+
+                # If IdentifierList (FROM a, b)
+                if isinstance(next_token, IdentifierList):
+                    for identifier in next_token.get_identifiers():
+                        name = identifier.get_real_name()
+                        if name:
+                            refs.add(normalize_name(name))
+                    break
+
+                # If single Identifier
+                if isinstance(next_token, Identifier):
+                    name = next_token.get_real_name()
+                    if name:
+                        refs.add(normalize_name(name))
+                    break
+
+                # If function (e.g., UNNEST(...)) ignore
+                if next_token.is_group:
+                    break
+
+                break
+
+        # Recurse into subqueries
+        if token.is_group:
+            refs.update(extract_references_from_statement(token))
+
+        i += 1
+
+    return refs
+
+
+# ==========================================================
+# Extract Dependencies Per File
+# ==========================================================
+
 def extract_dependencies(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    creates = CREATE_PATTERN.findall(content)
-    references = REFERENCE_PATTERN.findall(content)
-    from_join_refs = FROM_JOIN_PATTERN.findall(content)
+    statements = sqlparse.parse(content)
 
-    created_objects = [obj[1].lower() for obj in creates]
-    referenced_objects = set(
-        ref.lower() for ref in (references + from_join_refs)
-    )
+    created_objects = []
+    referenced_objects = set()
+
+    # Top-level statements
+    for statement in statements:
+        created_objects.extend(extract_created_objects(statement))
+        referenced_objects.update(
+            extract_references_from_statement(statement)
+        )
+        referenced_objects.update(
+            extract_function_calls(statement)
+        )
+        referenced_objects.update(
+            extract_reference_constraints(statement)
+        )
+
+    # Function bodies
+    bodies = extract_function_bodies(content)
+
+    for body in bodies:
+        body_statements = sqlparse.parse(body)
+        for stmt in body_statements:
+            referenced_objects.update(
+                extract_references_from_statement(stmt)
+            )
 
     return created_objects, referenced_objects
 
+
+# ==========================================================
+# Build Dependency Graph
+# ==========================================================
 
 def build_dependency_graph(sql_files):
     object_to_file = {}
     file_dependencies = defaultdict(set)
 
-    # Initialize dependency graph for ALL files
     for file in sql_files:
         file_dependencies[file] = set()
 
-    # First pass: map created objects to files
+    # Pass 1: map created objects
     for file in sql_files:
         created_objects, _ = extract_dependencies(file)
         for obj in created_objects:
             object_to_file[obj] = file
 
-    # Second pass: build dependencies
+    # Pass 2: map references
     for file in sql_files:
         _, referenced_objects = extract_dependencies(file)
+
         for ref in referenced_objects:
             ref_file = object_to_file.get(ref)
             if ref_file and ref_file != file:
@@ -78,6 +292,10 @@ def build_dependency_graph(sql_files):
 
     return file_dependencies
 
+
+# ==========================================================
+# Topological Sort
+# ==========================================================
 
 def topological_sort(dependencies):
     in_degree = {file: 0 for file in dependencies}
@@ -105,17 +323,23 @@ def topological_sort(dependencies):
     return ordered
 
 
+# ==========================================================
+# Output
+# ==========================================================
+
 def print_files_in_order(ordered_files):
-    n = 0
-    for file_path in ordered_files:
-        n += 1
-        print(f"\n-- {n}. {file_path}")
+    for i, file_path in enumerate(ordered_files, 1):
+        print(f"\n-- {i}. {file_path}\n")
 
         with open(file_path, "r", encoding="utf-8") as f:
             print(f.read())
 
         print(f"\n-- EOF: {file_path}")
 
+
+# ==========================================================
+# Main
+# ==========================================================
 
 def main(parent_folder):
     sql_files = scan_sql_files(parent_folder)
@@ -130,8 +354,6 @@ def main(parent_folder):
 
 
 if __name__ == "__main__":
-    import sys
-
     if len(sys.argv) != 2:
         print("Usage: python order_sql.py <parent_sql_folder>")
         sys.exit(1)

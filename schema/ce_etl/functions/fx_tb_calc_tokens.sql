@@ -17,12 +17,12 @@ CREATE OR REPLACE FUNCTION ce_etl.fx_tb_calc_tokens(
         series TEXT,
         tokens TEXT[]
     )
-    LANGUAGE sql
+    LANGUAGE plpgsql
     STABLE
 AS
 $$
-    SELECT *
-    FROM EXECUTE FORMAT($sql$
+BEGIN
+    RETURN QUERY EXECUTE FORMAT($sql$
         SELECT
             calc_series,
             ARRAY_AGG(DISTINCT token ORDER BY token) AS tokens
@@ -49,6 +49,7 @@ $$
         GROUP BY 1
         ORDER BY 1
     $sql$, _calc_table, _const_table);
+END
 $$;
 
 COMMENT ON FUNCTION ce_etl.fx_tb_calc_tokens

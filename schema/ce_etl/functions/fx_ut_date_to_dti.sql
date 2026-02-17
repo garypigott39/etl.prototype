@@ -28,5 +28,5 @@ $$
         END;
 $$;
 
-COMMENT ON FUNCTION ce_etl.fx_ut_date_to_pdi
+COMMENT ON FUNCTION ce_etl.fx_ut_date_to_dti
     IS 'Utility function - convert date to date INT (pseudo primary key)';

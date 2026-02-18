@@ -288,30 +288,32 @@ BEGIN
     EXECUTE _sql;
 
     -- x_value, some jiggery-pokery needed here
-    _cols := 'fk_pk_s, pdi, type, source, value, fk_pk_tip, is_calculated, error, updated_utc';
+    _cols := 'fk_pk_s, pdi, type, source, value, fk_pk_tip, is_calculated, updated_utc';
     _sql := $q$
         INSERT INTO ce_etl.x_value (%s)
-            ON CONFLICT (fk_pk_s, pdi) DO NOTHING
         OVERRIDING SYSTEM VALUE
-        SELECT t.fk_pk_s, t.pdi, t.type, src.pk_src, t.value, t.fk_pk_tip, %L, t.error, t.updated_utc AT TIME ZONE 'UTC'
+        SELECT t.fk_pk_s, t.pdi, t.type, src.pk_src, t.value, %s, %L, t.updated_utc AT TIME ZONE 'UTC'
         FROM dblink(
             'myconn',
-            'SELECT %s FROM ce_pipeline.%I'
+            'SELECT * FROM ce_pipeline.%I %s'
         ) AS t(
             fk_pk_s INT,
             pdi INT,
+            freq SMALLINT,
             type SMALLINT,
             source TEXT,
             value NUMERIC,
-            fk_pk_tip INT,
-            error TEXT,
-            updated_utc TIMESTAMP
+            %s INT,
+            %s
+            updated_utc TIMESTAMP,
+            idx INT
         )
            LEFT JOIN ce_etl.l_source src ON src.code = t.source
+        ON CONFLICT (fk_pk_s, pdi) DO NOTHING
     $q$;
-    EXECUTE FORMAT(_sql, _cols, FALSE, _cols, 'x_api');
-    EXECUTE FORMAT(_sql, _cols, FALSE, _cols, 'x_manual');
-    EXECUTE FORMAT(_sql, _cols, TRUE, _cols, 'x_calc');
+    EXECUTE FORMAT(_sql, _cols, 't.fk_pk_tip', FALSE, 'x_api', '', 'fk_pk_tip', '');
+    EXECUTE FORMAT(_sql, _cols, 't.fk_pk_tip', FALSE, 'x_manual', '', 'fk_pk_tip', '');
+    EXECUTE FORMAT(_sql, _cols, 'NULL::INT', TRUE, 'x_calc', 'WHERE error IS NULL', 'fk_pk_calc', 'error TEXT,');
 
     -- a_x_value @todo
 

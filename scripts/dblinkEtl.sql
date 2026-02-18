@@ -343,7 +343,33 @@ BEGIN
     $q$, _cols);
     EXECUTE _sql;
 
-    -- x_series_value, there's no source table for this, but we can populate it from x_value etc
+    -- x_series_value, there's no source table for this but the values can be pulled from derived table ce_powerbi.series - see existing pipelin scripts!!
+    _cols := 'fk_pk_s, freq, type, has_values, new_values_utc, updated_values_utc';
+    _sql := FORMAT($q$
+        INSERT INTO ce_etl.x_series_value (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT fk_pk_xs, fk_pk_f, fk_pk_t, TRUE, new_values_utc AT TIME ZONE 'UTC', updated_values_utc AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT fk_pk_xs, fk_pk_f, fk_pk_t, new_values_utc, updated_values_utc FROM ce_powerbi.series'
+        ) AS t(
+            fk_pk_xs INT,
+            fk_pk_f SMALLINT,
+            fk_pk_t SMALLINT,
+            new_values_utc TIMESTAMP,
+            updated_values_utc TIMESTAMP
+        )
+    $q$, _cols);
+    EXECUTE _sql;
+
+    UPDATE ce_etl.x_series_value xs
+    SET has_values = FALSE
+    WHERE NOT EXISTS (
+        SELECT 1 FROM ce_etl.x_value xv
+        WHERE xv.fk_pk_s = xs.fk_pk_s
+        AND xv.freq = xs.freq
+        AND xv.type = xs.type
+    );
 
     ------------------------------------------------------------------
     -- Reset sequences safely

@@ -14,6 +14,7 @@ CREATE OR REPLACE FUNCTION ce_etl.fx_ut_date_to_pdi(
     _freq INT
 )
     RETURNS INT
+    RETURNS NULL ON NULL INPUT
     LANGUAGE sql
     IMMUTABLE
 AS

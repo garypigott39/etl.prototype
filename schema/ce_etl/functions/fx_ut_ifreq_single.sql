@@ -13,7 +13,8 @@ CREATE OR REPLACE FUNCTION ce_etl.fx_ut_ifreq_single(
     _freq TEXT
 )
     RETURNS INT
-    LANGUAGE 'sql'
+    RETURNS NULL ON NULL INPUT
+    LANGUAGE sql
     IMMUTABLE
     PARALLEL SAFE
 AS

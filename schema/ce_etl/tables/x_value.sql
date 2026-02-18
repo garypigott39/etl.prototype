@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS ce_etl.x_value
         REFERENCES ce_etl.x_tooltip (pk_tip)
         ON UPDATE CASCADE
         ON DELETE SET NULL,  -- optional tooltip reference
-    is_calculated BOOLEAN NOT NULL,  -- flag to indicate if the value is calculated
+    is_calculated BOOLEAN NOT NULL,  -- flag to indicate if the value was calculated
     error TEXT,  -- optional error message for invalid values, there should never be any!!
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (idx),

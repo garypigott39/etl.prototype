@@ -46,6 +46,7 @@ BEGIN
         ce_etl.c_ind,
         ce_etl.c_series_meta,
         ce_etl.c_series,
+        ce_etl.x_tooltip,
         ce_etl.x_value,
         ce_etl.a_x_value,
         ce_etl.x_series_value
@@ -270,8 +271,17 @@ BEGIN
     $q$, _cols, _cols, _cols);
     EXECUTE _sql;
 
+    -- x_tooltip
+    _cols := 'pk_tip, tooltip';
+    _sql := FORMAT($q$
+        INSERT INTO ce_etl.x_tooltip (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT %s AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT %s FROM ce_pipeline.x_tooltip'
     -- x_value @todo
-
+    _cols := 'fk_pk_s, pdi, type, source, value, fk_pk_tip, is_calculated, error, updated_utc';
     -- a_x_value @todo
 
     -- x_series_value @todo

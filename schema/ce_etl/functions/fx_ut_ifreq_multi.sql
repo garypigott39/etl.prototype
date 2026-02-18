@@ -13,6 +13,7 @@ CREATE OR REPLACE FUNCTION ce_etl.fx_ut_ifreq_multi(
     _freqs TEXT[]
 )
     RETURNS INT[]
+    RETURNS NULL ON NULL INPUT
     LANGUAGE sql
     IMMUTABLE
     PARALLEL SAFE

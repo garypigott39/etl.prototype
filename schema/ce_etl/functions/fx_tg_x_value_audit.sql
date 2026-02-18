@@ -12,7 +12,7 @@
 CREATE OR REPLACE FUNCTION ce_etl.fx_tg_x_value_audit(
 )
     RETURNS TRIGGER
-    LANGUAGE 'plpgsql'
+    LANGUAGE plpgsql
 AS
 $$
 DECLARE
@@ -26,6 +26,7 @@ BEGIN
             VALUES(NEW.fk_pk_s, NEW.freq, NEW.type, TRUE, NOW())
             ON CONFLICT (fk_pk_s, freq, type)
             DO UPDATE SET new_values_utc = NOW();
+
     ELSEIF TG_OP = 'UPDATE' THEN
         IF OLD.type IS DISTINCT FROM NEW.type OR
            OLD.source IS DISTINCT FROM NEW.source OR
@@ -47,6 +48,7 @@ BEGIN
                 ON CONFLICT (fk_pk_s, freq, type)
                 DO UPDATE SET updated_values_utc = NOW();
         END IF;
+
     ELSEIF TG_OP = 'DELETE' THEN
         INSERT INTO ce_etl.a_xvalue (fk_pk_s, pdi, type, source, value, realised, audit_type)
             VALUES (OLD.fk_pk_s, OLD.pdi, OLD.type, OLD.source, OLD.value FALSE, 'D');

@@ -7,7 +7,7 @@
  ***********************************************************************************************************
  */
 
--- DROP SCHEMA IF EXISTS ce_etl CASCADE;
+DROP SCHEMA IF EXISTS ce_etl CASCADE;  -- comment out once not needed for development, be careful with this!!
 
 CREATE SCHEMA IF NOT EXISTS ce_etl;
 --     AUTHORIZATION pgadmin842;

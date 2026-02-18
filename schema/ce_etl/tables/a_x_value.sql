@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS ce_etl.a_x_value
 );
 
 CREATE INDEX IF NOT EXISTS a_x_value__datapoint__idx
-    ON ce_powerbi.a_x_value (fk_pk_xs, pdi);
+    ON ce_etl.a_x_value (fk_pk_s, pdi);
 
 COMMENT ON TABLE ce_etl.a_x_value
     IS 'Audit table - datapoint values';

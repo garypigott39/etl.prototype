@@ -19,10 +19,10 @@ CREATE TABLE IF NOT EXISTS ce_etl.x_value
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     pdi INT NOT NULL,  -- reference to period identifier, see housekeeping
-    type SMALLINT NOT NULL
-        REFERENCES ce_etl.l_type (pk_t),
     freq SMALLINT NOT NULL GENERATED ALWAYS
         AS (pdi / 100000000) STORED,  -- extract frequency from period code
+    type SMALLINT NOT NULL
+        REFERENCES ce_etl.l_type (pk_t),
     source TEXT NOT NULL,
     value NUMERIC NOT NULL,
     fk_pk_tip INT

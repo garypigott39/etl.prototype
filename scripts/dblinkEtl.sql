@@ -16,6 +16,7 @@ DECLARE
     -- Amend connection string as neededuser has appropriate permissions & dblink extension is installed on the target database.
     _conn TEXT := 'dbname=testdb user=postgres password=postgres host=localhost';
     _cols TEXT;
+    _cols2 TEXT;
     _sql TEXT;
 BEGIN
 
@@ -279,7 +280,7 @@ BEGIN
         SELECT %s
         FROM dblink(
             'myconn',
-            'SELECT %s FROM ce_pipeline.x_tooltip'
+            'SELECT %s FROM ce_pipeline.x_tooltip ORDER BY pk_tip'
          ) AS t(
             pk_tip INT,
             tooltip TEXT
@@ -295,7 +296,7 @@ BEGIN
         SELECT t.fk_pk_s, t.pdi, t.type, src.pk_src, t.value, %s, %L, t.updated_utc AT TIME ZONE 'UTC'
         FROM dblink(
             'myconn',
-            'SELECT * FROM ce_pipeline.%I %s'
+            'SELECT * FROM ce_pipeline.%I %s ORDER BY idx'
         ) AS t(
             fk_pk_s INT,
             pdi INT,
@@ -315,9 +316,34 @@ BEGIN
     EXECUTE FORMAT(_sql, _cols, 't.fk_pk_tip', FALSE, 'x_manual', '', 'fk_pk_tip', '');
     EXECUTE FORMAT(_sql, _cols, 'NULL::INT', TRUE, 'x_calc', 'WHERE error IS NULL', 'fk_pk_calc', 'error TEXT,');
 
-    -- a_x_value @todo
+    -- a_x_value
+    _cols := 'fk_pk_s, pdi, type, source, value, new_value, realised, audit_type, audit_utc';
+    _sql := FORMAT($q$
+        INSERT INTO ce_etl.a_x_value (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT t.fk_pk_xs, t.pdi, t.type, src.pk_src, t.value, t.new_value, t.realised, t.aud_type, t.aud_utc AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT * FROM ce_powerbi.x_values_audit ORDER BY idx'
+         ) AS t(
+            fk_pk_xs INT,
+            pdi INT,
+            freq SMALLINT,
+            type SMALLINT,
+            source TEXT,
+            value NUMERIC,
+            new_value NUMERIC,
+            realised BOOLEAN,
+            correction INT,
+            aud_type TEXT,
+            aud_utc TIMESTAMP,
+            idx INT
+        )
+            LEFT JOIN ce_etl.l_source src ON src.code = t.source
+    $q$, _cols);
+    EXECUTE _sql;
 
-    -- x_series_value @todo
+    -- x_series_value, there's no source table for this, but we can populate it from x_value etc
 
     ------------------------------------------------------------------
     -- Reset sequences safely

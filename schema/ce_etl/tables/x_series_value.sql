@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS ce_etl.x_series_value
         CHECK (freq IN (1, 2, 3 , 4, 5)),
     type SMALLINT NOT NULL
         CHECK (type IN (1, 2)),  -- enforce valid types: 1=actual, 2=forecast
-    has_values BOOLEAN NOT NULL DEFAULT FALSE,  -- flag to indicate if there are any values for this series/frequency/type
+    has_values BOOLEAN NOT NULL,  -- flag to indicate if there are any values for this series/frequency/type
     new_values_utc TIMESTAMPTZ,  -- timestamp of the most recent new value
     updated_values_utc TIMESTAMPTZ,  -- timestamp of the most recent updated (or deleted) value
     PRIMARY KEY (idx),

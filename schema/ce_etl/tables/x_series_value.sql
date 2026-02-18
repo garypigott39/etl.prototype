@@ -4,6 +4,7 @@
  * x_series_value.sql
  *
  * Internal table - series values summary/metadata.
+ *
  * Maintained by trigger updates, can also be built up from x_value + audit trail.
  ***********************************************************************************************************
  */

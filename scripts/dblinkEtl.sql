@@ -46,9 +46,9 @@ BEGIN
         ce_etl.c_ind,
         ce_etl.c_series_meta,
         ce_etl.c_series,
+        ce_etl.x_value,
         ce_etl.a_x_value,
-        ce_etl.x_series_value,
-        ce_etl.x_value
+        ce_etl.x_series_value
     RESTART IDENTITY CASCADE;
 
     ------------------------------------------------------------------
@@ -270,11 +270,11 @@ BEGIN
     $q$, _cols, _cols, _cols);
     EXECUTE _sql;
 
+    -- x_value @todo
+
     -- a_x_value @todo
 
     -- x_series_value @todo
-
-    -- x_value @todo
 
     ------------------------------------------------------------------
     -- Reset sequences safely

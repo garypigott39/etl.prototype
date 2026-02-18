@@ -82,20 +82,9 @@ DATABASES = {
         'HOST': 'localhost',      # OS environment variable for database host
         'PORT': '5432',           # OS environment variable for database port
         'OPTIONS': {
-            'options': '-c search_path=public',
+            'options': '-c search_path=ce_warehouse,ce_powerbi_v02,public',
         }
     },
-    'etl': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'prototype',  # OS environment variable for database name
-        'USER': 'postgres',  # OS environment variable for database user
-        'PASSWORD': 'postgres',  # OS environment variable for database password
-        'HOST': 'localhost',  # OS environment variable for database host
-        'PORT': '5432',  # OS environment variable for database port
-        'OPTIONS': {
-            'options': '-c search_path=ce_etl',
-        }
-    }
 }
 
 

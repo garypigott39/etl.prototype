@@ -1,6 +1,19 @@
+/*
+ ***********************************************************************************************************
+ * @file
+ * dblinkEtl.sql
+ *
+ * Local SQL script to copy data from ce_data to ce_etl using dblink.
+ *
+ * Note: this is a 1-time script, not intended for regular use, it could be adapted for migration purpose
+ * if needed...
+ ***********************************************************************************************************
+ */
+
 DO
 $$
 DECLARE
+    -- Amend connection string as neededuser has appropriate permissions & dblink extension is installed on the target database.
     _conn TEXT := 'dbname=testdb user=postgres password=postgres host=localhost';
     _cols TEXT;
     _sql TEXT;
@@ -16,6 +29,12 @@ BEGIN
     PERFORM dblink_connect('myconn', _conn);
 
     ------------------------------------------------------------------
+    -- Disable triggers
+    ------------------------------------------------------------------
+    ALTER TABLE ce_etl.c_series DISABLE TRIGGER ALL;
+    ALTER TABLE ce_etl.x_value DISABLE TRIGGER ALL;
+
+    ------------------------------------------------------------------
     -- OPTIONAL: truncate first (remove if not desired)
     ------------------------------------------------------------------
     TRUNCATE TABLE
@@ -26,7 +45,10 @@ BEGIN
         ce_etl.c_geo,
         ce_etl.c_ind,
         ce_etl.c_series_meta,
-        ce_etl.c_series
+        ce_etl.c_series,
+        ce_etl.a_x_value,
+        ce_etl.x_series_value,
+        ce_etl.x_value
     RESTART IDENTITY CASCADE;
 
     ------------------------------------------------------------------
@@ -248,10 +270,22 @@ BEGIN
     $q$, _cols, _cols, _cols);
     EXECUTE _sql;
 
+    -- a_x_value @todo
+
+    -- x_series_value @todo
+
+    -- x_value @todo
+
     ------------------------------------------------------------------
     -- Reset sequences safely
     ------------------------------------------------------------------
     CALL ce_etl.px_ut_fix_seq();
+
+    ------------------------------------------------------------------
+    -- Re-enable triggers
+    ------------------------------------------------------------------
+    ALTER TABLE ce_etl.c_series ENABLE TRIGGER ALL;
+    ALTER TABLE ce_etl.x_value ENABLE TRIGGER ALL;
 
     -- Close connection
     PERFORM dblink_disconnect('myconn');

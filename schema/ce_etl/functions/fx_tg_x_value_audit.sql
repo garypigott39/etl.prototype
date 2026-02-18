@@ -20,7 +20,7 @@ DECLARE
 BEGIN
     IF TG_OP = 'INSERT' THEN
         INSERT INTO ce_etl.a_xvalue (fk_pk_s, pdi, type, source, value, realised, audit_type)
-            VALUES (NEW.fk_pk_s, NEW.pdi, NEW.type, NEW.source, NEW.value FALSE, 'I');
+            VALUES (NEW.fk_pk_s, NEW.pdi, NEW.type, NEW.source, NEW.value, FALSE, 'I');
         -- Upsert x_series_value
         INSERT INTO ce_etl.x_series_value (fk_pk_s, freq, type, has_values, new_values_utc)
             VALUES(NEW.fk_pk_s, NEW.freq, NEW.type, TRUE, NOW())
@@ -51,7 +51,7 @@ BEGIN
 
     ELSEIF TG_OP = 'DELETE' THEN
         INSERT INTO ce_etl.a_xvalue (fk_pk_s, pdi, type, source, value, realised, audit_type)
-            VALUES (OLD.fk_pk_s, OLD.pdi, OLD.type, OLD.source, OLD.value FALSE, 'D');
+            VALUES (OLD.fk_pk_s, OLD.pdi, OLD.type, OLD.source, OLD.value, FALSE, 'D');
         -- Upsert x_series_value
         _number_of_values := (
             SELECT COUNT(*) FROM ce_etl.x_value
@@ -68,5 +68,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_etl.fx_tg_x_value_audits
+COMMENT ON FUNCTION ce_etl.fx_tg_x_value_audit
     IS 'Trigger function - log changes in x_value';

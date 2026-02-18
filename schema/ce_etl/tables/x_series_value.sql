@@ -18,10 +18,10 @@ CREATE TABLE IF NOT EXISTS ce_etl.x_series_value
         REFERENCES ce_etl.c_series (pk_s)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-    freq SMALLINT
-        REFERENCES ce_etl.l_freq (pk_f),
+    freq SMALLINT NOT NULL
+        CHECK (freq IN (1, 2, 3 , 4, 5)),
     type SMALLINT NOT NULL
-        REFERENCES ce_etl.l_type (pk_t),
+        CHECK (type IN (1, 2)),  -- enforce valid types: 1=actual, 2=forecast
     has_values BOOLEAN NOT NULL DEFAULT FALSE,  -- flag to indicate if there are any values for this series/frequency/type
     new_values_utc TIMESTAMPTZ,  -- timestamp of the most recent new value
     updated_values_utc TIMESTAMPTZ,  -- timestamp of the most recent updated (or deleted) value

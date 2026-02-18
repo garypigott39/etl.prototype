@@ -35,5 +35,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_etl.fx_tg_c_series_audits
+COMMENT ON FUNCTION ce_etl.fx_tg_c_series_audit
     IS 'Trigger function - log changes in c_series';

@@ -11,7 +11,8 @@
 
 CREATE TABLE IF NOT EXISTS ce_etl.l_geo_catg
 (
-    code TEXT NOT NULL CHECK (code ~ '^[A-Z][A-Za-z0-9 ]*$'),
+    code TEXT NOT NULL
+        CHECK (code ~ '^[A-Z][A-Za-z0-9 ]*$'),
     PRIMARY KEY (code)
 );
 

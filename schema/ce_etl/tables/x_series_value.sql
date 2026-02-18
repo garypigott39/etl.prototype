@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS ce_etl.x_series_value
         REFERENCES ce_etl.l_freq (pk_f),
     type SMALLINT NOT NULL
         REFERENCES ce_etl.l_type (pk_t),
+    has_values BOOLEAN NOT NULL DEFAULT FALSE,  -- flag to indicate if there are any values for this series/frequency/type
     new_values_utc TIMESTAMPTZ,  -- timestamp of the most recent new value
     updated_values_utc TIMESTAMPTZ,  -- timestamp of the most recent updated (or deleted) value
     PRIMARY KEY (idx),

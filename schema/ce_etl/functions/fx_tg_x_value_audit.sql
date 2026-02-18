@@ -15,13 +15,15 @@ CREATE OR REPLACE FUNCTION ce_etl.fx_tg_x_value_audit(
     LANGUAGE 'plpgsql'
 AS
 $$
+DECLARE
+    _number_of_values INT;
 BEGIN
     IF TG_OP = 'INSERT' THEN
         INSERT INTO ce_etl.a_xvalue (fk_pk_s, pdi, type, source, value, realised, audit_type)
             VALUES (NEW.fk_pk_s, NEW.pdi, NEW.type, NEW.source, NEW.value FALSE, 'I');
         -- Upsert x_series_value
-        INSERT INTO ce_etl.x_series_value (fk_pk_s, freq, type, new_values_utc)
-            VALUES(NEW.fk_pk_s, NEW.freq, NEW.type, NOW())
+        INSERT INTO ce_etl.x_series_value (fk_pk_s, freq, type, has_values, new_values_utc)
+            VALUES(NEW.fk_pk_s, NEW.freq, NEW.type, TRUE, NOW())
             ON CONFLICT (fk_pk_s, freq, type)
             DO UPDATE SET new_values_utc = NOW();
     ELSEIF TG_OP = 'UPDATE' THEN
@@ -40,8 +42,8 @@ BEGIN
                   'U'
               );
             -- Upsert x_series_value
-            INSERT INTO ce_etl.x_series_value (fk_pk_s, freq, type, updated_values_utc)
-                VALUES(NEW.fk_pk_s, NEW.freq, NEW.type, NOW())
+            INSERT INTO ce_etl.x_series_value (fk_pk_s, freq, type, has_values, updated_values_utc)
+                VALUES(OLD.fk_pk_s, OLD.freq, OLD.type, TRUE, NOW())
                 ON CONFLICT (fk_pk_s, freq, type)
                 DO UPDATE SET updated_values_utc = NOW();
         END IF;
@@ -49,8 +51,14 @@ BEGIN
         INSERT INTO ce_etl.a_xvalue (fk_pk_s, pdi, type, source, value, realised, audit_type)
             VALUES (OLD.fk_pk_s, OLD.pdi, OLD.type, OLD.source, OLD.value FALSE, 'D');
         -- Upsert x_series_value
-        INSERT INTO ce_etl.x_series_value (fk_pk_s, freq, type, updated_values_utc)
-            VALUES(NEW.fk_pk_s, NEW.freq, NEW.type, NOW())
+        _number_of_values := (
+            SELECT COUNT(*) FROM ce_etl.x_value
+            WHERE fk_pk_s = OLD.fk_pk_s
+            AND freq = OLD.freq
+            AND type = OLD.type
+        );
+        INSERT INTO ce_etl.x_series_value (fk_pk_s, freq, type, has_values, updated_values_utc)
+            VALUES(OLD.fk_pk_s, OLD.freq, OLD.type, (_number_of_values > 0), NOW())
             ON CONFLICT (fk_pk_s, freq, type)
             DO UPDATE SET updated_values_utc = NOW();
     END IF;

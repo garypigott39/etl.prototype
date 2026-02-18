@@ -37,5 +37,9 @@ CREATE TABLE IF NOT EXISTS ce_etl.x_value
     UNIQUE (fk_pk_s, pdi)  -- enforce only one value per period
 );
 
+-- Counter to track number of values per series/frequency/type, updated by trigger
+CREATE INDEX IF NOT EXISTS x_value__series_value__idx
+    ON ce_etl.x_value (fk_pk_s, freq, type);
+
 COMMENT ON TABLE ce_etl.x_value
     IS 'Internal table - datapoint values';

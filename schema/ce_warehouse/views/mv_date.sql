@@ -26,7 +26,7 @@ _dates AS (
     FROM _range
 )
 SELECT
-    ce_warehouse.fx_ut_date_to_dti(d.d_date)::INT                                         AS pk_d,
+    ce_warehouse.fx_ut_date_to_dti(d.d_date)::INT                                   AS pk_d,
     d.d_date                                                                        AS d_date,
 
     /* ================================================================

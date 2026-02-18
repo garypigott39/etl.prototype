@@ -17,7 +17,7 @@ import sys
 from collections import defaultdict, deque
 
 import sqlparse
-from sqlparse.sql import Function, Identifier, IdentifierList, Parenthesis
+from sqlparse.sql import Identifier, IdentifierList
 from sqlparse.tokens import Keyword
 
 
@@ -93,6 +93,118 @@ def extract_created_objects(statement):
             break
 
     return created
+
+
+# ==========================================================
+# Extract Trigger Definitions (Robust, Schema-aware)
+# ==========================================================
+
+def extract_triggers(statement):
+    """
+    Detect CREATE TRIGGER statements and return:
+      - created trigger name
+      - referenced table (after ON)
+      - referenced function (after EXECUTE FUNCTION/PROCEDURE)
+
+    Handles schema-qualified names like:
+        ce_etl.x_value
+        ce_etl.fx_tg_x_value_audit()
+    """
+    created = []
+    refs = set()
+
+    if statement.get_type() != "CREATE":
+        return created, refs
+
+    # Must contain TRIGGER keyword
+    if "TRIGGER" not in statement.value.upper():
+        return created, refs
+
+    tokens = list(statement.tokens)
+
+    trigger_name = None
+    table_name = None
+    function_name = None
+
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
+
+        # -----------------------------
+        # CREATE TRIGGER <name>
+        # -----------------------------
+        if token.ttype is Keyword and token.value.upper() == "TRIGGER":
+            j = i + 1
+            while j < len(tokens):
+                next_token = tokens[j]
+
+                if next_token.is_whitespace:
+                    j += 1
+                    continue
+
+                if isinstance(next_token, Identifier):
+                    trigger_name = normalize_name(next_token.get_real_name())
+                else:
+                    trigger_name = normalize_name(next_token.value)
+
+                break
+
+        # -----------------------------
+        # ON <table>
+        # -----------------------------
+        if token.ttype is Keyword and token.value.upper() == "ON":
+            j = i + 1
+            while j < len(tokens):
+                next_token = tokens[j]
+
+                if next_token.is_whitespace:
+                    j += 1
+                    continue
+
+                if isinstance(next_token, Identifier):
+                    table_name = normalize_name(next_token.get_real_name())
+                else:
+                    table_name = normalize_name(next_token.value)
+
+                break
+
+        # -----------------------------
+        # EXECUTE FUNCTION <func>
+        # -----------------------------
+        if token.ttype is Keyword and token.value.upper() == "EXECUTE":
+            j = i + 1
+            while j < len(tokens):
+
+                next_token = tokens[j]
+
+                if next_token.is_whitespace:
+                    j += 1
+                    continue
+
+                # Skip FUNCTION / PROCEDURE keyword
+                if next_token.ttype is Keyword and next_token.value.upper() in ("FUNCTION", "PROCEDURE"):
+                    j += 1
+                    continue
+
+                if isinstance(next_token, Identifier):
+                    function_name = normalize_name(next_token.get_real_name())
+                else:
+                    function_name = normalize_name(next_token.value)
+
+                break
+
+        i += 1
+
+    if trigger_name:
+        created.append(trigger_name)
+
+    if table_name:
+        refs.add(table_name)
+
+    if function_name:
+        refs.add(function_name)
+
+    return created, refs
 
 
 # ==========================================================
@@ -242,6 +354,13 @@ def extract_dependencies(file_path):
     # Top-level statements
     for statement in statements:
         created_objects.extend(extract_created_objects(statement))
+
+        # Trigger support
+        trigger_created, trigger_refs = extract_triggers(statement)
+        created_objects.extend(trigger_created)
+        referenced_objects.update(trigger_refs)
+
+        # General references
         referenced_objects.update(
             extract_references_from_statement(statement)
         )

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS ce_etl.a_x_value
         WHEN pdi > 0 THEN (pdi / 100000000)
       END
     ) STORED,
-    source TEXT,
+    source SMALLINT,
     value NUMERIC,
     new_value NUMERIC,  -- for updates, store the new value for debugging!
     realised BOOLEAN,

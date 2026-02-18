@@ -23,14 +23,14 @@ CREATE TABLE IF NOT EXISTS ce_etl.x_value
         AS (pdi / 100000000) STORED,  -- extract frequency from period code
     type SMALLINT NOT NULL
         REFERENCES ce_etl.l_type (pk_t),
-    source TEXT NOT NULL,
+    source SMALLINT NOT NULL
+        REFERENCES ce_etl.l_source (pk_src),
     value NUMERIC NOT NULL,
     fk_pk_tip INT
         REFERENCES ce_etl.x_tooltip (pk_tip)
         ON UPDATE CASCADE
         ON DELETE SET NULL,  -- optional tooltip reference
-    is_calculated BOOLEAN NOT NULL GENERATED ALWAYS
-        AS (source ~ '^X') STORED,  -- flag to indicate if the value is calculated
+    is_calculated BOOLEAN NOT NULL,  -- flag to indicate if the value is calculated
     error TEXT,  -- optional error message for invalid values, there should never be any!!
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (idx),

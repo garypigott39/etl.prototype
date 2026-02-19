@@ -39,5 +39,5 @@ AS
         ce_powerbi.fx_ut_null_text()
     ORDER BY 1;
 
-COMMENT ON VIEW ce_powerbi.mv_period
+COMMENT ON VIEW ce_powerbi.v_period
     IS 'View - period lookup.';

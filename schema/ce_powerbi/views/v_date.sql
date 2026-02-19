@@ -90,7 +90,7 @@ AS
         d.date                        AS d_yy,
         d.date                        AS d_mmmm,
         d.date                        AS d_mmm
-    FROM ce_warehouse.date d
+    FROM ce_warehouse.mv_date d
 
     UNION ALL
 

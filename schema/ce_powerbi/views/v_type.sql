@@ -9,7 +9,7 @@
 
 -- DROP VIEW IF EXISTS ce_powerbi.v_type;
 
-CREATE OR REPLACE VIEW ce_powerbi.mv_type
+CREATE OR REPLACE VIEW ce_powerbi.v_type
 AS
     SELECT
         pk_t,

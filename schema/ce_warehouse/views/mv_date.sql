@@ -29,6 +29,13 @@ SELECT
     ce_warehouse.fx_ut_date_to_dti(d.dt)::INT                                       AS pk_d,
     d.dt                                                                            AS date,
 
+    -- Status (Past, Current, Future)
+    CASE
+        WHEN d.dt < CURRENT_DATE THEN 'Past'
+        WHEN d.dt > CURRENT_DATE THEN 'Future'
+        ELSE 'Current'
+    END                                                                             AS status,
+
     /* ================================================================
        YEAR
        ================================================================ */

@@ -12,7 +12,7 @@
 CREATE OR REPLACE VIEW ce_powerbi.v_freq
 AS
     SELECT
-        pk_f,
+        pk_f  AS pk_f,  -- use the surrogate key from l_freq!!
         code  AS f_code,
         name  AS f_name,
         pk_f  AS f_order  -- ordering column

@@ -12,8 +12,8 @@
 CREATE MATERIALIZED VIEW ce_powerbi.mv_ind
 AS
     SELECT
-        pk_i,
-        i_code,
+        pk_i                                       AS pk_i,  -- use the surrogate key from c_ind!!
+        i_code                                     AS i_code,
         ce_powerbi.fx_ut_null_text(i_name)         AS i_name,
         ce_powerbi.fx_ut_null_text(i_description)  AS i_description,
         ce_powerbi.fx_ut_null_text(i_name1)        AS i_name1,

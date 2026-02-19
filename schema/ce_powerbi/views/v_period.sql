@@ -12,7 +12,7 @@
 CREATE OR REPLACE VIEW ce_powerbi.v_period
 AS
     SELECT
-        pk_p,
+        pk_p                 AS pk_p,  -- use the surrogate key from base mv_period!!
         period               AS p_period,
         status               AS p_status,
         start_of_period      AS p_start_of_period,

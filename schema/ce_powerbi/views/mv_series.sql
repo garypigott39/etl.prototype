@@ -12,7 +12,7 @@
 CREATE MATERIALIZED VIEW ce_powerbi.mv_series
 AS
     SELECT
-        sx.sid_pk_s                                  AS pk_s,  -- use the derived UNIQUE key from mv_sid_meta!!
+        sx.pk_s                                      AS pk_s,  -- use the derived UNIQUE key from mv_sid_meta!!
         sx.s_id_1                                    AS s_id_1,
         sx.s_id_2                                    AS s_id_2,
         sx.s_id_3                                    AS s_id_3,
@@ -38,8 +38,8 @@ AS
         sx.updated_utc                               AS s_updated_utc,
         ce_powerbi.fx_ut_null_int(s.s_order)         AS s_order
     FROM ce_warehouse.c_series s
-        JOIN ce_powerbi.mv_sid_meta sx
-            ON s.pk_s = sx.pk_s
+        JOIN ce_powerbi.mv_sid_xref sx
+            ON s.pk_s = sx.base_pks
     WHERE sx.downloadable NOT IN ('none', 'internal')  -- CEP-313: Exclude "none" & "internal" from  PowerBI datasets
     AND s.error IS NULL
 

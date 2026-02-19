@@ -12,10 +12,10 @@
 CREATE OR REPLACE VIEW ce_powerbi.v_source
 AS
     SELECT
-        pk_src,
-        code  AS src_code,
-        name  AS src_name,
-        api_available AS src_api_available
+        pk_src         AS pk_src,  -- use the surrogate key from l_source!!
+        code           AS src_code,
+        name           AS src_name,
+        api_available  AS src_api_available
     FROM ce_warehouse.l_source
 
     UNION ALL

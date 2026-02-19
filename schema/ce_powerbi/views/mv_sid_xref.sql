@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * mv_sid_meta.sql
+ * mv_sid_xref.sql
  *
- * Materialized View - series ID metadata lookup.
+ * Materialized View - series ID metadata/xref lookup.
  ***********************************************************************************************************
  */
 
--- DROP MATERIALIZED VIEW IF EXISTS ce_powerbi.mv_sid_meta;
+-- DROP MATERIALIZED VIEW IF EXISTS ce_powerbi.mv_sid_xref;
 
-CREATE MATERIALIZED VIEW ce_powerbi.mv_sid_meta
+CREATE MATERIALIZED VIEW ce_powerbi.mv_sid_xref
 AS
     WITH _base AS (
         SELECT
@@ -48,8 +48,8 @@ AS
     )
     SELECT
         ((f.pk_f * 10) + t.pk_t) * 100000000) + b.pk_s
-                                               AS sid_pk_s,  --derived UNIQUE key!!
-        b.pk_s                                 AS base_pk_s,
+                                               AS pk_s,  --derived UNIQUE key!!
+        b.pk_s                                 AS base_pks,
         f.pk_f                                 AS freq,
         f.code                                 AS freq_code,
         t.pk_t                                 AS type,
@@ -76,7 +76,11 @@ AS
             WHEN 'start' THEN last.start_of_period
             WHEN 'end' THEN last.end_of_period
             ELSE last.mid_of_period
-        END                                    AS last_date
+        END                                    AS last_date,
+        -- FOREIGN keys
+        g.pk_geo                               AS fk_pk_geo,
+        c.pk_com                               AS fk_pk_com,
+        i.pk_i                                 AS fk_pk_i
     FROM _base b
         JOIN _blended bl
             ON bl.fk_pk_s = b.pk_s
@@ -101,13 +105,21 @@ AS
         LEFT JOIN ce_warehouse.mv_period first
             ON first.pk_p = mx.first_pdi
         LEFT JOIN ce_warehouse.mv_period last
-            ON last.pk_p = mx.last_pdi;
+            ON last.pk_p = mx.last_pdi
+        LEFT JOIN ce_warehouse.c_geo g
+            ON g.geo_code = b.gcode
+            AND b.gcode LIKE 'G.%'
+        LEFT JOIN ce_warehouse.c_com c
+            ON c.com_code = b.gcode
+            AND b.gcode LIKE 'C.%'
+        LEFT JOIN ce_warehouse.c_ind i
+            ON i.i_code = b.icode;
 
-CREATE UNIQUE INDEX IF NOT EXISTS mv_sid_meta__sid_pk_s__idx
-    ON ce_powerbi.mv_sid_meta (sid_pk_s);
+CREATE UNIQUE INDEX IF NOT EXISTS mv_sid_xref__pk_sv__idx
+    ON ce_powerbi.mv_sid_xref (pk_sm);
 
-CREATE INDEX IF NOT EXISTS mv_sid_meta__pk_s__idx
-    ON ce_powerbi.mv_sid_meta (pk_s);
+CREATE INDEX IF NOT EXISTS mv_sid_xref__base_pks__idx
+    ON ce_powerbi.mv_sid_xref (base_pks);
 
-COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_sid_meta
-    IS 'Materialized View - series ID metadata lookup';
+COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_sid_xref
+    IS 'Materialized View - series ID metadata/xref lookup';

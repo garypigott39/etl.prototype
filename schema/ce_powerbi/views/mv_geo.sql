@@ -12,8 +12,8 @@
 CREATE MATERIALIZED VIEW ce_powerbi.mv_geo
 AS
     SELECT
-        pk_geo,
-        geo_code,
+        g.pk_geo                                         AS pk_geo,  -- use the surrogate key from c_geo!!
+        g.geo_code                                       AS geo_code,
         ce_powerbi.fx_ut_null_text(g.geo_name)           AS geo_name,
         ce_powerbi.fx_ut_null_text(g.geo_name2)          AS geo_name2,
         SUBSTR(g.geo_code, 3)                            AS geo_short_code,

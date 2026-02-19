@@ -12,7 +12,7 @@
 CREATE OR REPLACE VIEW ce_powerbi.v_type
 AS
     SELECT
-        pk_t,
+        pk_t  AS pk_t,  -- use the surrogate key from l_type!!
         code  AS t_code,
         name  AS t_name
     FROM ce_warehouse.l_type

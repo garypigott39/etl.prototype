@@ -12,8 +12,8 @@
 CREATE MATERIALIZED VIEW ce_powerbi.mv_tooltip
 AS
     SELECT
-        pk_tip,
-        tooltip AS t_tip
+        pk_tip   AS pk_tip,  -- use the surrogate key from c_tooltip!!
+        tooltip  AS t_tip
     FROM ce_warehouse.x_tooltip
 
     UNION ALL

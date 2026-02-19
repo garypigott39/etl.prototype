@@ -12,8 +12,8 @@
 CREATE MATERIALIZED VIEW ce_powerbi.mv_com
 AS
     SELECT
-        pk_com,
-        com_code,
+        pk_com                                      AS pk_com,  -- use the surrogate key from c_com!!
+        com_code                                    AS com_code,
         ce_powerbi.fx_ut_null_text(com_name)        AS com_name,
         SUBSTR(com_code, 3)                         AS com_short_code,
         ce_powerbi.fx_ut_null_text(com_short_name)  AS com_short_name,

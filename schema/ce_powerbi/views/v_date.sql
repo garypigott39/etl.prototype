@@ -14,7 +14,7 @@
 CREATE OR REPLACE VIEW ce_powerbi.v_date
 AS
     SELECT
-        d.pk_d,
+        d.pk_d                        AS pk_d,  -- use the surrogate key from base mv_date!!
         d.date                        AS d_date,
         d.status                      AS d_status,
         d.decade                      AS d_decade,

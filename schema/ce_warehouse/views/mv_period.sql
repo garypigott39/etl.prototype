@@ -87,7 +87,7 @@ _base AS (
         END AS period,
         CASE
             WHEN freq = 1 THEN TO_CHAR(start_of_period, 'DD/MM/YYYY')
-            WHEN freq = 2 THEN 'w' || TO_CHAR(start_of_period, 'IYYYIW')
+            WHEN freq = 2 THEN 'w' || TO_CHAR(start_of_period, 'IW IYYY')
             WHEN freq = 3 THEN TO_CHAR(start_of_period, 'MM YYYY')
             WHEN freq = 4 THEN 'Q' || TO_CHAR(start_of_period, 'Q YYYY')
             WHEN freq = 5 THEN TO_CHAR(start_of_period, 'YYYY')

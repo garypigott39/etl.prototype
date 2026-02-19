@@ -33,7 +33,7 @@ AS
         ce_powerbi.fx_ut_null_bool(i_proprietary_data)
                                                    AS i_proprietary_data,
         ce_powerbi.fx_ut_null_int(i_order)         AS i_order
-    FROM ce_powerbi.ind
+    FROM ce_warehouse.c_ind
     WHERE error IS NULL
 
     UNION ALL

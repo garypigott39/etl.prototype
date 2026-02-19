@@ -47,8 +47,8 @@ AS
         GROUP BY fk_pk_s, freq, type
     )
     SELECT
-        ((f.pk_f * 10) + t.pk_t) * 100000000) + b.pk_s
-                                               AS pk_s,  --derived UNIQUE key!!
+        (((f.pk_f * 10) + t.pk_t) * 10000000) + b.pk_s
+                                               AS pk_sx,  --derived UNIQUE key!!
         b.pk_s                                 AS base_pks,
         f.pk_f                                 AS freq,
         f.code                                 AS freq_code,
@@ -92,7 +92,7 @@ AS
             ON xsv.fk_pk_s = b.pk_s
             AND xsv.freq = f.pk_f
             AND xsv.type = t.pk_t
-        LEFT JOIN ce_warehouse.c_sid_meta sm
+        LEFT JOIN ce_warehouse.c_series_meta sm
             ON sm.sm_gcode = b.gcode
             AND sm.sm_icode = b.icode
             AND sm.sm_freq = f.code
@@ -116,7 +116,7 @@ AS
             ON i.i_code = b.icode;
 
 CREATE UNIQUE INDEX IF NOT EXISTS mv_sid_xref__pk_sv__idx
-    ON ce_powerbi.mv_sid_xref (pk_sm);
+    ON ce_powerbi.mv_sid_xref (pk_sx);
 
 CREATE INDEX IF NOT EXISTS mv_sid_xref__base_pks__idx
     ON ce_powerbi.mv_sid_xref (base_pks);

@@ -12,7 +12,7 @@
 CREATE MATERIALIZED VIEW ce_powerbi.mv_series
 AS
     SELECT
-        sx.pk_s                                      AS pk_s,  -- use the derived UNIQUE key from mv_sid_meta!!
+        sx.pk_sx                                     AS pk_s,  -- use the derived UNIQUE key from mv_sid_xref!!
         sx.s_id_1                                    AS s_id_1,
         sx.s_id_2                                    AS s_id_2,
         sx.s_id_3                                    AS s_id_3,
@@ -72,7 +72,7 @@ AS
         ce_powerbi.fx_ut_null_int();
 
 CREATE UNIQUE INDEX IF NOT EXISTS mv_series__pk_s__idx
-    ON ce_powerbi.mv_sid_meta (pk_s);
+    ON ce_powerbi.mv_series (pk_s);
 
 COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_series
     IS 'Materialized View - series lookup';

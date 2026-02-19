@@ -61,6 +61,7 @@ AS
         xsv.new_values_utc                     AS new_values_utc,
         xsv.updated_values_utc                 AS updated_values_utc,
         xsv.updated_utc                        AS updated_utc,
+        -- First & last periods
         first.period_name                      AS first_period,
         last.period_name                       AS last_period,
         -- ADJ dates

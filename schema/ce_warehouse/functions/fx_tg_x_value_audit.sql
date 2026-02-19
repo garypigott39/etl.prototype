@@ -25,7 +25,8 @@ BEGIN
         INSERT INTO ce_warehouse.x_series_value (fk_pk_s, freq, type, has_values, new_values_utc)
             VALUES(NEW.fk_pk_s, NEW.freq, NEW.type, TRUE, NOW())
             ON CONFLICT (fk_pk_s, freq, type)
-            DO UPDATE SET new_values_utc = NOW();
+            DO UPDATE
+                SET (new_values_utc, updated_utc) = (NOW(), NOW());
 
     ELSEIF TG_OP = 'UPDATE' THEN
         IF OLD.type IS DISTINCT FROM NEW.type OR
@@ -46,7 +47,9 @@ BEGIN
             INSERT INTO ce_warehouse.x_series_value (fk_pk_s, freq, type, has_values, updated_values_utc)
                 VALUES(OLD.fk_pk_s, OLD.freq, OLD.type, TRUE, NOW())
                 ON CONFLICT (fk_pk_s, freq, type)
-                DO UPDATE SET updated_values_utc = NOW();
+                DO UPDATE
+                    SET (updated_values_utc, updated_utc) = (NOW(), NOW());
+
         END IF;
 
     ELSEIF TG_OP = 'DELETE' THEN
@@ -62,7 +65,8 @@ BEGIN
         INSERT INTO ce_warehouse.x_series_value (fk_pk_s, freq, type, has_values, updated_values_utc)
             VALUES(OLD.fk_pk_s, OLD.freq, OLD.type, (_number_of_values > 0), NOW())
             ON CONFLICT (fk_pk_s, freq, type)
-            DO UPDATE SET updated_values_utc = NOW();
+            DO UPDATE
+                SET (updated_values_utc, updated_utc) = (NOW(), NOW());
     END IF;
     RETURN NULL;
 END

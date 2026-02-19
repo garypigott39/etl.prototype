@@ -25,10 +25,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u_value
     uv_tooltip TEXT,
     update_type TEXT,  -- NEW, UPDATE, DELETE or UNCHANGED
     -- Calculated
-    pks INT,  -- (fk_pk_s)
-    pdi INT,  -- (fk_pk_p)
+    pks INT,
+    pdi INT,
     freq INT,
     type INT,
+    source INT,
     -- End
     is_api BOOLEAN NOT NULL,  -- flag to indicate if the value is from an API (set via manual loader)
     file_name TEXT,

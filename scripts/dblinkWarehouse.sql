@@ -371,6 +371,14 @@ BEGIN
         AND xv.type = xs.type
     );
 
+    UPDATE ce_warehouse.x_series_value xs
+    SET updated_utc = (
+        SELECT MAX(updated_utc) FROM ce_warehouse.x_value xv
+        WHERE xv.fk_pk_s = xs.fk_pk_s
+        AND xv.freq = xs.freq
+        AND xv.type = xs.type
+    );
+
     ------------------------------------------------------------------
     -- Reset sequences safely
     ------------------------------------------------------------------

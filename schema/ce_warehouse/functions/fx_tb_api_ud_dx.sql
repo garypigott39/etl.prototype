@@ -31,6 +31,7 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb_api_ud_dx(
         pdi           INT,
         freq          INT,
         type          INT,
+        source        INT,
         is_api        BOOLEAN,
         file_name     TEXT,
         error         TEXT,
@@ -43,12 +44,15 @@ DECLARE
     _DATE       DATE := CURRENT_DATE;
     _AC_TYPE    INT := 1;
     _FILENAME   TEXT := 'ce_warehouse.fx_tb_api_ud_dx';
+    _SOURCE     INT := (SELECT pk_src FROM ce_warehouse.l_source WHERE code = 'DX');
 
 BEGIN
     IF _phase IS NULL THEN
         RAISE EXCEPTION 'Phase parameter is required';
     ELSEIF _phase NOT IN (1, 2) THEN
         RAISE EXCEPTION 'Unsupported phase: %', _phase;
+    ELSEIF _SOURCE IS NULL THEN
+        RAISE EXCEPTION 'Source "DX" not found in l_source';
     END IF;
 
     --------------------------------------------------------------------------------
@@ -279,6 +283,7 @@ BEGIN
         u.pdi          AS pdi,
         u.freq         AS freq,
         _AC_TYPE       AS type,
+        _SOURCE        AS source,
         FALSE          AS is_api,
         _FILENAME      AS file_name,
         NULL::TEXT     AS error,
@@ -303,6 +308,7 @@ BEGIN
         d.pdi,
         d.freq,
         _AC_TYPE,
+        _SOURCE,
         FALSE,
         _FILENAME,
         NULL::TEXT,

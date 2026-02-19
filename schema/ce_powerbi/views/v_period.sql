@@ -36,8 +36,7 @@ AS
         ce_powerbi.fx_ut_null_int(),
         ce_powerbi.fx_ut_null_text(),
         ce_powerbi.fx_ut_null_text(),
-        ce_powerbi.fx_ut_null_text()
-    ORDER BY 1;
+        ce_powerbi.fx_ut_null_text();
 
 COMMENT ON VIEW ce_powerbi.v_period
     IS 'View - period lookup.';

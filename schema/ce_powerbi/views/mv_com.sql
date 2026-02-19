@@ -33,8 +33,7 @@ AS
         ce_powerbi.fx_ut_null_text(),
         ce_powerbi.fx_ut_null_text(),
         ce_powerbi.fx_ut_null_text(),
-        ce_powerbi.fx_ut_null_int()
-    ORDER BY 1;
+        ce_powerbi.fx_ut_null_int();
 
 COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_com
     IS 'Materialized View - commodity lookup';

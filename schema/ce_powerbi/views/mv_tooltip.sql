@@ -20,8 +20,7 @@ AS
 
     SELECT
         -1,
-        ce_powerbi.fx_ut_null_text()
-    ORDER BY 1;
+        ce_powerbi.fx_ut_null_text();
 
 COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_tooltip
     IS 'View - tooltip lookup';

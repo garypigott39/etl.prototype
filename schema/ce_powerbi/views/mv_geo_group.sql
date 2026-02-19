@@ -25,8 +25,7 @@ AS
         JOIN ce_warehouse.l_geo_group l
             ON raw.code = l.code
     WHERE g.geo_groups IS NOT NULL
-    AND g.error IS NULL
-    ORDER BY 1;
+    AND g.error IS NULL;
 
 COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_geo_group
     IS 'Materialized View - geo groupings lookup';

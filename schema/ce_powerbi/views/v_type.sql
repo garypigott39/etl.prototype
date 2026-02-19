@@ -22,8 +22,7 @@ AS
     SELECT
         -1,
         ce_powerbi.fx_ut_null_text(),
-        ce_powerbi.fx_ut_null_text()
-    ORDER BY 1;
+        ce_powerbi.fx_ut_null_text();
 
 COMMENT ON VIEW ce_powerbi.v_type
     IS 'View - type lookup';

@@ -171,8 +171,7 @@ AS
 
         ce_powerbi.fx_ut_null_date(),
         ce_powerbi.fx_ut_null_date(),
-        ce_powerbi.fx_ut_null_date()
-    ORDER BY 1;
+        ce_powerbi.fx_ut_null_date();
 
 COMMENT ON VIEW ce_powerbi.v_date
     IS 'View - date lookup';

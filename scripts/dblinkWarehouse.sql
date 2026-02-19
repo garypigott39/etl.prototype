@@ -65,7 +65,7 @@ BEGIN
         SELECT %s AT TIME ZONE 'UTC'
         FROM dblink(
             'myconn',
-            'SELECT %s FROM ce_data.c_api_calc'
+            'SELECT %s FROM ce_data.c_api_calc ORDER BY pk_api_calc'
         ) AS t(
             ca_target_series TEXT,
             ca_target_freq TEXT[],
@@ -88,7 +88,7 @@ BEGIN
         SELECT %s AT TIME ZONE 'UTC'
         FROM dblink(
             'myconn',
-            'SELECT %s FROM ce_data.c_calc'
+            'SELECT %s FROM ce_data.c_calc ORDER BY pk_calc'
         ) AS t(
             calc_series TEXT,
             calc_freq TEXT,
@@ -109,7 +109,7 @@ BEGIN
         SELECT %s AT TIME ZONE 'UTC'
         FROM dblink(
             'myconn',
-            'SELECT %s FROM ce_data.c_com'
+            'SELECT %s FROM ce_data.c_com ORDER BY pk_com'
         ) AS t(
             com_code TEXT,
             com_name TEXT,
@@ -132,7 +132,7 @@ BEGIN
         SELECT %s AT TIME ZONE 'UTC'
         FROM dblink(
             'myconn',
-            'SELECT %s FROM ce_data.c_const'
+            'SELECT %s FROM ce_data.c_const ORDER BY pk_con'
         ) AS t(
             con_code TEXT,
             con_expr TEXT,
@@ -152,7 +152,7 @@ BEGIN
         SELECT %s AT TIME ZONE 'UTC'
         FROM dblink(
             'myconn',
-            'SELECT %s FROM ce_data.c_geo'
+            'SELECT %s FROM ce_data.c_geo ORDER BY pk_geo'
         ) AS t(
             geo_code TEXT,
             geo_name TEXT,
@@ -189,7 +189,7 @@ BEGIN
         SELECT %s AT TIME ZONE 'UTC'
         FROM dblink(
             'myconn',
-            'SELECT %s FROM ce_data.c_ind'
+            'SELECT %s FROM ce_data.c_ind ORDER BY pk_i'
         ) AS t(
             i_code TEXT,
             i_name TEXT,
@@ -225,7 +225,7 @@ BEGIN
         SELECT %s AT TIME ZONE 'UTC'
         FROM dblink(
             'myconn',
-            'SELECT %s FROM ce_data.c_series_metadata'
+            'SELECT %s FROM ce_data.c_series_metadata ORDER BY pk_sm'
         ) AS t(
             sm_gcode TEXT,
             sm_icode TEXT,
@@ -248,7 +248,7 @@ BEGIN
         SELECT %s AT TIME ZONE 'UTC', pk_s
         FROM dblink(
             'myconn',
-            'SELECT %s, pk_s FROM ce_data.c_series'
+            'SELECT %s, pk_s FROM ce_data.c_series ORDER BY pk_s'
         ) AS t(
             s_gcode TEXT,
             s_icode TEXT,

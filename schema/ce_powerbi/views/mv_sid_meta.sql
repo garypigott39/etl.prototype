@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * mv_series_meta.sql
+ * mv_sid_meta.sql
  *
- * Materialized View - series metadata lookup.
+ * Materialized View - series ID metadata lookup.
  ***********************************************************************************************************
  */
 
--- DROP MATERIALIZED VIEW IF EXISTS ce_powerbi.mv_series_meta;
+-- DROP MATERIALIZED VIEW IF EXISTS ce_powerbi.mv_sid_meta;
 
-CREATE MATERIALIZED VIEW ce_powerbi.mv_series_meta
+CREATE MATERIALIZED VIEW ce_powerbi.mv_sid_meta
 AS
     WITH _base AS (
         SELECT
@@ -47,7 +47,9 @@ AS
         GROUP BY fk_pk_s, freq, type
     )
     SELECT
-        b.pk_s,
+        ((f.pk_f * 10) + t.pk_t) * 100000000) + b.pk_s
+                                               AS sid_pk_s,  --derived UNIQUE key!!
+        b.pk_s                                 AS base_pk_s,
         f.pk_f                                 AS freq,
         f.code                                 AS freq_code,
         t.pk_t                                 AS type,
@@ -86,7 +88,7 @@ AS
             ON xsv.fk_pk_s = b.pk_s
             AND xsv.freq = f.pk_f
             AND xsv.type = t.pk_t
-        LEFT JOIN ce_warehouse.c_series_meta sm
+        LEFT JOIN ce_warehouse.c_sid_meta sm
             ON sm.sm_gcode = b.gcode
             AND sm.sm_icode = b.icode
             AND sm.sm_freq = f.code
@@ -101,5 +103,11 @@ AS
         LEFT JOIN ce_warehouse.mv_period last
             ON last.pk_p = mx.last_pdi;
 
-COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_series_meta
-    IS 'Materialized View - series metadata lookup';
+CREATE UNIQUE INDEX IF NOT EXISTS mv_sid_meta__sid_pk_s__idx
+    ON ce_powerbi.mv_sid_meta (sid_pk_s);
+
+CREATE INDEX IF NOT EXISTS mv_sid_meta__pk_s__idx
+    ON ce_powerbi.mv_sid_meta (pk_s);
+
+COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_sid_meta
+    IS 'Materialized View - series ID metadata lookup';

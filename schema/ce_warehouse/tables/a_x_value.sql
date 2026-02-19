@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a_x_value
 );
 
 CREATE INDEX IF NOT EXISTS a_x_value__datapoint__idx
-    ON ce_warehouse.a_x_value (fk_pk_s, pdi);
+    ON ce_warehouse.a_x_value (fk_pk_s, pdi, idx DESC);
 
 COMMENT ON TABLE ce_warehouse.a_x_value
     IS 'Audit table - datapoint values';

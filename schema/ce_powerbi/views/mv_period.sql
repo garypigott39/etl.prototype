@@ -26,7 +26,9 @@ AS
     FROM ce_warehouse.mv_period p
         LEFT JOIN ce_warehouse.l_freq f
             ON p.p_freq = f.pk_f
+
     UNION ALL
+
     SELECT
         -1,
         ce_powerbi.fx_ut_null_text(),

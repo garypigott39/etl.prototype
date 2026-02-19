@@ -7,9 +7,9 @@
  ***********************************************************************************************************
  */
 
--- DROP MATERIALIZED VIEW IF EXISTS ce_powerbi_v02.mv_ind;
+-- DROP MATERIALIZED VIEW IF EXISTS ce_powerbi.mv_ind;
 
-CREATE MATERIALIZED VIEW ce_powerbi_v02.mv_ind
+CREATE MATERIALIZED VIEW ce_powerbi.mv_ind
 AS
     SELECT
         pk_i,
@@ -35,7 +35,9 @@ AS
         ce_powerbi.fx_ut_null_int(i_order)         AS i_order
     FROM ce_powerbi.ind
     WHERE error IS NULL
+
     UNION ALL
+
     SELECT
         -1,
         '_undef',

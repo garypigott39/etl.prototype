@@ -16,12 +16,14 @@ AS
         code  AS t_code,
         name  AS t_name
     FROM ce_warehouse.l_type
+
     UNION ALL
+
     SELECT
         -1,
         ce_powerbi.fx_ut_null_text(),
         ce_powerbi.fx_ut_null_text()
     ORDER BY 1;
 
-COMMENT ON Materialized View ce_powerbi.mv_type
+COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_type
     IS 'Materialized View - type lookup';

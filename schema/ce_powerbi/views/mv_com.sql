@@ -22,7 +22,9 @@ AS
         ce_powerbi.fx_ut_null_int(com_order)        AS com_order
     FROM ce_warehouse.c_com
     WHERE error IS NULL
+
     UNION ALL
+
     SELECT
         -1,
         '_undef',

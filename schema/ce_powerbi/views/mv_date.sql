@@ -90,8 +90,10 @@ AS
         d_date  AS d_yy,
         d_date  AS d_mmmm,
         d_date  AS d_mmm
-    FROM ce_powerbi.date
+    FROM ce_warehouse.date
+
     UNION ALL
+
     SELECT
         -1,
         ce_powerbi.fx_ut_null_date(),

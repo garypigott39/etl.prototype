@@ -15,7 +15,9 @@ AS
         pk_tip,
         tooltip AS t_tip
     FROM ce_warehouse.x_tooltip
+
     UNION ALL
+
     SELECT
         -1,
         ce_powerbi.fx_ut_null_text()

@@ -17,7 +17,9 @@ AS
         name  AS src_name,
         api_available AS src_api_available
     FROM ce_warehouse.l_source
+
     UNION ALL
+
     SELECT
         -1,
         ce_powerbi.fx_ut_null_text(),

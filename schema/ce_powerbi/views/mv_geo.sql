@@ -46,7 +46,9 @@ AS
         LEFT JOIN ce_warehouse.s_sys_flags s
             ON s.code = 'GEO.FLAG.BASEURL'
     WHERE g.error IS NULL
+
     UNION ALL
+
     SELECT
         -1,
         '_undef',

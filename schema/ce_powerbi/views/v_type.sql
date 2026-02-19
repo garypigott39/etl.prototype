@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * mv_type.sql
+ * v_type.sql
  *
- * Materialized View - type lookup.
+ * View - type lookup.
  ***********************************************************************************************************
  */
 
--- DROP MATERIALIZED VIEW IF EXISTS ce_powerbi.mv_type;
+-- DROP VIEW IF EXISTS ce_powerbi.v_type;
 
-CREATE MATERIALIZED VIEW ce_powerbi.mv_type
+CREATE OR REPLACE VIEW ce_powerbi.mv_type
 AS
     SELECT
         pk_t,
@@ -25,5 +25,5 @@ AS
         ce_powerbi.fx_ut_null_text()
     ORDER BY 1;
 
-COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_type
-    IS 'Materialized View - type lookup';
+COMMENT ON VIEW ce_powerbi.v_type
+    IS 'View - type lookup';

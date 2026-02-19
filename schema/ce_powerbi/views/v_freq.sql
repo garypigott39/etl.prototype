@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * mv_freq.sql
+ * v_freq.sql
  *
- * Materialized View - frequency lookup.
+ * View - frequency lookup.
  ***********************************************************************************************************
  */
 
--- DROP MATERIALIZED VIEW IF EXISTS ce_powerbi.mv_freq;
+-- DROP VIEW IF EXISTS ce_powerbi.v_freq;
 
-CREATE MATERIALIZED VIEW ce_powerbi.mv_freq
+CREATE OR REPLACE VIEW ce_powerbi.v_freq
 AS
     SELECT
         pk_f,
@@ -27,5 +27,5 @@ AS
         ce_powerbi.fx_ut_null_int()
     ORDER BY 1;
 
-COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_freq
-    IS 'Materialized View - frequency lookup';
+COMMENT ON VIEW ce_powerbi.v_freq
+    IS 'View - frequency lookup';

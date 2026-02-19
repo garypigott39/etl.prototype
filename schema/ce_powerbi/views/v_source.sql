@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * mv_source.sql
+ * v_source.sql
  *
- * Materialized View - source lookup.
+ * View - source lookup.
  ***********************************************************************************************************
  */
 
--- DROP MATERIALIZED VIEW IF EXISTS ce_powerbi.mv_source;
+-- DROP VIEW IF EXISTS ce_powerbi.v_source;
 
-CREATE MATERIALIZED VIEW ce_powerbi.mv_source
+CREATE OR REPLACE VIEW ce_powerbi.v_source
 AS
     SELECT
         pk_src,
@@ -27,5 +27,5 @@ AS
         ce_powerbi.fx_ut_null_bool()
     ORDER BY 1;
 
-COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_source
-    IS 'Materialized View - source lookup';
+COMMENT ON VIEW ce_powerbi.v_source
+    IS 'View - source lookup';

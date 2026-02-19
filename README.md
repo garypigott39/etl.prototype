@@ -101,3 +101,5 @@ After updating the settings, run the migrations again to create the necessary ta
 
 If you want you can import an existing schema but see ChatGPT for help with that...
 
+
+Enjoy!

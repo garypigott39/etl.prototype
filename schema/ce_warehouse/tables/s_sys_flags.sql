@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.s_sys_flags
     code TEXT NOT NULL,
     value TEXT NOT NULL,
     description TEXT NOT NULL,
+
     PRIMARY KEY (code)
 );
 

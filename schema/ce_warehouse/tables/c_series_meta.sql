@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_meta
     has_values BOOLEAN NOT NULL DEFAULT FALSE,  -- flag to indicate if there are any values for this series/frequency/type
     new_values_utc TIMESTAMPTZ,  -- timestamp of the most recent new value
     updated_values_utc TIMESTAMPTZ,  -- timestamp of the most recent updated (or deleted) value
+
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),

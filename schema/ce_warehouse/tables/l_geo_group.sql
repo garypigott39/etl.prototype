@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_geo_group
         CHECK (code ~ '^[A-Z][A-Za-z0-9_-]*$'),
     name TEXT NOT NULL
         CHECK (name ~ '^[A-Z][A-Za-z0-9 _,-]*$'),
+
     PRIMARY KEY (pk_geo_gp),
     UNIQUE (code)
 );

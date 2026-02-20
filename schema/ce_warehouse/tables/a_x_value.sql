@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a_x_value
     audit_type TEXT NOT NULL
         CHECK (audit_type IN ('I', 'U', 'D', 'init', 'pipeline')),
     audit_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
     PRIMARY KEY (idx)
 );
 

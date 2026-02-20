@@ -251,14 +251,14 @@ BEGIN
 
     -- c_series_meta, some jiggerry-pokery needed
     --   errors in series ID, frequency or type will cause this to fail!!
-    _cols := 'fk_pk_s, freq, type, downloadable, forecast_only_lifespan, internal_notes, error, updated_utc';
+    _cols := 'fk_pk_s, freq, type, downloadable, forecast_only_lifespan, internal_notes, updated_utc';
     _sql := FORMAT($q$
         INSERT INTO ce_warehouse.c_series_meta (%s)
         OVERRIDING SYSTEM VALUE
-        SELECT s.pk_s, f.pk_f, t.pk_t, t.sm_downloadable, t.forecast_only_lifespan, t.internal_notes, t.error, t.updated_utc AT TIME ZONE 'UTC'
+        SELECT s.pk_s, f.pk_f, type.pk_t, t.sm_downloadable, t.forecast_only_lifespan, t.internal_notes, t.updated_utc AT TIME ZONE 'UTC'
         FROM dblink(
             'myconn',
-            'SELECT %s FROM ce_data.c_series_metadata ORDER BY pk_sm'
+            'SELECT * FROM ce_data.c_series_metadata ORDER BY pk_sm'
         ) AS t(
             sm_gcode TEXT,
             sm_icode TEXT,
@@ -268,16 +268,17 @@ BEGIN
             forecast_only_lifespan INT,
             internal_notes TEXT,
             error TEXT,
-            updated_utc TIMESTAMP
+            updated_utc TIMESTAMP,
+            pk_sm INT
         )
             LEFT JOIN ce_warehouse.c_series s
                 ON s.s_gcode = t.sm_gcode
                 AND s.s_icode = t.sm_icode
             LEFT JOIN ce_warehouse.l_freq f
                 ON f.code = t.sm_freq
-            LEFT JOIN ce_warehouse.l_type t
-                ON t.code = t.sm_type
-    $q$, _cols, _cols, _cols);
+            LEFT JOIN ce_warehouse.l_type type
+                ON type.code = t.sm_type
+    $q$, _cols);
     EXECUTE _sql;
 
     -- x_tooltip
@@ -386,13 +387,14 @@ BEGIN
         AND x.type = sm.type
     );
 
-    UPDATE ce_warehouse.x_series_value sm
-    SET updated_utc = (
+    UPDATE ce_warehouse.c_series_meta sm
+    SET updated_values_utc = (
         SELECT MAX(updated_utc) FROM ce_warehouse.x_value x
         WHERE x.fk_pk_s = sm.fk_pk_s
         AND x.freq = sm.freq
         AND x.type = sm.type
-    );
+    )
+    WHERE updated_values_utc IS NULL;
 
     ------------------------------------------------------------------
     -- Reset sequences safely

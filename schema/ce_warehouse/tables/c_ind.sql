@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
     internal_notes TEXT,  -- Internal notes, unvalidated!
     error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
     PRIMARY KEY (pk_i),
     UNIQUE (i_code)
 );

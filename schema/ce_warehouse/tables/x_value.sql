@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
     is_calculated BOOLEAN NOT NULL DEFAULT FALSE,  -- flag to indicate if the value was calculated
     error TEXT,  -- optional error message for invalid values, there should never be any!!
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
     PRIMARY KEY (idx),
     UNIQUE (fk_pk_s, pdi)  -- enforce only one value per period
 );

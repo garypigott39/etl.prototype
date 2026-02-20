@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a_c_series
     audit_type TEXT NOT NULL
         CHECK (audit_type IN ('U', 'D')),
     audit_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
     PRIMARY KEY (idx)
 );
 

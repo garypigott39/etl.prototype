@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_type
     code TEXT NOT NULL
         CHECK (code IN ('AC','F')),  -- restrict to valid codes
     name TEXT NOT NULL,
+
     PRIMARY KEY (pk_t),
     UNIQUE (code)
 );

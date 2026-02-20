@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_api_calc
             ON UPDATE CASCADE
             ON DELETE CASCADE,
     ca_source_freq TEXT NOT NULL
-        CHECK (ca_source_freq IN ('D', 'W', 'M', 'Q', 'Y')),
+        CHECK (ca_source_freq IN ('D', 'W', 'M', 'Q', 'Y', '-')),
     ca_source_freq_int INT GENERATED ALWAYS AS (
         ce_warehouse.fx_ut_ifreq_single(ca_source_freq)
     ) STORED,

@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.s_pipeline_lock
 (
     name TEXT NOT NULL,
     locked_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- Locked timestamp
+
     PRIMARY KEY (name)
 );
 

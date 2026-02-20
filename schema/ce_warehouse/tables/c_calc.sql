@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc
     internal_notes TEXT,  -- Internal notes, unvalidated!
     error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
     PRIMARY KEY (pk_calc),
     UNIQUE (calc_series,  calc_freq, calc_type)
 );

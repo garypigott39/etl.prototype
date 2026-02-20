@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_source
         CHECK (source_is IN ('A', 'M', 'B', '-')),     -- A=Api/M=Manual/B=Both/-=N/A
     active        BOOLEAN NOT NULL DEFAULT TRUE,  -- enables the source to be marked as inactive if required
     api_available BOOLEAN NOT NULL DEFAULT TRUE,  -- this is used to determine if the source is available for API calls (@see plugin)
+
     PRIMARY KEY(pk_src),
     UNIQUE (code)
 );

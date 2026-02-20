@@ -3,20 +3,20 @@
  * @file
  * mv_fact_series_value.sql
  *
- * Materialized View - "fact" table for series value.
+ * Materialized View - "fact" table for series values.
  ***********************************************************************************************************
  */
 
--- DROP VIEW IF EXISTS ce_powerbi.mv_fact_series_value;
+-- DROP MATERIALIZED VIEW IF EXISTS ce_powerbi.mv_fact_series_value;
 
-CREATE OR REPLACE VIEW ce_powerbi.mv_fact_series_value
+CREATE MATERIALIZED VIEW ce_powerbi.mv_fact_series_value
 AS
     SELECT
         x.idx            AS pk_sv,
         x.value          AS sv_value,
         a.old_value      AS sv_old_value,
         x.fk_pk_tip      AS fk_pk_tip,
-        sx.pk_s          AS fk_pk_s,
+        sx.pk_sx         AS fk_pk_s,
         x.pdi            AS fk_pk_p,
         ce_warehouse.fx_ut_date_to_dti(
             CASE s.s_date_point
@@ -53,5 +53,5 @@ AS
             AND a.pdi = x.pdi
     WHERE x.error IS NULL;
 
-COMMENT ON VIEW ce_powerbi.fact_series_value
-    IS 'View - "fact" table for series value';
+COMMENT ON MATERIALIZED VIEW ce_powerbi.mv_fact_series_value
+    IS 'Materialized View - "fact" table for series values';

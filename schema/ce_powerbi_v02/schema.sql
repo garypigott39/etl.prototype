@@ -3,7 +3,7 @@
  * @file
  * schema.sql
  *
- * Schema for PowerBi "exposed" tables & associated functionality. VERSION #2
+ * Schema for PowerBi "exposed" tables & views. VERSION #2
  ***********************************************************************************************************
  */
 
@@ -13,7 +13,7 @@ CREATE SCHEMA IF NOT EXISTS ce_powerbi_v02;
 --     AUTHORIZATION pgadmin842;
 
 COMMENT ON SCHEMA ce_powerbi_v02
-    IS 'CE: powerbi "exposed" internal tables & functionality. VERSION #2';
+    IS 'CE: powerbi "exposed" tables & views. VERSION #2';
 
 -- REVOKE ALL ON SCHEMA ce_powerbi_v02 FROM public;
 

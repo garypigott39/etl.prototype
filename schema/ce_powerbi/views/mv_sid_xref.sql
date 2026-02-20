@@ -87,10 +87,10 @@ AS
             ON f.pk_f = bl.freq
         JOIN ce_warehouse.l_type t
             ON bl.label IN ('BLENDED', t.code)
-        JOIN ce_warehouse.x_series_value xsv
-            ON xsv.fk_pk_s = b.pk_s
-            AND xsv.freq = f.pk_f
-            AND xsv.type = t.pk_t
+        JOIN _min_max_periods mx
+            ON mx.fk_pk_s = b.pk_s
+            AND mx.freq = bl.freq
+            AND mx.type = t.pk_t
         LEFT JOIN ce_warehouse.c_series_meta sm
             ON sm.fk_pk_s = b.pk_s
             AND sm.freq = f.pk_f

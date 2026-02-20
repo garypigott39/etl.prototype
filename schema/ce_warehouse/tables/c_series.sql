@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
     s_description TEXT,
     s_source TEXT,
     s_units TEXT,
-    s_precision INT NOT NULL,
+    s_precision INT NOT NULL
+        CHECK (s_precision BETWEEN -1 AND 12),  -- number of decimal places for rounding in PowerBI
     s_date_point TEXT NOT NULL DEFAULT 'mid',
     s_active BOOL NOT NULL DEFAULT TRUE,
     s_order INT NOT NULL DEFAULT 0,

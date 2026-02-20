@@ -13,8 +13,16 @@ CREATE MATERIALIZED VIEW ce_powerbi.mv_fact_series_value
 AS
     SELECT
         x.idx                                    AS pk_sv,
-        x.value                                  AS sv_value,
-        a.old_value                              AS sv_old_value,
+        CASE
+            WHEN s.s_precision IS NOT NULL AND s.s_precision BETWEEN 0 AND 12 THEN
+                ROUND(x.value, s.s_precision)
+            ELSE x.value
+        END                                      AS sv_value,
+        CASE
+            WHEN s.s_precision IS NOT NULL AND s.s_precision BETWEEN 0 AND 12 THEN
+                ROUND(a.old_value, s.s_precision)
+            ELSE a.old_value
+        END                                      AS sv_old_value,
         ce_powerbi.fx_ut_null_int(x.fk_pk_tip)   AS fk_pk_tip,
         sx.pk_sx                                 AS fk_pk_s,
         x.pdi                                    AS fk_pk_p,

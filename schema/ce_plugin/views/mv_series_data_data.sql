@@ -34,7 +34,8 @@ AS
         JOIN ce_powerbi.v_date d
             ON v.fk_pk_d = d.pk_d
         LEFT JOIN ce_powerbi.mv_tooltip t
-            ON v.fk_pk_tip = t.pk_tip;
+            ON v.fk_pk_tip = t.pk_tip
+            AND v.fk_pk_tip > 0;
 
 -- Unique index to support concurrent refreshes etc
 CREATE UNIQUE INDEX IF NOT EXISTS mv_series_data_data__unique__idx

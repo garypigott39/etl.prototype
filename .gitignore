@@ -210,3 +210,4 @@ __marimo__/
 wip/
 test.data/
 a.sql
+*.sql.gz

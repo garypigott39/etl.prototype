@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_freq
 (
     pk_f SMALLINT NOT NULL,
     code TEXT NOT NULL
-        CHECK (code IN ('D','W','M','Q','Y')),  -- restrict to valid codes
+        CHECK (code IN ('D', 'W', 'M', 'Q', 'Y')),  -- restrict to valid codes
     name TEXT NOT NULL,
     forecast_only_lifespan INT NOT NULL,
     PRIMARY KEY (pk_f),

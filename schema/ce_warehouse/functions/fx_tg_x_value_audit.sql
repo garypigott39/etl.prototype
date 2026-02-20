@@ -21,8 +21,8 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
         INSERT INTO ce_warehouse.a_xvalue (fk_pk_s, pdi, type, source, value, realised, audit_type)
             VALUES (NEW.fk_pk_s, NEW.pdi, NEW.type, NEW.source, NEW.value, FALSE, 'I');
-        -- Upsert x_series_value
-        INSERT INTO ce_warehouse.x_series_value (fk_pk_s, freq, type, has_values, new_values_utc)
+        -- Upsert c_series_meta
+        INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, freq, type, has_values, new_values_utc)
             VALUES(NEW.fk_pk_s, NEW.freq, NEW.type, TRUE, NOW())
             ON CONFLICT (fk_pk_s, freq, type)
             DO UPDATE
@@ -43,8 +43,8 @@ BEGIN
                   (OLD.type = 2 AND NEW.type = 1),  -- Realised if 2=(F)orecast becomes 1=(AC)tuals
                   'U'
               );
-            -- Upsert x_series_value
-            INSERT INTO ce_warehouse.x_series_value (fk_pk_s, freq, type, has_values, updated_values_utc)
+            -- Upsert c_series_meta
+            INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, freq, type, has_values, updated_values_utc)
                 VALUES(OLD.fk_pk_s, OLD.freq, OLD.type, TRUE, NOW())
                 ON CONFLICT (fk_pk_s, freq, type)
                 DO UPDATE
@@ -55,14 +55,14 @@ BEGIN
     ELSEIF TG_OP = 'DELETE' THEN
         INSERT INTO ce_warehouse.a_xvalue (fk_pk_s, pdi, type, source, value, realised, audit_type)
             VALUES (OLD.fk_pk_s, OLD.pdi, OLD.type, OLD.source, OLD.value, FALSE, 'D');
-        -- Upsert x_series_value
+        -- Upsert c_series_meta
         _number_of_values := (
             SELECT COUNT(*) FROM ce_warehouse.x_value
             WHERE fk_pk_s = OLD.fk_pk_s
             AND freq = OLD.freq
             AND type = OLD.type
         );
-        INSERT INTO ce_warehouse.x_series_value (fk_pk_s, freq, type, has_values, updated_values_utc)
+        INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, freq, type, has_values, updated_values_utc)
             VALUES(OLD.fk_pk_s, OLD.freq, OLD.type, (_number_of_values > 0), NOW())
             ON CONFLICT (fk_pk_s, freq, type)
             DO UPDATE

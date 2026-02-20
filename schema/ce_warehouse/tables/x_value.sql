@@ -25,7 +25,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
     type SMALLINT NOT NULL
         CHECK (type IN (1, 2)),  -- enforce valid types: 1=actual, 2=forecast
     source SMALLINT NOT NULL
-        REFERENCES ce_warehouse.l_source (pk_src),
+        REFERENCES ce_warehouse.l_source (pk_src)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
     value NUMERIC NOT NULL,
     fk_pk_tip INT
         REFERENCES ce_warehouse.x_tooltip (pk_tip)

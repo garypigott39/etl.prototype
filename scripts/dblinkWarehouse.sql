@@ -16,7 +16,6 @@ DECLARE
     -- Amend connection string as neededuser has appropriate permissions & dblink extension is installed on the target database.
     _conn TEXT := 'dbname=testdb user=postgres password=postgres host=localhost';
     _cols TEXT;
-    _cols2 TEXT;
     _sql TEXT;
 BEGIN
 
@@ -46,16 +45,49 @@ BEGIN
         ce_warehouse.c_geo,
         ce_warehouse.c_ind,
         ce_warehouse.c_series_meta,
-        ce_warehouse.c_series,
-        ce_warehouse.x_tooltip,
+
         ce_warehouse.x_value,
+        ce_warehouse.x_tooltip,
         ce_warehouse.a_x_value,
-        ce_warehouse.x_series_value
+
+        ce_warehouse.c_series  -- do this last as there are FKs to it
     RESTART IDENTITY CASCADE;
 
     ------------------------------------------------------------------
     -- COPY TABLES with named columns
     ------------------------------------------------------------------
+
+    -- c_series, this must be done first as there are FKS to it!!
+    _cols := 's_gcode, s_icode, s_name, s_name1, s_name2, s_name3, s_name4, s_description, s_source, s_units, s_precision, s_date_point, s_active, s_order, internal_notes, error, updated_utc';
+    _sql :=  FORMAT($q$
+        INSERT INTO ce_warehouse.c_series (%s, pk_s)
+        OVERRIDING SYSTEM VALUE
+        SELECT %s AT TIME ZONE 'UTC', pk_s
+        FROM dblink(
+            'myconn',
+            'SELECT %s, pk_s FROM ce_data.c_series ORDER BY pk_s'
+        ) AS t(
+            s_gcode TEXT,
+            s_icode TEXT,
+            s_name TEXT,
+            s_name1 TEXT,
+            s_name2 TEXT,
+            s_name3 TEXT,
+            s_name4 TEXT,
+            s_description TEXT,
+            s_source TEXT,
+            s_units TEXT,
+            s_precision INT,
+            s_date_point TEXT,
+            s_active BOOL,
+            s_order INT,
+            internal_notes TEXT,
+            error TEXT,
+            updated_utc TIMESTAMP,
+            pk_s INT
+        )
+    $q$, _cols, _cols, _cols);
+    EXECUTE _sql;
 
     -- c_api_calc
     _cols := 'ca_target_series, ca_target_freq, ca_source_series, ca_source_freq, ca_formula_type, internal_notes, error, regenerate, updated_utc';
@@ -217,12 +249,13 @@ BEGIN
     $q$, _cols, _cols, _cols);
     EXECUTE _sql;
 
-    -- c_series_meta
-    _cols := 'sm_gcode, sm_icode, sm_freq, sm_type, sm_downloadable, forecast_only_lifespan, internal_notes, error, updated_utc';
+    -- c_series_meta, some jiggerry-pokery needed
+    --   errors in series ID, frequency or type will cause this to fail!!
+    _cols := 'fk_pk_s, freq, type, downloadable, forecast_only_lifespan, internal_notes, error, updated_utc';
     _sql := FORMAT($q$
         INSERT INTO ce_warehouse.c_series_meta (%s)
         OVERRIDING SYSTEM VALUE
-        SELECT %s AT TIME ZONE 'UTC'
+        SELECT s.pk_s, f.pk_f, t.pk_t, t.sm_downloadable, t.forecast_only_lifespan, t.internal_notes, t.error, t.updated_utc AT TIME ZONE 'UTC'
         FROM dblink(
             'myconn',
             'SELECT %s FROM ce_data.c_series_metadata ORDER BY pk_sm'
@@ -237,38 +270,13 @@ BEGIN
             error TEXT,
             updated_utc TIMESTAMP
         )
-    $q$, _cols, _cols, _cols);
-    EXECUTE _sql;
-
-    -- c_series
-    _cols := 's_gcode, s_icode, s_name, s_name1, s_name2, s_name3, s_name4, s_description, s_source, s_units, s_precision, s_date_point, s_active, s_order, internal_notes, error, updated_utc';
-    _sql :=  FORMAT($q$
-        INSERT INTO ce_warehouse.c_series (%s, pk_s)
-        OVERRIDING SYSTEM VALUE
-        SELECT %s AT TIME ZONE 'UTC', pk_s
-        FROM dblink(
-            'myconn',
-            'SELECT %s, pk_s FROM ce_data.c_series ORDER BY pk_s'
-        ) AS t(
-            s_gcode TEXT,
-            s_icode TEXT,
-            s_name TEXT,
-            s_name1 TEXT,
-            s_name2 TEXT,
-            s_name3 TEXT,
-            s_name4 TEXT,
-            s_description TEXT,
-            s_source TEXT,
-            s_units TEXT,
-            s_precision INT,
-            s_date_point TEXT,
-            s_active BOOL,
-            s_order INT,
-            internal_notes TEXT,
-            error TEXT,
-            updated_utc TIMESTAMP,
-            pk_s INT
-        )
+            LEFT JOIN ce_warehouse.c_series s
+                ON s.s_gcode = t.sm_gcode
+                AND s.s_icode = t.sm_icode
+            LEFT JOIN ce_warehouse.l_freq f
+                ON f.code = t.sm_freq
+            LEFT JOIN ce_warehouse.l_type t
+                ON t.code = t.sm_type
     $q$, _cols, _cols, _cols);
     EXECUTE _sql;
 
@@ -309,7 +317,8 @@ BEGIN
             updated_utc TIMESTAMP,
             idx INT
         )
-           LEFT JOIN ce_warehouse.l_source src ON src.code = t.source
+           LEFT JOIN ce_warehouse.l_source src
+                ON src.code = t.source
         ON CONFLICT (fk_pk_s, pdi) DO NOTHING
     $q$;
     EXECUTE FORMAT(_sql, _cols, 't.fk_pk_tip', FALSE, 'x_api', '', 'fk_pk_tip', '');
@@ -339,14 +348,15 @@ BEGIN
             aud_utc TIMESTAMP,
             idx INT
         )
-            LEFT JOIN ce_warehouse.l_source src ON src.code = t.source
+            LEFT JOIN ce_warehouse.l_source src
+                ON src.code = t.source
     $q$, _cols);
     EXECUTE _sql;
 
-    -- x_series_value, there's no source table for this but the values can be pulled from derived table ce_powerbi.series - see existing pipelin scripts!!
+    -- c_series_meta, UPSERT
     _cols := 'fk_pk_s, freq, type, has_values, new_values_utc, updated_values_utc';
     _sql := FORMAT($q$
-        INSERT INTO ce_warehouse.x_series_value (%s)
+        INSERT INTO ce_warehouse.c_series_meta (%s)
         OVERRIDING SYSTEM VALUE
         SELECT fk_pk_xs, fk_pk_f, fk_pk_t, TRUE, new_values_utc AT TIME ZONE 'UTC', updated_values_utc AT TIME ZONE 'UTC'
         FROM dblink(
@@ -359,24 +369,29 @@ BEGIN
             new_values_utc TIMESTAMP,
             updated_values_utc TIMESTAMP
         )
+        ON CONFLICT (fk_pk_s, freq, type)
+        DO UPDATE
+            SET has_values = EXCLUDED.has_values,
+                new_values_utc = EXCLUDED.new_values_utc,
+                updated_values_utc = EXCLUDED.updated_values_utc
     $q$, _cols);
     EXECUTE _sql;
 
-    UPDATE ce_warehouse.x_series_value xs
-    SET has_values = FALSE
-    WHERE NOT EXISTS (
-        SELECT 1 FROM ce_warehouse.x_value xv
-        WHERE xv.fk_pk_s = xs.fk_pk_s
-        AND xv.freq = xs.freq
-        AND xv.type = xs.type
+    UPDATE ce_warehouse.c_series_meta sm
+    SET has_values = TRUE
+    WHERE EXISTS (
+        SELECT 1 FROM ce_warehouse.x_value x
+        WHERE x.fk_pk_s = sm.fk_pk_s
+        AND x.freq = sm.freq
+        AND x.type = sm.type
     );
 
-    UPDATE ce_warehouse.x_series_value xs
+    UPDATE ce_warehouse.x_series_value sm
     SET updated_utc = (
-        SELECT MAX(updated_utc) FROM ce_warehouse.x_value xv
-        WHERE xv.fk_pk_s = xs.fk_pk_s
-        AND xv.freq = xs.freq
-        AND xv.type = xs.type
+        SELECT MAX(updated_utc) FROM ce_warehouse.x_value x
+        WHERE x.fk_pk_s = sm.fk_pk_s
+        AND x.freq = sm.freq
+        AND x.type = sm.type
     );
 
     ------------------------------------------------------------------

@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
     fk_pk_s INT NOT NULL
         REFERENCES ce_warehouse.c_series (pk_s)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
+        ON DELETE RESTRICT,  -- prevent deletion of series with values, see app logic!!
     pdi INT NOT NULL,  -- reference to period identifier, see housekeeping
     freq SMALLINT NOT NULL GENERATED ALWAYS
         AS (pdi / 100000000) STORED

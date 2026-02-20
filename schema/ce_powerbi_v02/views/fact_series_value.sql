@@ -11,7 +11,7 @@
 
 CREATE OR REPLACE VIEW ce_powerbi_v02.fact_series_value
 AS
-    -- As per base materialized view, by specifying cols this allows for easier mods
+    -- As per base materialized view (without sv_updated_utc)
     SELECT
         pk_sv,
         sv_value,

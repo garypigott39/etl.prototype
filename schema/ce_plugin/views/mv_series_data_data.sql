@@ -19,9 +19,9 @@ AS
         v.sv_value                 AS value,
         v.sv_old_value             AS old_value,
         v.sv_updated_utc           AS updated_utc,  -- Value record updated timestamp
-        t.tip                      AS tip,
-        src.api_available          AS api_available,
-        v.s_downloadable           AS downloadable,
+        t.t_tip                    AS tip,
+        src.src_api_available      AS api_available,
+        s.s_downloadable           AS downloadable,
         -- Adjustment date: only used by API
         d.d_date                   AS adj_date,
         -- PRIMARY key needed for concurrent refreshes - not exposed to plugin
@@ -29,11 +29,11 @@ AS
     FROM ce_powerbi.mv_series s
         JOIN ce_powerbi.mv_fact_series_value v
             ON v.fk_pk_s = s.pk_s
-        JOIN ce_powerbi.source src
+        JOIN ce_powerbi.v_source src
             ON v.fk_pk_src = src.pk_src
-        JOIN ce_powerbi.date d
+        JOIN ce_powerbi.v_date d
             ON v.fk_pk_d = d.pk_d
-        LEFT JOIN ce_powerbi.tooltip t
+        LEFT JOIN ce_powerbi.mv_tooltip t
             ON v.fk_pk_tip = t.pk_tip;
 
 -- Unique index to support concurrent refreshes etc

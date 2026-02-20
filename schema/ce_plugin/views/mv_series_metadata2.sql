@@ -38,14 +38,15 @@ AS
         MAX(s_updated_utc) FILTER (WHERE t_code = 'F')
                                              AS forecast_last_updated,
         -- PRIMARY key needed for concurrent refreshes - not exposed to plugin
-        pk_s                                 AS idx
-    FROM ce_powerbi_v02.mv_series_metadata s
+        ROW_NUMBER() OVER (ORDER BY skey, f_code)
+                                             AS idx
+    FROM ce_plugin.mv_series_metadata s
     WHERE t_code IN ('AC', 'F')
     GROUP BY
         skey, f_code;
 
 CREATE UNIQUE INDEX IF NOT EXISTS mv_series_metadata2__unique__idx
-    ON ce_powerbi_v02.mv_series_metadata2(idx);
+    ON ce_plugin.mv_series_metadata2(idx);
 
 COMMENT ON MATERIALIZED VIEW ce_plugin.mv_series_metadata2
     IS 'Materialized view - for Excel plugin series data header';

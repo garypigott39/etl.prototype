@@ -22,7 +22,7 @@ AS
         sx.i_name1                    AS i_name1,
         sx.freq_code                  AS f_code,
         sx.freq_name                  AS f_name,
-        sx.freq_code                  AS t_code,
+        sx.type_code                  AS t_code,
         sx.type_name                  AS t_name,
         s.s_description               AS s_description,
         s.s_source                    AS s_source,

@@ -6,6 +6,8 @@ Determine dependency order of SQL files (tables, views, functions, procedures)
 without requiring a live PostgreSQL database.
 
 Schema-aware version.
+
+Note, doesn't support cross-schema dependencies, you'll need to run that bit by hand!!!
 """
 
 import os

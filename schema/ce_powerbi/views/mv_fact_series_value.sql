@@ -12,25 +12,25 @@
 CREATE MATERIALIZED VIEW ce_powerbi.mv_fact_series_value
 AS
     SELECT
-        x.idx            AS pk_sv,
-        x.value          AS sv_value,
-        a.old_value      AS sv_old_value,
-        x.fk_pk_tip      AS fk_pk_tip,
-        sx.pk_sx         AS fk_pk_s,
-        x.pdi            AS fk_pk_p,
+        x.idx                                    AS pk_sv,
+        x.value                                  AS sv_value,
+        a.old_value                              AS sv_old_value,
+        ce_powerbi.fx_ut_null_int(x.fk_pk_tip)   AS fk_pk_tip,
+        sx.pk_sx                                 AS fk_pk_s,
+        x.pdi                                    AS fk_pk_p,
         ce_warehouse.fx_ut_date_to_dti(
             CASE s.s_date_point
                 WHEN 'start' THEN p.start_of_period
                 WHEN 'end' THEN p.end_of_period
                 ELSE p.mid_of_period
             END
-        )                AS fk_pk_d,
-        x.source         AS fk_pk_src,  -- 1:1 mapping
-        x.type           AS fk_pk_t,    -- ditto
-        x.freq           AS fk_pk_f,    -- ditto
-        sx.fk_pk_geo     AS fk_pk_geo,
-        sx.fk_pk_com     AS fk_pk_com,
-        sx.fk_pk_i       AS fk_pk_i
+        )                                        AS fk_pk_d,
+        x.source                                 AS fk_pk_src,  -- 1:1 mapping
+        x.type                                   AS fk_pk_t,    -- ditto
+        x.freq                                   AS fk_pk_f,    -- ditto
+        ce_powerbi.fx_ut_null_int(sx.fk_pk_geo)  AS fk_pk_geo,
+        ce_powerbi.fx_ut_null_int(sx.fk_pk_com)  AS fk_pk_com,
+        sx.fk_pk_i                               AS fk_pk_i
     FROM ce_warehouse.x_value x
         JOIN ce_warehouse.c_series s
             ON s.pk_s = x.fk_pk_s

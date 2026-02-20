@@ -11,7 +11,7 @@
 
 CREATE OR REPLACE VIEW ce_powerbi_v02.dim_source
 AS
-    SELECT * FROM ce_powerbi.mv_source;
+    SELECT * FROM ce_powerbi.v_source;
 
 COMMENT ON VIEW ce_powerbi_v02.dim_source
     IS 'View - "dimension" table for source lookup';

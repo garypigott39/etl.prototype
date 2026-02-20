@@ -48,38 +48,49 @@ AS
     )
     SELECT
         (((f.pk_f * 10) + t.pk_t) * 10000000) + b.pk_s
-                                                 AS pk_sx,  --derived UNIQUE key!!
-        b.pk_s                                   AS base_pks,
-        f.pk_f                                   AS freq,
-        f.code                                   AS freq_code,
-        t.pk_t                                   AS type,
-        t.code                                   AS type_code,
-        b.s3 || '_' || f.code || '_' || t.code   AS s_id_1,
-        b.s3 || '_' || f.code                    AS s_id_2,
-        b.s3                                     AS s_id_3,
-        bl.label                                 AS s_id_2_blended,
-        COALESCE(sm.downloadable, 'ess_plugin')  AS downloadable,
-        sm.new_values_utc                        AS new_values_utc,
-        sm.updated_values_utc                    AS updated_values_utc,
-        sm.updated_utc                           AS updated_utc,
+                                                  AS pk_sx,  --derived UNIQUE key!!
+        b.pk_s                                    AS base_pks,
+        f.pk_f                                    AS freq,
+        f.code                                    AS freq_code,
+        t.pk_t                                    AS type,
+        t.code                                    AS type_code,
+        b.s3 || '_' || f.code || '_' || t.code    AS s_id_1,
+        b.s3 || '_' || f.code                     AS s_id_2,
+        b.s3                                      AS s_id_3,
+        bl.label                                  AS s_id_2_blended,
+        COALESCE(sm.downloadable, 'ess_plugin')   AS downloadable,
+        sm.new_values_utc                         AS new_values_utc,
+        sm.updated_values_utc                     AS updated_values_utc,
+        sm.updated_utc                            AS updated_utc,
         -- First & last periods
-        first.period_name                        AS first_period,
-        last.period_name                         AS last_period,
+        first.period_name                         AS first_period,
+        last.period_name                          AS last_period,
         -- ADJ dates
         CASE b.date_point
             WHEN 'start' THEN first.start_of_period
             WHEN 'end' THEN first.end_of_period
             ELSE first.mid_of_period
-        END                                      AS first_date,
+        END                                       AS first_date,
         CASE b.date_point
             WHEN 'start' THEN last.start_of_period
             WHEN 'end' THEN last.end_of_period
             ELSE last.mid_of_period
-        END                                      AS last_date,
+        END                                       AS last_date,
+        -- Other useful stuff
+        SUBSTR(COALESCE(g.geo_code, c.com_code), 3)
+                                                  AS geo_short_code,
+        COALESCE(g.geo_short_name, c.com_short_name)
+                                                  AS geo_short_name,
+        CASE
+            WHEN b.gcode LIKE 'G.%' THEN 'Geography'
+            ELSE 'Commodity'
+        END                                       AS geo_type,
+        i.i_code                                  AS i_code,
+        i.i_name1                                 AS i_name1,
         -- FOREIGN keys
-        g.pk_geo                                 AS fk_pk_geo,
-        c.pk_com                                 AS fk_pk_com,
-        i.pk_i                                   AS fk_pk_i
+        g.pk_geo                                  AS fk_pk_geo,
+        c.pk_com                                  AS fk_pk_com,
+        i.pk_i                                    AS fk_pk_i
     FROM _base b
         JOIN _blended bl
             ON bl.fk_pk_s = b.pk_s

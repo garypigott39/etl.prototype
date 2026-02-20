@@ -30,7 +30,9 @@ AS
         x.freq                                   AS fk_pk_f,    -- ditto
         ce_powerbi.fx_ut_null_int(sx.fk_pk_geo)  AS fk_pk_geo,
         ce_powerbi.fx_ut_null_int(sx.fk_pk_com)  AS fk_pk_com,
-        sx.fk_pk_i                               AS fk_pk_i
+        sx.fk_pk_i                               AS fk_pk_i,
+        -- Used by plugin views
+        x.updated_utc                            AS sv_updated_utc
     FROM ce_warehouse.x_value x
         JOIN ce_warehouse.c_series s
             ON s.pk_s = x.fk_pk_s

@@ -120,7 +120,7 @@ SELECT
     p.end_of_period,
     p.days_in_period,
     p.ifreq,
-    f.code AS ifreq_code,
+    f.code AS freq_code,
 
     -- Period range, performance related. The "half-open" range "[)" may have a massive impact on
     -- the performance of the GIST index for date range queries; the closed range "[]" is more efficient but includes the

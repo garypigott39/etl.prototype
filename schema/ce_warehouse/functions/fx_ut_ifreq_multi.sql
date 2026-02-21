@@ -21,13 +21,13 @@ AS
 $$
     SELECT ARRAY(
         SELECT DISTINCT
-        CASE f
-            WHEN 'D' THEN 1
-            WHEN 'W' THEN 2
-            WHEN 'M' THEN 3
-            WHEN 'Q' THEN 4
-            WHEN 'Y' THEN 5
-        END
+            CASE f
+                WHEN 'D' THEN 1
+                WHEN 'W' THEN 2
+                WHEN 'M' THEN 3
+                WHEN 'Q' THEN 4
+                WHEN 'Y' THEN 5
+            END
         FROM UNNEST(_freqs) AS f
         WHERE f IS NOT NULL
         ORDER BY 1

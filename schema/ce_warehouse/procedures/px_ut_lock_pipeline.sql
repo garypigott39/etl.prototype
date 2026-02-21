@@ -10,36 +10,45 @@
 -- DROP PROCEDURE IF EXISTS ce_warehouse.px_ut_lock_pipeline;
 
 CREATE OR REPLACE PROCEDURE ce_warehouse.px_ut_lock_pipeline(
-    _name TEXT DEFAULT NULL,
-    _type TEXT DEFAULT 'lock',  -- lock/unlock
-    _interval INTERVAL DEFAULT '1 hour'  -- Interval for checking if the pipeline is locked
+    _name TEXT,
+    _type TEXT DEFAULT 'lock',          -- lock | unlock
+    _interval INTERVAL DEFAULT '1 hour'
 )
     LANGUAGE plpgsql
 AS
 $$
-DECLARE
-    _ts TIMESTAMP := NOW() AT TIME ZONE 'UTC' - _interval;
 BEGIN
     _name := UPPER(TRIM(_name));
+    _type := LOWER(TRIM(_type));
 
-    IF _name IS NULL THEN
+    IF _name IS NULL OR _name = '' THEN
         RAISE EXCEPTION 'Pipeline name must be provided';
-    ELSEIF _type = 'lock' THEN
-        IF (SELECT COUNT(*) FROM ce_warehouse.s_pipeline_lock WHERE name = _name AND locked_utc > _ts) > 0 THEN
+    END IF;
+
+    IF _type = 'lock' THEN
+        -- Fail if active lock exists
+        IF EXISTS (
+            SELECT 1 FROM ce_warehouse.s_pipeline_lock
+            WHERE name = _name AND locked_at > NOW() - _interval
+        ) THEN
             RAISE EXCEPTION 'Pipeline "%" is already locked', _name;
-        ELSE
-            DELETE FROM ce_warehouse.s_pipeline_lock WHERE name = _name;
-            INSERT INTO ce_warehouse.s_pipeline_lock(name) VALUES (_name);
-            RAISE INFO 'Pipeline "%" locked', _name;
         END IF;
-    ELSEIF _type = 'unlock' THEN
-        -- Unlock the pipeline
-        DELETE FROM ce_warehouse.s_pipeline_lock WHERE name = _name;
-        RAISE INFO 'Pipeline "%" unlocked', _name;
+
+        -- Insert or refresh lock
+        INSERT INTO ce_warehouse.s_pipeline_lock(name) VALUES (_name)
+            ON CONFLICT (name)
+            DO UPDATE SET locked_at = NOW();
+
+    ELSIF _type = 'unlock' THEN
+        DELETE FROM ce_warehouse.s_pipeline_lock
+        WHERE name = _name;
+
     ELSE
         RAISE EXCEPTION 'Invalid type "%" - must be lock or unlock', _type;
     END IF;
-END
+
+    RAISE INFO 'Pipeline "%" %ed successfully', _name, _type;
+END;
 $$;
 
 COMMENT ON PROCEDURE ce_warehouse.px_ut_lock_pipeline

@@ -15,23 +15,25 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.u_value
 (
     idx INT GENERATED ALWAYS AS IDENTITY,
+
     uv_gcode TEXT,
     uv_icode TEXT,
     uv_period TEXT,
-    uv_freq TEXT,
-    uv_type TEXT,
-    uv_source TEXT,  -- e.g. 'DS' (DataStream) & 'BLS' (Bureau for Labour Statistics) etc
+    uv_freq TEXT,    -- CHAR version of frequency
+    uv_type TEXT,    -- CHAR version of type
+    uv_source TEXT,  -- CHAR version of source
     uv_value TEXT,
     uv_tooltip TEXT,
     update_type TEXT,  -- NEW, UPDATE, DELETE or UNCHANGED
     -- Calculated
     pks INT,
     pdi INT,
-    freq INT,
-    type INT,
-    source INT,
+    ifreq INT,
+    itype INT,
+    isource INT,
     -- End
-    is_api BOOLEAN NOT NULL,  -- flag to indicate if the value is from an API (set via manual loader)
+
+    is_api BOOL NOT NULL,  -- flag to indicate if the value is from an API (set via manual loader)
     file_name TEXT,
     error TEXT,
 

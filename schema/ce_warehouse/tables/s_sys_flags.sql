@@ -11,7 +11,8 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.s_sys_flags
 (
-    code TEXT NOT NULL,
+    code TEXT NOT NULL
+        CHECK (code ~ '^[A-Z][A-Z0-9_-.]*[A-Z0-9]$'),
     value TEXT NOT NULL,
     description TEXT NOT NULL,
 

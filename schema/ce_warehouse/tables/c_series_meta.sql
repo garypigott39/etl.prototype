@@ -18,26 +18,26 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_meta
         REFERENCES ce_warehouse.c_series (pk_s)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-    freq SMALLINT NOT NULL
-        CHECK (freq IN (1, 2, 3, 4, 5)),
-    type SMALLINT NOT NULL,
-        CHECK (type IN (1, 2)),
+    ifreq SMALLINT NOT NULL
+        CHECK (ifreq IN (1, 2, 3, 4, 5)),
+    itype SMALLINT NOT NULL,
+        CHECK (itype IN (1, 2)),
 
     -- User maintained fields
     downloadable TEXT NOT NULL DEFAULT 'ess_plugin'
         CHECK (downloadable IN ('all', 'api', 'adv_plugin', 'ess_plugin', 'internal', 'none', 'powerbi')),  -- control which series are downloadable and via which channels
-    forecast_only_lifespan INT,  -- If NULL then will take the system default from s_freq
-    internal_notes TEXT,  -- Internal notes, unvalidated!
+    forecast_only_lifespan INT,  -- If NULL then will take the system default
+    internal_notes TEXT,  -- Unvalidated!
 
     -- UPDATED via trigger etc
-    has_values BOOLEAN NOT NULL DEFAULT FALSE,  -- flag to indicate if there are any values for this series/frequency/type
+    has_values BOOL NOT NULL DEFAULT FALSE,  -- flag to indicate if there are any values for this series/frequency/type
     new_values_utc TIMESTAMPTZ,  -- timestamp of the most recent new value
     updated_values_utc TIMESTAMPTZ,  -- timestamp of the most recent updated (or deleted) value
 
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),
-    UNIQUE (fk_pk_s, freq, type)
+    UNIQUE (fk_pk_s, ifreq, itype)
 );
 
 COMMENT ON TABLE ce_warehouse.c_series_meta

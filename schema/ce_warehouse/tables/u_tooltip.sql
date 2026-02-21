@@ -17,10 +17,11 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.u_tooltip
 (
     idx INT GENERATED ALWAYS AS IDENTITY,
+
     ut_gcode TEXT,
     ut_icode TEXT,
     ut_period TEXT,
-    ut_freq TEXT,
+    ut_freq TEXT,  -- CHAR version of frequency
     ut_tooltip TEXT,
     file_name TEXT, -- File it came from, if applicable
 

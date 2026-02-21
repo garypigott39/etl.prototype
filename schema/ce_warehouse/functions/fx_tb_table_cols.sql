@@ -17,23 +17,18 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb_table_cols(
     RETURNS TABLE (
         column_name NAME
     )
-    LANGUAGE plpgsql
+    LANGUAGE sql
 AS
 $$
-
-BEGIN
-    RETURN QUERY(
-        SELECT
-            schema.column_name::NAME
-        FROM information_schema.columns schema
-        WHERE schema.table_name = _tablename
-        AND schema.table_schema = _schema
-        AND schema.table_catalog = CURRENT_DATABASE()
-        AND (_ignore IS NULL OR ARRAY_POSITION(_ignore, schema.column_name::TEXT) IS NULL)
-        ORDER BY
-           schema.ordinal_position
-    );
-END
+    SELECT s.column_name::NAME
+    FROM information_schema.columns s
+    WHERE s.table_name   = _tablename
+    AND s.table_schema = _schema
+    AND s.table_catalog = CURRENT_DATABASE()
+    AND (
+        _ignore IS NULL OR s.column_name <> ALL (_ignore)
+    )
+    ORDER BY s.ordinal_position;
 $$;
 
 COMMENT ON FUNCTION ce_warehouse.fx_tb_table_cols

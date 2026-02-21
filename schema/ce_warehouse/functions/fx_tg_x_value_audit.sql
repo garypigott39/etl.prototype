@@ -16,57 +16,85 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg_x_value_audit(
 AS
 $$
 DECLARE
-    _number_of_values INT;
+    _now TIMESTAMPTZ := NOW();
+    _has_changed BOOL;
+    _has_values BOOL;
+
 BEGIN
     IF TG_OP = 'INSERT' THEN
-        INSERT INTO ce_warehouse.a_xvalue (fk_pk_s, pdi, type, source, value, realised, audit_type)
-            VALUES (NEW.fk_pk_s, NEW.pdi, NEW.type, NEW.source, NEW.value, FALSE, 'I');
-        -- Upsert c_series_meta
-        INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, freq, type, has_values, new_values_utc)
-            VALUES(NEW.fk_pk_s, NEW.freq, NEW.type, TRUE, NOW())
-            ON CONFLICT (fk_pk_s, freq, type)
-            DO UPDATE
-                SET (new_values_utc, updated_utc) = (NOW(), NOW());
+        INSERT INTO ce_warehouse.a_xvalue (fk_pk_s, pdi, itype, isource, value, realised, audit_type)
+            VALUES (
+                NEW.fk_pk_s, NEW.pdi, NEW.itype, NEW.isource, NEW.value, FALSE, 'I'
+            );
 
-    ELSEIF TG_OP = 'UPDATE' THEN
-        IF OLD.type IS DISTINCT FROM NEW.type OR
-           OLD.source IS DISTINCT FROM NEW.source OR
-           OLD.value IS DISTINCT FROM NEW.value THEN
-          INSERT INTO ce_warehouse.a_xvalue (fk_pk_s, pdi, type, source, value, new_value, realised, audit_type)
-             VALUES (
-                  OLD.fk_pk_s,
-                  OLD.pdi,
-                  OLD.type,    -- Log the OLD type, @see CEP-633
-                  OLD.source,  -- Log the OLD source, @see CEP-633
-                  OLD.value,
-                  NEW.value,
-                  (OLD.type = 2 AND NEW.type = 1),  -- Realised if 2=(F)orecast becomes 1=(AC)tuals
-                  'U'
-              );
+        -- Upsert c_series_meta
+        INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, ifreq, itype, has_values, new_values_utc)
+            VALUES (
+                NEW.fk_pk_s, NEW.ifreq, NEW.itype, TRUE, _now
+            )
+            ON CONFLICT (fk_pk_s, ifreq, itype)
+            DO UPDATE
+                SET has_values = TRUE,
+                    updated_values_utc = _now,
+                    updated_utc = _now;
+
+        RETURN NULL;
+    END IF;
+
+    IF TG_OP = 'UPDATE' THEN
+        _has_changed :=
+            (OLD.value IS DISTINCT FROM NEW.value) OR
+            (OLD.type IS DISTINCT FROM NEW.type) OR
+            (OLD.source IS DISTINCT FROM NEW.source);
+
+        IF _has_changed THEN
+            INSERT INTO ce_warehouse.a_xvalue (fk_pk_s, pdi, itype, isource, value, new_value, realised, audit_type)
+                VALUES (
+                    OLD.fk_pk_s,
+                    OLD.pdi,
+                    OLD.itype,    -- Log the OLD type, @see CEP-633
+                    OLD.isource,  -- Log the OLD source, @see CEP-633
+                    OLD.value,
+                    NEW.value,
+                    (OLD.itype = 2 AND NEW.itype = 1),  -- Realised if 2=(F)orecast becomes 1=(AC)tuals
+                    'U'
+                );
+
             -- Upsert c_series_meta
-            INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, freq, type, has_values, updated_values_utc)
-                VALUES(OLD.fk_pk_s, OLD.freq, OLD.type, TRUE, NOW())
-                ON CONFLICT (fk_pk_s, freq, type)
+            INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, ifreq, itype, has_values, updated_values_utc)
+                VALUES (
+                    OLD.fk_pk_s, OLD.ifreq, OLD.itype, TRUE, _now
+                )
+                ON CONFLICT (fk_pk_s, ifreq, itype)
                 DO UPDATE
-                    SET (updated_values_utc, updated_utc) = (NOW(), NOW());
-
+                    SET has_values = TRUE,
+                        updated_values_utc = _now,
+                        updated_utc = _now;
         END IF;
+        RETURN NULL;
+    END IF;
 
-    ELSEIF TG_OP = 'DELETE' THEN
-        INSERT INTO ce_warehouse.a_xvalue (fk_pk_s, pdi, type, source, value, realised, audit_type)
-            VALUES (OLD.fk_pk_s, OLD.pdi, OLD.type, OLD.source, OLD.value, FALSE, 'D');
+    IF TG_OP = 'DELETE' THEN
+        INSERT INTO ce_warehouse.a_xvalue (fk_pk_s, pdi, itype, isource, value, realised, audit_type)
+            VALUES (
+                OLD.fk_pk_s, OLD.pdi, OLD.itype, OLD.isource, OLD.value, FALSE, 'D'
+            );
+
         -- Upsert c_series_meta
-        _number_of_values := (
-            SELECT COUNT(*) FROM ce_warehouse.x_value
-            WHERE fk_pk_s = OLD.fk_pk_s
-            AND freq = OLD.freq
-            AND type = OLD.type
+        _has_values := EXISTS(
+            SELECT 1 FROM ce_warehouse.x_value
+            WHERE fk_pk_s = OLD.fk_pk_s AND ifreq = OLD.ifreq AND itype = OLD.itype
         );
-        INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, freq, type, has_values, updated_values_utc)
-            VALUES(OLD.fk_pk_s, OLD.freq, OLD.type, (_number_of_values > 0), NOW())
-            ON CONFLICT (fk_pk_s, freq, type)
+
+        INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, ifreq, itype, has_values, updated_values_utc)
+            VALUES(
+                OLD.fk_pk_s, OLD.ifreq, OLD.itype, _has_values, _now
+            )
+            ON CONFLICT (fk_pk_s, ifreq, itype)
             DO UPDATE
-                SET (updated_values_utc, updated_utc) = (NOW(), NOW());
+                SET has_values = _has_values,
+                    updated_values_utc = _now,
+                    updated_utc = _now;
     END IF;
     RETURN NULL;
 END

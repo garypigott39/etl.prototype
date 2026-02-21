@@ -10,11 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env file
+env_file = BASE_DIR / '.env'
+if env_file.exists():
+    load_dotenv(env_file)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -37,7 +43,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ce_etl',
+    'ce_warehouse',
+    'ce_plugin',
+    'ce_powerbi',
+    'ce_powerbi_v02',
 ]
 
 MIDDLEWARE = [
@@ -73,16 +82,36 @@ WSGI_APPLICATION = '_config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# Define a base database configuration that can be reused or extended if needed
+base_db_settings = {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': os.getenv('DBNAME'),
+    'USER': os.getenv('DBUSER'),
+    'PASSWORD': os.getenv('DBPASSWORD'),
+    'HOST': os.getenv('DBHOST', 'localhost'),
+    'PORT': os.getenv('DBPORT', '5432'),
+}
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'prototype',      # OS environment variable for database name
-        'USER': 'postgres',       # OS environment variable for database user
-        'PASSWORD': 'postgres',   # OS environment variable for database password
-        'HOST': 'localhost',      # OS environment variable for database host
-        'PORT': '5432',           # OS environment variable for database port
+    'default': base_db_settings,
+    'ce_warehouse': base_db_settings + {
         'OPTIONS': {
-            'options': '-c search_path=ce_warehouse,ce_powerbi_v02,public',
+            'options': '-c search_path=ce_warehouse',
+            }
+    },
+    'ce_plugin': base_db_settings + {
+        'OPTIONS': {
+            'options': '-c search_path=ce_plugin',
+        }
+    },
+    'ce_powerbi': base_db_settings + {
+        'OPTIONS': {
+            'options': '-c search_path=ce_powerbi',
+        }
+    },
+    'ce_powerbi_v02': base_db_settings + {
+        'OPTIONS': {
+            'options': '-c search_path=ce_powerbi_v02',
         }
     },
 }

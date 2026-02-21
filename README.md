@@ -28,7 +28,7 @@ django-admin startproject _config app
 
 ```shell
 cd demo
-django-admin startapp ce_core
+django-admin startapp myapp
 ```
 
 ## Start the app

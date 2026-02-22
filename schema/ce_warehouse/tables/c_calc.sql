@@ -19,15 +19,19 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc
 
     series_id TEXT NOT NULL
         REFERENCES ce_warehouse.c_series(s_series_id)
+            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
             ON DELETE CASCADE,
     cfreq TEXT NOT NULL
         CHECK (cfreq IN ('D', 'W', 'M', 'Q', 'Y')),
     ctype TEXT NOT NULL
         CHECK (ctype IN ('AC', 'F', 'BLENDED')),
+
+    -- Validated via APP, hence error column
     formula TEXT NOT NULL,
 
-    internal_notes TEXT,  -- Unvalidated!
+    internal_notes TEXT
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes)),
 
     error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),

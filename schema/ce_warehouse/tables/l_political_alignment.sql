@@ -1,7 +1,7 @@
 /*
  ***********************************************************************************************************
  * @file
- * l_politcal_alignment.sql
+ * l_political_alignment.sql
  *
  * Lookup table - political alignment lookup.
  ***********************************************************************************************************
@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_political_alignment
 (
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Z][A-Za-z0-9 ]*$'),
+
     PRIMARY KEY (code)
 );
 

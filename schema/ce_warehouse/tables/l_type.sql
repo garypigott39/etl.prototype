@@ -11,7 +11,8 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_type
 (
-    pk_t SMALLINT NOT NULL,
+    pk_t SMALLINT NOT NULL
+        CHECK (pk_t IN (1, 2)),
 
     code TEXT NOT NULL
         CHECK (code IN ('AC','F')),  -- restrict to valid codes

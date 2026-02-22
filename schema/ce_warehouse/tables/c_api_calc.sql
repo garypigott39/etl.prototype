@@ -15,9 +15,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_api_calc
 
     tgt_series_id TEXT NOT NULL
         REFERENCES ce_warehouse.c_series(series_id)
+            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
             ON DELETE CASCADE,
 
+    -- Validated via APP, hence error column
     tgt_cfreq TEXT[] NOT NULL
         CHECK (
             ARRAY_LENGTH(tgt_cfreq, 1) > 0
@@ -29,6 +31,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_api_calc
 
     src_series_id TEXT NOT NULL
         REFERENCES ce_warehouse.c_series(series_id)
+            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
             ON DELETE CASCADE,
 
@@ -41,7 +44,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_api_calc
     formula_type TEXT NOT NULL
         CHECK (formula_type IN ('peop', 'psum', 'pmean', 'growth', 'growth-1')),
 
-    internal_notes TEXT,  -- Unvalidated!
+    internal_notes TEXT
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes)),
 
     regenerate BOOL NOT NULL DEFAULT TRUE,  -- Does this series need regenerating?
 

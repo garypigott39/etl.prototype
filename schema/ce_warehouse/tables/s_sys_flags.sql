@@ -13,8 +13,10 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.s_sys_flags
 (
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Z][A-Z0-9_-.]*[A-Z0-9]$'),
-    value TEXT NOT NULL,
-    description TEXT NOT NULL,
+    value TEXT NOT NULL
+        CHECK(ce_warehouse.fx_val_is_text(value)),
+    description TEXT NOT NULL
+        CHECK(ce_warehouse.fx_val_is_text(description)),
 
     PRIMARY KEY (code)
 );

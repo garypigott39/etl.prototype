@@ -11,7 +11,8 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_freq
 (
-    pk_f SMALLINT NOT NULL,
+    pk_f SMALLINT NOT NULL
+        CHECK (pk_f BETWEEN 1 AND 5),  -- restrict to valid codes
 
     code TEXT NOT NULL
         CHECK (code IN ('D', 'W', 'M', 'Q', 'Y')),  -- restrict to valid codes

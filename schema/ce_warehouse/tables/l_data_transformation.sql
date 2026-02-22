@@ -12,6 +12,7 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_data_transformation
 (
     code TEXT NOT NULL,
+
     PRIMARY KEY (code)
 );
 

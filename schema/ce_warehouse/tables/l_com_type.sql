@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_com_type
 (
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Z][a-z0-9 ]*$'),
+
     PRIMARY KEY (code)
 );
 

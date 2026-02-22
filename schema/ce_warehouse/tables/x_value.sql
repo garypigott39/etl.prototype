@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
 
     fk_pk_s INT NOT NULL
         REFERENCES ce_warehouse.c_series (pk_s)
+        DEFERRABLE INITIALLY DEFERRED
         ON UPDATE CASCADE
         ON DELETE RESTRICT,  -- prevent deletion of series with values, see app logic!!
     pdi INT NOT NULL,  -- reference to period identifier, see housekeeping
@@ -27,17 +28,17 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
         CHECK (itype IN (1, 2)),  -- enforce valid types: 1=actual, 2=forecast
     isource SMALLINT NOT NULL
         REFERENCES ce_warehouse.l_source (pk_src)
+        DEFERRABLE INITIALLY DEFERRED
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
     value NUMERIC NOT NULL,
     fk_pk_tip INT
         REFERENCES ce_warehouse.x_tooltip (pk_tip)
+        DEFERRABLE INITIALLY DEFERRED
         ON UPDATE CASCADE
         ON DELETE SET NULL,  -- optional tooltip reference
 
     is_calculated BOOL NOT NULL DEFAULT FALSE,  -- flag to indicate if the value was calculated
-
-    error TEXT,  -- optional error message for invalid values, there should never be any!!
 
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
@@ -45,9 +46,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
     UNIQUE (fk_pk_s, pdi)  -- enforce only one value per period
 );
 
--- Counter to track number of values per series/frequency/type, updated by trigger
-CREATE INDEX IF NOT EXISTS x_value__series_value__idx
-    ON ce_warehouse.x_value (fk_pk_s, ifreq, itype);
+-- It's recommended to have INDICES on foreign keys for performance!! (particularly important for large tables)
+CREATE INDEX IF NOT EXISTS x_value__pdi__idx
+    ON ce_warehouse.x_value (pdi);
+
+CREATE INDEX IF NOT EXISTS x_value__isource__idx
+    ON ce_warehouse.x_value (isource);
+
+CREATE INDEX IF NOT EXISTS x_value__fk_pk_tip__idx
+    ON ce_warehouse.x_value (fk_pk_tip);
 
 COMMENT ON TABLE ce_warehouse.x_value
     IS 'Internal table - datapoint values';

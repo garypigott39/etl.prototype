@@ -23,7 +23,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u_tooltip
     ut_period TEXT,
     ut_freq TEXT,  -- CHAR version of frequency
     ut_tooltip TEXT,
+
     file_name TEXT, -- File it came from, if applicable
+    error TEXT,
 
     PRIMARY KEY (idx)
 );

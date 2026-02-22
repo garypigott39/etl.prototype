@@ -23,8 +23,7 @@ COMMENT ON TABLE ce_warehouse.l_geo_catg
 /**
  * Pre-populate with known values. Update as required.
  */
-
- INSERT INTO ce_warehouse.l_geo_catg (code)
+INSERT INTO ce_warehouse.l_geo_catg (code)
  VALUES
     ('Country'),
     ('Region'),

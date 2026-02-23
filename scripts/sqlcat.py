@@ -417,8 +417,24 @@ def main(parent_folder, debug=False):
         print("No SQL files found.")
         return
 
+    # Named schemas and tables must be created first, so we detect those and put them in priority list
+    priority_files = []
+    for f in sql_files:
+        created, _ = extract_dependencies(f)
+        # ce_warehouse.s_sys_flags must be created first
+        if "schema.sql" in f:
+            priority_files.append(f)
+            sql_files.remove(f)
+        if "ce_warehouse.s_sys_flags" in created:
+            priority_files.append(f)
+            sql_files.remove(f)
+
+    # Remove duplicates in case schema file also contains the table
+    priority_files = list(dict.fromkeys(priority_files))
+
     dependencies = build_dependency_graph(sql_files)
-    ordered_files = topological_sort(dependencies)
+
+    ordered_files = priority_files + topological_sort(dependencies)
     print_files_in_order(ordered_files, debug=debug)
 
 

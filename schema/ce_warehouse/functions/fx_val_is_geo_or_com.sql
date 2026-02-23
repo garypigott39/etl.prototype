@@ -24,23 +24,17 @@ BEGIN
             RETURN 'GEO/COM code cannot be null';
         END IF;
         RETURN NULL;
-    END IF;
-
-    -- GEO or COM code
-    IF _code ~ '^C.' THEN
+    ELSEIF _code ~ '^C.' THEN
         IF NOT EXISTS (SELECT 1 FROM ce_warehouse.c_com WHERE code = _code) THEN
             RETURN FORMAT('Commodity code "%s" does not exist', _code);
-        ELSEIF EXISTS(SELECT 1 FROM ce_warehouse.c_geo WHERE SUBSTR(_code, 3) = SUBSTR(code, 3)) THEN
-            RETURN FORMAT('Commodity SHORT code "%s" cannot match a GEO code', SUBSTR(_code, 3));
         END IF;
     ELSEIF _code ~ '^G.'THEN
         IF NOT EXISTS (SELECT 1 FROM ce_warehouse.c_geo WHERE code = _code) THEN
             RETURN FORMAT('Geography code "%s" does not exist', _code);
-        ELSEIF EXISTS(SELECT 1 FROM ce_warehouse.c_com WHERE SUBSTR(_code, 3) = SUBSTR(code, 3)) THEN
-            RETURN FORMAT('Geography SHORT code "%s" cannot match a COM code', SUBSTR(_code, 3));            END IF;
+        END IF;
     ELSE
         RETURN 'Code must start with "C." or "G." for COM or GEO respectively';
-    END LOOP;
+    END IF;
 
     RETURN NULL;
 END

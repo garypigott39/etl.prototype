@@ -10,11 +10,11 @@
 -- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb_calc_tokens;
 
 CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb_calc_tokens(
-    _calc_table TEXT DEFAULT 'ce_warehouse.c_calc',
+    _calc_table TEXT DEFAULT 'ce_warehouse.c_calc_v2',
     _const_table TEXT DEFAULT 'ce_warehouse.c_const'
 )
     RETURNS TABLE (
-        series TEXT,
+        tgt_series_id TEXT,
         tokens TEXT[]
     )
     LANGUAGE plpgsql
@@ -24,18 +24,18 @@ $$
 BEGIN
     RETURN QUERY EXECUTE FORMAT($sql$
         SELECT
-            calc_series,
+            tgt_series_id,
             ARRAY_AGG(DISTINCT token ORDER BY token) AS tokens
         FROM (
             SELECT
-                calc_series,
+                tgt_series_id,
                 COALESCE(const.token, calc.token) AS token
             FROM (
                 SELECT
-                    calc_series,
-                    UNNEST(REGEXP_MATCHES(calc_formula, '#([^#]+)#', 'g')) AS token
+                    tgt_series_id,
+                    UNNEST(REGEXP_MATCHES(formula, '#([^#]+)#', 'g')) AS token
                 FROM %s
-                WHERE calc_formula ~ '#([^#]+)#'
+                WHERE formula ~ '#([^#]+)#'
             ) calc
             LEFT JOIN (
                 SELECT

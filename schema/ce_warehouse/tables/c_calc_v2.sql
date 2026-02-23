@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc_v2
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_calc),
-    UNIQUE (tgt_series_id,  tgt_cfreq, tgt_type)
+    UNIQUE (tgt_series_id, tgt_cfreq, tgt_type)
 );
 
 COMMENT ON TABLE ce_warehouse.c_calc_v2

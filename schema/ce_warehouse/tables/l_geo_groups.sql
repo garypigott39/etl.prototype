@@ -3,7 +3,7 @@
  * @file
  * l_geo_group.sql
  *
- * Lookup table - geo group lookup.
+ * Lookup table - GEO group lookup.
  ***********************************************************************************************************
  */
 
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_geo_group
 );
 
 COMMENT ON TABLE ce_warehouse.l_geo_group
-    IS 'Lookup table - geo group lookup';
+    IS 'Lookup table - GEO group lookup';
 
 /**
  * Pre-populate with known values. Update as required.

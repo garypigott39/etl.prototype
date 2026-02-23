@@ -3,7 +3,7 @@
  * @file
  * l_geo_catg.sql
  *
- * Lookup table - geo category lookup.
+ * Lookup table - GEO category lookup.
  ***********************************************************************************************************
  */
 
@@ -18,13 +18,13 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_geo_catg
 );
 
 COMMENT ON TABLE ce_warehouse.l_geo_catg
-    IS 'Lookup table - geo category lookup';
+    IS 'Lookup table - GEO category lookup';
 
 /**
  * Pre-populate with known values. Update as required.
  */
 INSERT INTO ce_warehouse.l_geo_catg (code)
- VALUES
+VALUES
     ('Country'),
     ('Region'),
     ('Subnational'),

@@ -16,8 +16,8 @@ import sys
 from collections import defaultdict, deque
 
 import sqlparse
-from sqlparse.sql import Identifier, IdentifierList
-from sqlparse.tokens import Keyword
+from sqlparse.sql import Identifier, IdentifierList, Token, TokenList
+from sqlparse.tokens import Keyword, Name, Punctuation
 
 
 SQL_EXTENSIONS = (".sql",)
@@ -239,24 +239,20 @@ def extract_references_from_statement(statement):
 # Extract Function Calls
 # ==========================================================
 
-def extract_function_calls(statement):
+def extract_function_calls_regex(sql_text):
+    """
+    Extract all function calls using regex, including schema-qualified functions.
+    Works for CHECK constraints inside CREATE TABLE columns.
+    """
+    # Matches schema.func(...) or func(...)
+    pattern = re.compile(r'\b(?:(\w+)\.)?(\w+)\s*\(', re.IGNORECASE)
     refs = set()
-    tokens = list(statement.flatten())
-
-    for i, token in enumerate(tokens):
-        if token.value == "(" and i > 0:
-            prev = tokens[i - 1]
-
-            if isinstance(prev, Identifier):
-                name = normalize_identifier(prev)
-                if name:
-                    refs.add(name)
-
-            elif prev.ttype is None:
-                name = normalize_name(prev.value)
-                if name and "." in name:
-                    refs.add(name)
-
+    for match in pattern.findall(sql_text):
+        schema, func = match
+        if schema:
+            refs.add(normalize_name(f"{schema}.{func}"))
+        else:
+            refs.add(normalize_name(func))
     return refs
 
 
@@ -290,6 +286,10 @@ def extract_reference_constraints(statement):
 # ==========================================================
 
 def extract_dependencies(file_path):
+    """
+    Extract created objects and referenced objects using regex for function calls.
+    This reliably detects functions in column-level CHECK constraints.
+    """
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
@@ -299,23 +299,20 @@ def extract_dependencies(file_path):
     referenced_objects = set()
 
     for statement in statements:
+        # Created objects
         created_objects.extend(extract_created_objects(statement))
 
-        trigger_refs = extract_triggers(statement)
-        referenced_objects.update(trigger_refs)
+        # Triggers
+        referenced_objects.update(extract_triggers(statement))
 
+        # Standard references (FROM / JOIN)
         referenced_objects.update(extract_references_from_statement(statement))
-        referenced_objects.update(extract_function_calls(statement))
+
+        # Foreign key / reference constraints
         referenced_objects.update(extract_reference_constraints(statement))
 
-    bodies = extract_function_bodies(content)
-
-    for body in bodies:
-        body_statements = sqlparse.parse(body)
-        for stmt in body_statements:
-            referenced_objects.update(
-                extract_references_from_statement(stmt)
-            )
+    # Finally, detect all function calls in entire file text
+    referenced_objects.update(extract_function_calls_regex(content))
 
     return created_objects, referenced_objects
 
@@ -385,8 +382,11 @@ def topological_sort(dependencies):
 # Output
 # ==========================================================
 
-def print_files_in_order(ordered_files):
+def print_files_in_order(ordered_files, debug=False):
     for i, file_path in enumerate(ordered_files, 1):
+        if debug:
+            print(raise_info(file_path))
+
         print(f"\n-- {i}. {file_path}\n")
 
         with open(file_path, "r", encoding="utf-8") as f:
@@ -395,11 +395,22 @@ def print_files_in_order(ordered_files):
         print(f"\n-- EOF: {file_path}")
 
 
+def raise_info(file_path) -> str:
+    sql = f"""
+DO $$
+BEGIN
+    RAISE NOTICE 'Executing file: {file_path}';
+END
+$$;
+    """
+    return sql
+
+
 # ==========================================================
 # Main
 # ==========================================================
 
-def main(parent_folder):
+def main(parent_folder, debug=False):
     sql_files = scan_sql_files(parent_folder)
 
     if not sql_files:
@@ -408,12 +419,13 @@ def main(parent_folder):
 
     dependencies = build_dependency_graph(sql_files)
     ordered_files = topological_sort(dependencies)
-    print_files_in_order(ordered_files)
+    print_files_in_order(ordered_files, debug=debug)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: py sqlcat.py <parent_sql_folder>")
+    if len(sys.argv) not in (2, 3):
+        print("Usage: py sqlcat.py <parent_sql_folder> [--debug]")
         sys.exit(1)
+    debug = len(sys.argv) == 3 and sys.argv[2] =="--debug"
 
-    main(sys.argv[1])
+    main(sys.argv[1], debug=debug)

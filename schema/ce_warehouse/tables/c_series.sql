@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
         ),
     icode TEXT NOT NULL
         REFERENCES ce_warehouse.c_ind (code)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     series_id TEXT GENERATED ALWAYS
         AS (gcode || '_' || icode) STORED,  -- Series code
     name TEXT NOT NULL
@@ -41,9 +41,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
         CHECK (ce_warehouse.fx_val_is_text(source_annotation) IS NULL),
     units TEXT
         REFERENCES ce_warehouse.l_units (code)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     precision INT NOT NULL
         CHECK (precision BETWEEN -1 AND 12),  -- number of decimal places for rounding in PowerBI
     date_point TEXT NOT NULL DEFAULT 'mid'

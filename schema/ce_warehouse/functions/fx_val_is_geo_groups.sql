@@ -45,5 +45,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_core.fx_val_is_geo_groups
+COMMENT ON FUNCTION ce_warehouse.fx_val_is_geo_groups
     IS 'Validation function - check if GEO group codes are valid';

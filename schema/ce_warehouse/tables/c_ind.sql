@@ -41,19 +41,19 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
         CHECK (ce_warehouse.fx_val_is_text(name4_lower) IS NULL),
     catg_broad TEXT
         REFERENCES ce_warehouse.l_ind_broad_catg (code)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     catg_narrow TEXT
         REFERENCES ce_warehouse.l_ind_narrow_catg (code)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     data_transformation TEXT NOT NULL
         REFERENCES ce_warehouse.l_data_transformation (code)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     keyindicator BOOL NOT NULL DEFAULT FALSE,
     proprietary_data BOOL NOT NULL DEFAULT FALSE,
     ordering INT NOT NULL DEFAULT 0,

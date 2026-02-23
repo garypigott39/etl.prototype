@@ -16,15 +16,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo_group
 
     fk_pk_geo INT NOT NULL
         REFERENCES ce_warehouse.c_geo (pk_geo)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE CASCADE,
+            ON DELETE CASCADE
+            DEFERRABLE INITIALLY DEFERRED,
 
     group_code TEXT NOT NULL
         REFERENCES ce_warehouse.l_geo_group (code)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
 
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 

@@ -15,9 +15,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_api_calc
 
     tgt_series_id TEXT NOT NULL
         REFERENCES ce_warehouse.c_series(series_id)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE CASCADE,
+            ON DELETE CASCADE
+            DEFERRABLE INITIALLY DEFERRED,
 
     -- Validated via APP, hence error column
     tgt_cfreq TEXT[] NOT NULL
@@ -31,9 +31,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_api_calc
 
     src_series_id TEXT NOT NULL
         REFERENCES ce_warehouse.c_series(series_id)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE CASCADE,
+            ON DELETE CASCADE
+            DEFERRABLE INITIALLY DEFERRED,
 
     src_cfreq TEXT NOT NULL
         CHECK (src_cfreq IN ('D', 'W', 'M', 'Q', 'Y', '-')),

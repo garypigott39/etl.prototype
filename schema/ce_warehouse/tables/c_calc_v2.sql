@@ -16,9 +16,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc_v2
 
     tgt_series_id TEXT NOT NULL
         REFERENCES ce_warehouse.c_series(series_id)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE CASCADE,
+            ON DELETE CASCADE
+            DEFERRABLE INITIALLY DEFERRED,
     tgt_cfreq TEXT NOT NULL
         CHECK (tgt_cfreq IN ('D', 'W', 'M', 'Q', 'Y')),
     tgt_type TEXT NOT NULL
@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc_v2
 
     formula_type TEXT NOT NULL
         REFERENCES ce_warehouse.l_calc_formula_type(code)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE RESTRICT
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     formula TEXT NOT NULL,  -- Validated via APP
 
     internal_notes TEXT

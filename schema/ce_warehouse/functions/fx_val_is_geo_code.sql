@@ -32,5 +32,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_core.fx_val_is_geo_code
+COMMENT ON FUNCTION ce_warehouse.fx_val_is_geo_code
     IS 'Validation function - check if GEO code is valid  (available on Add)';

@@ -17,9 +17,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
 
     fk_pk_s INT NOT NULL
         REFERENCES ce_warehouse.c_series (pk_s)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,  -- prevent deletion of series with values, see app logic!!
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of series with values, see app logic!!
     pdi INT NOT NULL,  -- reference to period identifier, see housekeeping
     ifreq SMALLINT NOT NULL GENERATED ALWAYS
         AS (pdi / 100000000) STORED
@@ -28,15 +28,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
         CHECK (itype IN (1, 2)),  -- enforce valid types: 1=actual, 2=forecast
     isource SMALLINT NOT NULL
         REFERENCES ce_warehouse.l_source (pk_src)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     value NUMERIC NOT NULL,
     fk_pk_tip INT
         REFERENCES ce_warehouse.x_tooltip (pk_tip)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE SET NULL,  -- optional tooltip reference
+            ON DELETE SET NULL
+            DEFERRABLE INITIALLY DEFERRED,  -- optional tooltip reference
 
     is_calculated BOOL NOT NULL DEFAULT FALSE,  -- flag to indicate if the value was calculated
 

@@ -19,9 +19,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc
 
     series_id TEXT NOT NULL
         REFERENCES ce_warehouse.c_series(s_series_id)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE CASCADE,
+            ON DELETE CASCADE
+            DEFERRABLE INITIALLY DEFERRED,
     cfreq TEXT NOT NULL
         CHECK (cfreq IN ('D', 'W', 'M', 'Q', 'Y')),
     ctype TEXT NOT NULL

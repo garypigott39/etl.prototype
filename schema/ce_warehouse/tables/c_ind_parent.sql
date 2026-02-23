@@ -16,15 +16,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind_parent
 
     fk_pk_i INT NOT NULL
         REFERENCES ce_warehouse.c_ind (pk_i)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE CASCADE,
+            ON DELETE CASCADE
+            DEFERRABLE INITIALLY DEFERRED,
 
     icode TEXT NOT NULL
         REFERENCES ce_warehouse.c_ind (code)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
 
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 

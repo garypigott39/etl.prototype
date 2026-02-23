@@ -102,5 +102,5 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION ce_core.fx_val_is_const_expr
+COMMENT ON FUNCTION ce_warehouse.fx_val_is_const_expr
     IS 'Validation function - check constant expression';

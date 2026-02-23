@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_com
         CHECK (ce_warehouse.fx_val_is_text(tla, FALSE) IS NULL),
     commodity_type TEXT NOT NULL
         REFERENCES ce_warehouse.c_com_type(code)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     ordering INT NOT NULL DEFAULT '0',
 
     internal_notes TEXT
@@ -39,11 +39,3 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_com
 
 COMMENT ON TABLE ce_warehouse.c_com
       IS 'Control table - commodity details, used for validation & extra detail';
-
-/*
- ***********************************************************************************************************
- * Trigger to validate "short-code" COM against GEO.
- ***********************************************************************************************************
- */
-
--- @todo

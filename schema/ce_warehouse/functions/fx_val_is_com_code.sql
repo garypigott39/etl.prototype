@@ -32,5 +32,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_core.fx_val_is_com_code
+COMMENT ON FUNCTION ce_warehouse.fx_val_is_com_code
     IS 'Validation function - check if COM code is valid  (available on Add)';

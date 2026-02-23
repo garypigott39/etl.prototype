@@ -28,7 +28,7 @@ BEGIN
         RETURN 'Value contains unprintable characters';
     ELSEIF _val !~ '^[[:ascii:]]+$' THEN
         -- Contains non-ASCII characters
-        IF EXISTS (SELECT 1 FROM ce_core.s_sys_flags WHERE code = 'ASCII-ONLY' AND value = 'TRUE') THEN
+        IF EXISTS (SELECT 1 FROM ce_warehouse.s_sys_flags WHERE code = 'ASCII-ONLY' AND value = 'TRUE') THEN
             RETURN 'Value contains non-ASCII characters';
         END IF;
     END IF;
@@ -42,5 +42,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_core.fx_val_is_text
+COMMENT ON FUNCTION ce_warehouse.fx_val_is_text
     IS 'Validation function - check supplied string meets "free-text" rules';

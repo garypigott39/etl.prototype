@@ -17,9 +17,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_meta
 
     fk_pk_s INT NOT NULL
         REFERENCES ce_warehouse.c_series (pk_s)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE CASCADE,
+            ON DELETE CASCADE
+            DEFERRABLE INITIALLY DEFERRED,
     ifreq SMALLINT NOT NULL
         CHECK (ifreq IN (1, 2, 3, 4, 5)),
     itype SMALLINT NOT NULL,

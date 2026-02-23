@@ -22,6 +22,12 @@ COMMENT ON TABLE ce_warehouse.l_units
 
 /**
  * Pre-populate with known values. Update as required.
+ *
+ * Note, the use of the Euro symbol may cause issues with some clients, so can be updated to 'EUR' if needed.
+ *
+ * For example, pasting into SQL may give a warning like:
+ *     "TROJAN SOURCE WARNING, The pasted text contains bidirectional Unicode characters which could be interpreted
+ *      differently than what is displayed..."
  */
 INSERT INTO ce_warehouse.l_units (code)
 VALUES

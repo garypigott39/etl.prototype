@@ -44,5 +44,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_core.fx_val_is_ind_codes
+COMMENT ON FUNCTION ce_warehouse.fx_val_is_ind_codes
     IS 'Validation function - check if IND codes are valid';

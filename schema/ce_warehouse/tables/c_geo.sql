@@ -34,25 +34,25 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
     long NUMERIC
         CHECK (long >= -180 AND long <= 180),
     central_bank TEXT
-        REFERENCES ce_warehouse.l_central_bank(code),
-            DEFERRABLE INITIALLY DEFERRED
+        REFERENCES ce_warehouse.l_central_bank(code)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     stock_market TEXT
-        REFERENCES ce_warehouse.l_stock_market(code),
-            DEFERRABLE INITIALLY DEFERRED
+        REFERENCES ce_warehouse.l_stock_market(code)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     political_alignment TEXT
-        REFERENCES ce_warehouse.l_political_alignment(code),
-            DEFERRABLE INITIALLY DEFERRED
+        REFERENCES ce_warehouse.l_political_alignment(code)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     local_currency_unit TEXT
-        REFERENCES ce_warehouse.l_currency_unit(code),
-            DEFERRABLE INITIALLY DEFERRED
+        REFERENCES ce_warehouse.l_currency_unit(code)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
     flag TEXT
         CHECK (
             ce_warehouse.fx_val_is_text(flag) IS NULL AND
@@ -60,9 +60,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
         ),
     category TEXT NOT NULL
         REFERENCES ce_warehouse.l_geo_category(code)
-            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
-            ON DELETE RESTRICT,
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,
 
     ordering INT NOT NULL DEFAULT 0,
     internal_notes TEXT
@@ -76,11 +76,3 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
 
 COMMENT ON TABLE ce_warehouse.c_geo
     IS 'Control table - geography details, used for validation & extra detail';
-
-/*
- ***********************************************************************************************************
- * Trigger to validate "short-code" GEO against COM.
- ***********************************************************************************************************
- */
-
--- @todo

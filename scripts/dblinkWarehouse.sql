@@ -38,8 +38,9 @@ BEGIN
     -- OPTIONAL: truncate first (remove if not desired)
     ------------------------------------------------------------------
     TRUNCATE TABLE
-        ce_warehouse.c_api_calc,
-        ce_warehouse.c_calc,
+--         ce_warehouse.c_api_calc,
+--         ce_warehouse.c_calc,
+        ce_warehouse.c_calc_v2,
         ce_warehouse.c_com,
         ce_warehouse.c_const,
         ce_warehouse.c_geo,

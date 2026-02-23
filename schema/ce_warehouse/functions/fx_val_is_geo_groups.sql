@@ -22,7 +22,10 @@ DECLARE
 BEGIN
     -- Check for nulls
     IF _groups IS NULL THEN
-        RETURN _nulls_allowed ? NULL : 'GEO group codes cannot be null';
+        IF NOT _nulls_allowed THEN
+            RETURN 'GEO group codes cannot be null';
+        END IF;
+        RETURN NULL;
     END IF;
 
     -- Check for duplicates

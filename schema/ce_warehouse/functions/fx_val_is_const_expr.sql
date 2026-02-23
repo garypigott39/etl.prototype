@@ -25,7 +25,10 @@ DECLARE
     _pdi2  TEXT;
 BEGIN
     IF _expr IS NULL OR TRIM(p_expr) = '' THEN
-        RETURN _nulls_allowed ? NULL : 'Expression cannot be null or empty';
+        IF NOT _nulls_allowed THEN
+            RETURN 'Expression cannot be null or empty';
+        END IF;
+        RETURN NULL;
     END IF;
 
     ----------------------------------------------------------------

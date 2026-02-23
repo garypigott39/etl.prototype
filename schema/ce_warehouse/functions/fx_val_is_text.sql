@@ -19,7 +19,10 @@ AS
 $$
 BEGIN
     IF _val IS NULL OR TRIM(_val) = '' THEN
-        RETURN _nulls_allowed ? NULL : 'Value cannot be null or empty';
+        IF NOT _nulls_allowed THEN
+            RETURN 'Value cannot be null or empty';
+        END IF;
+        RETURN NULL;
     ELSEIF _val !~ '^[[:print:]]+$' THEN
         -- Contains unprintable characters
         RETURN 'Value contains unprintable characters';
@@ -31,7 +34,11 @@ BEGIN
     END IF;
 
     -- Must not start or end with whitespace
-    RETURN _val !~ '^\s' AND _val !~ '\s$' ? NULL : 'Value must not start or end with whitespace';
+    IF _val !~ '^\s' AND _val !~ '\s$' THEN
+        RETURN 'Value must not start or end with whitespace';
+    END IF;
+
+    RETURN NULL;
 END
 $$;
 

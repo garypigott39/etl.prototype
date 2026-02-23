@@ -34,7 +34,7 @@ BEGIN
     END IF;
 
     -- Must not start or end with whitespace
-    IF _val !~ '^\s' AND _val !~ '\s$' THEN
+    IF _val ~ '^\s' OR _val ~ '\s$' THEN
         RETURN 'Value must not start or end with whitespace';
     END IF;
 

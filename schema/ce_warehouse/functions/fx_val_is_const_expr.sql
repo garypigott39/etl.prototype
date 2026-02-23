@@ -43,13 +43,13 @@ BEGIN
     ----------------------------------------------------------------
     SELECT REGEXP_MATCHES(_expr,
            '^#([^#]+)#,(\d{9})$')
-    INTO m;
+    INTO _m;
 
-    IF m IS NOT NULL THEN
-        _tok  := m[1];
-        _pdi1 := m[2];
+    IF _m IS NOT NULL THEN
+        _tok  :=_m[1];
+        _pdi1 :=_m[2];
 
-        -- Token & Period must exist
+        -- Token & Period_must exist
         IF NOT EXISTS (SELECT 1 FROM ce_warehouse.c_series s WHERE s.series_id = _tok) THEN
             RETURN FORMAT('Token "%s" does not exist', _tok);
         ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l_period p WHERE p.pk_pdi = _pdi1::INT) THEN
@@ -60,27 +60,27 @@ BEGIN
     END IF;
 
     ----------------------------------------------------------------
-    -- 3️⃣ sd() or mean()
+    -- 3️⃣ sd() or_mean()
     ----------------------------------------------------------------
     SELECT regexp_matches(_expr,
            '^(sd|mean)\(#([^#]+)#,(\d{9}),(\d{9})\)$')
-    INTO m;
+    INTO _m;
 
-    IF m IS NOT NULL THEN
-        -- m[1] = function name (sd|mean) – already validated by regex
-        _tok  := m[2];
-        _pdi1 := m[3];
-        _pdi2 := m[4];
+    IF _m IS NOT NULL THEN
+        --_m[1] = function name (sd|mean) – already validated by regex
+        _tok  :=_m[2];
+        _pdi1 :=_m[3];
+        _pdi2 :=_m[4];
 
-        -- Period 1 must be <= Period 2, Token must exist, and both periods must exist
+        -- Period 1_must be <= Period 2, Token_must exist, and both periods_must exist
         IF _pdi1 > _pdi2 THEN
-            RETURN 'Period 1 must be less than or equal to Period 2';
+            RETURN 'Period 1_must be less than or equal to Period 2';
         ELSEIF _pdi1 ~ '^[1-5]' THEN
-            RETURN FORMAT('Period 1 %s is invalid, must start with 1-5', _pdi1);
+            RETURN FORMAT('Period 1 %s is invalid,_must start with 1-5', _pdi1);
         ELSEIF _pdi2 ~ '^[1-5]' THEN
-            RETURN FORMAT('Period 2 %s is invalid, must start with 1-5', _pdi1);
+            RETURN FORMAT('Period 2 %s is invalid,_must start with 1-5', _pdi1);
         ELSEIF LEFT(_pdi1, 1) <> LEFT(_pdi2,  1) THEN
-            RETURN 'Period 1 and Period 2 must be in the same frequency group';
+            RETURN 'Period 1 and Period 2_must be in the same frequency group';
         ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.c_series s WHERE s.series_id = _tok) THEN
             RETURN FORMAT('Token "%s" does not exist', _tok);
         ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l_period p WHERE p.pk_pdi = _pdi1::INT) THEN

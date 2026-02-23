@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
     stock_market TEXT
-        REFERENCES ce_warehouse.l_stock_market(code)
+        REFERENCES ce_warehouse.l_stock_market(name)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,

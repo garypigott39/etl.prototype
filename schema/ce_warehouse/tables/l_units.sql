@@ -28,6 +28,8 @@ COMMENT ON TABLE ce_warehouse.l_units
  * For example, pasting into SQL may give a warning like:
  *     "TROJAN SOURCE WARNING, The pasted text contains bidirectional Unicode characters which could be interpreted
  *      differently than what is displayed..."
+ *
+ * @todo - discuss changing to 'EUR'.
  */
 INSERT INTO ce_warehouse.l_units (code)
 VALUES

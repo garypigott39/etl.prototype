@@ -12,11 +12,9 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.s_sys_flags
 (
     code TEXT NOT NULL
-        CHECK (code ~ '^[A-Z][A-Z0-9_-.]*[A-Z0-9]$'),
-    value TEXT NOT NULL
-        CHECK(ce_warehouse.fx_val_is_text(value, FALSE) IS NULL),
-    description TEXT NOT NULL
-        CHECK(ce_warehouse.fx_val_is_text(description, FALSE) IS NULL),
+        CHECK (code ~ '^[A-Z][A-Z0-9 _/:\.+-]*[A-Z0-9]$'),
+    value TEXT NOT NULL,
+    description TEXT NOT NULL,
 
     PRIMARY KEY (code)
 );
@@ -29,7 +27,7 @@ COMMENT ON TABLE ce_warehouse.s_sys_flags
  */
 INSERT INTO ce_warehouse.s_sys_flags
 VALUES
-    ('ASCII-ONLY','FALSE','If set to "TRUE" then only allow ASCII text values in CSV files etc. Default is value is "FALSE".'),
+    ('ASCII-ONLY','FALSE','If set to "TRUE" then only allow ASCII text values. Default is value is "FALSE".'),
     ('DATE.MAX','+30 YEAR','Max date for date lookup table. This should be an INTERVAL value. Default is "+30 YEAR".'),
     ('DATE.MIN','1890-01-01','Minimum date for date lookup table, should be the beginning of a year'),
     ('GEO.FLAG.BASEURL','https://www.capitaleconomics.com/sites/default/files/','Base URL for GEO flags. Note the trailing slash.');

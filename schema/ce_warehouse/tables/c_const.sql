@@ -16,15 +16,14 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_const
     code TEXT NOT NULL
         CHECK (code ~ '^[a-z][a-z0-9_]*[a-z0-9]$'),
 
-    -- validated via APP, hence error column, but also can be a value, e.g. "code PI" = 3.1415
-    expr TEXT NOT NULL,
+    expr TEXT NOT NULL
+        CHECK (ce_warehouse.fx_val_is_const_expr(expr) IS NULL),
 
     value NUMERIC,  -- calculated value, can be NULL
 
     internal_notes TEXT
         CHECK (ce_warehouse.fx_val_is_text(internal_notes)),
 
-    error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_con),

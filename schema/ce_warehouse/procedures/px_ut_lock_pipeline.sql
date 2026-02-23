@@ -21,7 +21,7 @@ BEGIN
     _name := UPPER(TRIM(_name));
     _type := LOWER(TRIM(_type));
 
-    IF _name IS NULL OR _name = '' THEN
+    IF _name IS NULL OR TRIM(_name) = '' THEN
         RAISE EXCEPTION 'Pipeline name must be provided';
     END IF;
 

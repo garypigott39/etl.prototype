@@ -49,16 +49,12 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
             DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
             ON DELETE RESTRICT,
-    parent_icodes TEXT[]
-        CHECK (
-            code <> ALL(parent_icodes) AND
-            ce_warehouse.fx_val_is_ind_codes(parent_icodes)
-        ),
     data_transformation TEXT NOT NULL
         CHECK (ce_warehouse.fx_val_is_text(data_transformation))
         REFERENCES ce_warehouse.l_data_transformation (code)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
+            DEFERRABLE INITIALLY DEFERRED
+            ON UPDATE CASCADE
+            ON DELETE RESTRICT,
     keyindicator BOOL NOT NULL DEFAULT FALSE,
     proprietary_data BOOL NOT NULL DEFAULT FALSE,
     ordering INT NOT NULL DEFAULT 0,
@@ -74,3 +70,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
 
 COMMENT ON TABLE ce_warehouse.c_ind
     IS 'Control table - indicator details, used for validation & lookup';
+
+/*
+ ***********************************************************************************************************
+ * Trigger to update affected IND records when an indicater code is updated or deleted.
+ ***********************************************************************************************************
+ */
+
+-- @todo

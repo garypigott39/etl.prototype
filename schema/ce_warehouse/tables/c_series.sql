@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
         CHECK (gcode ~ '^[GC]\.[A-Z0-9_]+[A-Z0-9]$' OR gcode = 'INTERNAL'),
     icode TEXT NOT NULL
         REFERENCES ce_warehouse.c_ind (code)
+            DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
             ON DELETE RESTRICT,
     series_id TEXT GENERATED ALWAYS

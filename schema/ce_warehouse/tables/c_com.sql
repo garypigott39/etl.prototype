@@ -31,8 +31,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_com
     internal_notes TEXT
         CHECK (ce_warehouse.fx_val_is_text(internal_notes)),
 
-    -- Some cross table validation via app, hence error column
-    error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY(pk_com),
@@ -41,3 +39,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_com
 
 COMMENT ON TABLE ce_warehouse.c_com
       IS 'Control table - commodity details, used for validation & extra detail';
+
+/*
+ ***********************************************************************************************************
+ * Trigger to validate "short-code" COM against GEO.
+ ***********************************************************************************************************
+ */
+
+-- @todo

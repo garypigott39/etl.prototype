@@ -63,16 +63,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
             DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
             ON DELETE RESTRICT,
-    -- Groups must be valid & unique
-    groups TEXT[]
-        CHECK (ce_warehouse.fx_val_is_geo_group(groups)),
 
     ordering INT NOT NULL DEFAULT 0,
     internal_notes TEXT
         CHECK (ce_warehouse.fx_val_is_text(internal_notes)),
 
-    -- Some cross table validation via app, hence error column
-    error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_geo),
@@ -81,3 +76,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
 
 COMMENT ON TABLE ce_warehouse.c_geo
     IS 'Control table - geography details, used for validation & extra detail';
+
+/*
+ ***********************************************************************************************************
+ * Trigger to validate "short-code" GEO against COM.
+ ***********************************************************************************************************
+ */
+
+-- @todo

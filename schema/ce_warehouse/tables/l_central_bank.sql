@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_central_bank
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Z][A-Za-z0-9 ]*$'),
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(name)),
+        CHECK (ce_warehouse.fx_val_is_text(name, FALSE) IS NULL),
 
     PRIMARY KEY (code),
     UNIQUE (name)

@@ -14,9 +14,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.s_sys_flags
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Z][A-Z0-9_-.]*[A-Z0-9]$'),
     value TEXT NOT NULL
-        CHECK(ce_warehouse.fx_val_is_text(value)),
+        CHECK(ce_warehouse.fx_val_is_text(value, FALSE) IS NULL),
     description TEXT NOT NULL
-        CHECK(ce_warehouse.fx_val_is_text(description)),
+        CHECK(ce_warehouse.fx_val_is_text(description, FALSE) IS NULL),
 
     PRIMARY KEY (code)
 );

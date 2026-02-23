@@ -12,9 +12,9 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_stock_market
 (
     code TEXT NOT NULL
-        CHECK (code ~ '^[A-Z].*$' ce_warehouse.fx_val_is_text(name)),
+        CHECK (code ~ '^[A-Z]' AND ce_warehouse.fx_val_is_text(code) IS NULL),
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(name)),
+        CHECK (ce_warehouse.fx_val_is_text(name, FALSE) IS NULL),
 
     PRIMARY KEY (code),
     UNIQUE (name)

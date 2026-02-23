@@ -11,7 +11,8 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_data_transformation
 (
-    code TEXT NOT NULL,
+    code TEXT NOT NULL
+        CHECK (ce_warehouse.fx_val_is_text(code, FALSE) IS NULL),
 
     PRIMARY KEY (code)
 );

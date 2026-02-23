@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc
     formula TEXT NOT NULL,
 
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes)),
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
 
     error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),

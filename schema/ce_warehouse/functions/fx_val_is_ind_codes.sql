@@ -11,28 +11,33 @@
 
 CREATE OR REPLACE FUNCTION ce_warehouse.fx_val_is_ind_codes(
     _indicators TEXT[],
-    _nulls_allowed BOOL DEFAULT FALSE
+    _nulls_allowed BOOL DEFAULT TRUE
 )
-    RETURNS BOOL
+    RETURNS TEXT
     LANGUAGE plpgsql
 AS
 $$
 DECLARE
     _v TEXT;
 BEGIN
-    -- Check for duplicates
-    IF ARRAY_LENGTH(_indicators, 1) <> ARRAY_LENGTH(ARRAY(SELECT DISTINCT UNNEST(_indicators)), 1) THEN
-        RETURN FALSE;
+    -- Check for nulls
+    IF _indicators IS NULL THEN
+        RETURN _nulls_allowed ? NULL : 'IND codes cannot be null';
     END IF;
 
-    -- Check all elements exist in lookup_table
+    -- Check for duplicates
+    IF ARRAY_LENGTH(_indicators, 1) <> ARRAY_LENGTH(ARRAY(SELECT DISTINCT UNNEST(_indicators)), 1) THEN
+        RETURN 'Duplicate IND codes are not allowed';
+    END IF;
+
+    -- Check all elements exist in IND lookup table
     FOREACH _v IN ARRAY arr LOOP
         IF NOT EXISTS (SELECT 1 FROM ce_warehouse.c_ind WHERE code = _v) THEN
-            RETURN FALSE;
+            RETURN FORMAT('IND code "%s" does not exist', _v);
         END IF;
     END LOOP;
 
-    RETURN TRUE;
+    RETURN NULL;
 END
 $$;
 

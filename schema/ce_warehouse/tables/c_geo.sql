@@ -18,13 +18,13 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
     code TEXT NOT NULL
         CHECK (code ~ '^G\.[A-Z0-9_]+[A-Z0-9]$' AND code !~ 'INTERNAL'),
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(name)),
+        CHECK (ce_warehouse.fx_val_is_text(name, FALSE) IS NULL),
     name2 TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(name2)),
+        CHECK (ce_warehouse.fx_val_is_text(name2, FALSE) IS NULL),
     short_name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(short_name)),
+        CHECK (ce_warehouse.fx_val_is_text(short_name) IS NULL),
     tla TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(tla)),
+        CHECK (ce_warehouse.fx_val_is_text(tla, FALSE) IS NULL),
     iso2 TEXT
         CHECK (iso2 ~ '^[A-Z]{2}$'),
     iso3 TEXT
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
             ON DELETE RESTRICT,
     flag TEXT
         CHECK (
-            ce_warehouse.fx_val_is_text(flag) AND
+            ce_warehouse.fx_val_is_text(flag) IS NULL AND
             flag ~ '^(?!https?://)[\w\-/]+\/?[\w\-]+\.(jpg|jpeg|png|gif|webp)$'
         ),
     category TEXT NOT NULL
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
 
     ordering INT NOT NULL DEFAULT 0,
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes)),
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
 
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 

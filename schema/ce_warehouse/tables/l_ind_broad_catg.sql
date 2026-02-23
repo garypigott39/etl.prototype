@@ -12,7 +12,7 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_ind_broad_catg
 (
     code TEXT NOT NULL
-        CHECK (code ~ '^[A-Z][A-Za-z0-9 ]*$'),
+        CHECK (code ~ '^[A-Z][A-Za-z0-9 &]*$'),
 
     PRIMARY KEY (code)
 );

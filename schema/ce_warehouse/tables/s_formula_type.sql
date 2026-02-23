@@ -12,11 +12,11 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.s_formula_type
 (
     code TEXT NOT NULL
-        CHECK (code ~ '^[A-Z][A-Za-z0-9 ]*$'),
+        CHECK (code ~ '^[A-Za-z][A-Za-z0-9 ]*$'),
     class TEXT
-        CHECK (ce_warehouse.fx_val_is_text(class)),
+        CHECK (ce_warehouse.fx_val_is_text(class) IS NULL),
     description TEXT
-        CHECK (ce_warehouse.fx_val_is_text(description)),
+        CHECK (ce_warehouse.fx_val_is_text(description) IS NULL),
     ordering INT NOT NULL DEFAULT 0,  -- for ordering in UI
     
     PRIMARY KEY (code)

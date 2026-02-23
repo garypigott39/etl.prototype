@@ -17,12 +17,12 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_const
         CHECK (code ~ '^[a-z][a-z0-9_]*[a-z0-9]$'),
 
     expr TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_const_expr(expr) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_const_expr(expr, FALSE) IS NULL),
 
     value NUMERIC,  -- calculated value, can be NULL
 
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes)),
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
 
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 

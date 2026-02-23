@@ -11,29 +11,34 @@
 
 CREATE OR REPLACE FUNCTION ce_warehouse.fx_val_is_geo_groups(
     _groups TEXT[],
-    _nulls_allowed BOOL DEFAULT FALSE
+    _nulls_allowed BOOL DEFAULT TRUE
 )
-    RETURNS BOOL
+    RETURNS TEXT
     LANGUAGE plpgsql
 AS
 $$
 DECLARE
     _v TEXT;
 BEGIN
-    -- Check for duplicates
-    IF ARRAY_LENGTH(_groups, 1) <> ARRAY_LENGTH(ARRAY(SELECT DISTINCT UNNEST(_groups)), 1) THEN
-        RETURN FALSE;
+    -- Check for nulls
+    IF _groups IS NULL THEN
+        RETURN _nulls_allowed ? NULL : 'GEO group codes cannot be null';
     END IF;
 
-    -- Check all elements exist in lookup_table
+    -- Check for duplicates
+    IF ARRAY_LENGTH(_groups, 1) <> ARRAY_LENGTH(ARRAY(SELECT DISTINCT UNNEST(_groups)), 1) THEN
+        RETURN 'Duplicate GEO group codes are not allowed';
+    END IF;
+
+    -- Check all elements exist in GEO group lookup table
     FOREACH _v IN ARRAY _groups
     LOOP
         IF NOT EXISTS (SELECT 1 FROM ce_warehouse.l_geo_groups WHERE code = _v) THEN
-            RETURN FALSE;
+            RETURN FORMAT('GEO group code "%s" does not exist', _v);
         END IF;
     END LOOP;
 
-    RETURN TRUE;
+    RETURN NULL;
 END
 $$;
 

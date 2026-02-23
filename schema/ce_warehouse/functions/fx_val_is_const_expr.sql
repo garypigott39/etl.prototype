@@ -10,7 +10,8 @@
 -- DROP FUNCTION IF EXISTS ce_warehouse.fx_val_is_const_expr;
 
 CREATE OR REPLACE FUNCTION ce_warehouse.fx_val_is_const_expr(
-    _expr TEXT
+    _expr TEXT,
+    _nulls_allowed BOOL DEFAULT TRUE
 )
     RETURNS TEXT
     LANGUAGE plpgsql
@@ -24,7 +25,7 @@ DECLARE
     _pdi2  TEXT;
 BEGIN
     IF _expr IS NULL OR TRIM(p_expr) = '' THEN
-        RETURN 'Expression cannot be null or empty';
+        RETURN _nulls_allowed ? NULL : 'Expression cannot be null or empty';
     END IF;
 
     ----------------------------------------------------------------

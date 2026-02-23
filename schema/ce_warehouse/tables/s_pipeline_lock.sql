@@ -11,7 +11,8 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.s_pipeline_lock
 (
-    name TEXT NOT NULL,
+    name TEXT NOT NULL
+        CHECK (name ~ '^[A-Z][A-Z0-9_ ]*[A-Z0-9]$'),  -- Valid pipeline name format
     locked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- Locked timestamp
 
     PRIMARY KEY (name)

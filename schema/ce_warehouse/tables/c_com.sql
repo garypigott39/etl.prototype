@@ -16,11 +16,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_com
     code TEXT NOT NULL
         CHECK (code ~ '^C\.[A-Z0-9_]+[A-Z0-9]$' AND code !~ 'INTERNAL'),
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(name)),
+        CHECK (ce_warehouse.fx_val_is_text(name, FALSE) IS NULL),
     short_name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(short_name)),
+        CHECK (ce_warehouse.fx_val_is_text(short_name, FALSE) IS NULL),
     tla TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(tla)),
+        CHECK (ce_warehouse.fx_val_is_text(tla, FALSE) IS NULL),
     commodity_type TEXT NOT NULL
         REFERENCES ce_warehouse.c_com_type(code)
             DEFERRABLE INITIALLY DEFERRED
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_com
     ordering INT NOT NULL DEFAULT '0',
 
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes)),
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
 
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 

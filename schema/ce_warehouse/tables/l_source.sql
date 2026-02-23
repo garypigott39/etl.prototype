@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_source
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Z][A-Z0-9]{0,5}$'),   -- restrict to valid codes (max 6 chars, starting with a letter)
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(name)),
+        CHECK (ce_warehouse.fx_val_is_text(name, FALSE) IS NULL),
     source_is TEXT NOT NULL DEFAULT 'B',
         CHECK (source_is IN ('A', 'M', 'B', '-')),     -- A=Api/M=Manual/B=Both/-=N/A
     active BOOL NOT NULL DEFAULT TRUE,  -- enables the source to be marked as inactive if required

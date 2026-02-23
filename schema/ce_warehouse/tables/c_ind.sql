@@ -18,27 +18,27 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Z0-9][A-Z0-9<>._\-+#£$%]*[A-Z0-9#£€$%]$'),
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(name)),
+        CHECK (ce_warehouse.fx_val_is_text(name, FALSE) IS NULL),
     description TEXT
-        CHECK (ce_warehouse.fx_val_is_text(description)),
+        CHECK (ce_warehouse.fx_val_is_text(description) IS NULL),
     name1 TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name1)),
+        CHECK (ce_warehouse.fx_val_is_text(name1) IS NULL),
     name2 TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name2)),
+        CHECK (ce_warehouse.fx_val_is_text(name2) IS NULL),
     name3 TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name3)),
+        CHECK (ce_warehouse.fx_val_is_text(name3) IS NULL),
     name4 TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name4)),
+        CHECK (ce_warehouse.fx_val_is_text(name4) IS NULL),
     name_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name_lower)),
+        CHECK (ce_warehouse.fx_val_is_text(name_lower) IS NULL),
     name1_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name1_lower)),
+        CHECK (ce_warehouse.fx_val_is_text(name1_lower) IS NULL),
     name2_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name2_lower)),
+        CHECK (ce_warehouse.fx_val_is_text(name2_lower) IS NULL),
     name3_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name3_lower)),
+        CHECK (ce_warehouse.fx_val_is_text(name3_lower) IS NULL),
     name4_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name4_lower)),
+        CHECK (ce_warehouse.fx_val_is_text(name4_lower) IS NULL),
     catg_broad TEXT
         REFERENCES ce_warehouse.l_ind_broad_catg (code)
             DEFERRABLE INITIALLY DEFERRED
@@ -50,7 +50,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
             ON UPDATE CASCADE
             ON DELETE RESTRICT,
     data_transformation TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(data_transformation))
         REFERENCES ce_warehouse.l_data_transformation (code)
             DEFERRABLE INITIALLY DEFERRED
             ON UPDATE CASCADE
@@ -60,7 +59,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
     ordering INT NOT NULL DEFAULT 0,
 
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes)),
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
 
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 

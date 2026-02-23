@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_api_calc
         CHECK (formula_type IN ('peop', 'psum', 'pmean', 'growth', 'growth-1')),
 
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes)),
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
 
     regenerate BOOL NOT NULL DEFAULT TRUE,  -- Does this series need regenerating?
 

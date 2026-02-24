@@ -42,7 +42,12 @@ VALUES
     ('DX', 'API Calc', '-', TRUE),
     ('M','Manual', 'M', TRUE);
 
--- Additional user supplied codes.
+/**
+ * Additional user supplied codes.
+ *
+ * @todo - discuss with Rhydian needed to change "'BHIGA', 'eGovernment Authority, Bahrain'"
+ *   to amend name to 'E-Government Authority, Bahrain' to fit the simple names rules.
+ */
 INSERT INTO ce_warehouse.l_source (code, name)
 VALUES
     ('ABS', 'Australian Bureau of Statistics'),
@@ -64,7 +69,7 @@ VALUES
     ('BESB', 'Statistics Belgium'),
     ('BGBNB', 'Bulgarian National Bank'),
     ('BGNSI', 'National Statistical Institute of Bulgaria'),
-    ('BHIGA', 'eGovernment Authority, Bahrain'),
+    ('BHIGA', 'E-Government Authority, Bahrain'),
     ('BIS', 'Bank for International Settlements'),
     ('BOC', 'Bank of Canada'),
     ('BOE', 'Bank of England'),

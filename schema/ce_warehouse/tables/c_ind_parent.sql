@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind_parent
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),
-    UNIQUE (fk_pk_geo, icode)
+    UNIQUE (fk_pk_i, icode)
 );
 
 COMMENT ON TABLE ce_warehouse.c_ind_parent

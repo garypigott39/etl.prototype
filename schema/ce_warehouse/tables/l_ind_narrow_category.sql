@@ -1,29 +1,29 @@
 /*
  ***********************************************************************************************************
  * @file
- * l_ind_narrow_catg.sql
+ * l_ind_narrow_category.sql
  *
  * Lookup table - IND narrow category lookup.
  ***********************************************************************************************************
  */
 
--- DROP TABLE IF EXISTS ce_warehouse.l_ind_narrow_catg;
+-- DROP TABLE IF EXISTS ce_warehouse.l_ind_narrow_category;
 
-CREATE TABLE IF NOT EXISTS ce_warehouse.l_ind_narrow_catg
+CREATE TABLE IF NOT EXISTS ce_warehouse.l_ind_narrow_category
 (
     name TEXT NOT NULL
         CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
 
-    PRIMARY KEY (code)
+    PRIMARY KEY (name)
 );
 
-COMMENT ON TABLE ce_warehouse.l_ind_narrow_catg
+COMMENT ON TABLE ce_warehouse.l_ind_narrow_category
     IS 'Lookup table - IND narrow category lookup';
 
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l_ind_narrow_catg (name)
+INSERT INTO ce_warehouse.l_ind_narrow_category (name)
 VALUES
     ('AI Index'),
     ('Asset Return'),

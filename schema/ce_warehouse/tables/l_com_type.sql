@@ -23,7 +23,7 @@ COMMENT ON TABLE ce_warehouse.l_com_type
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l_com_type (code)
+INSERT INTO ce_warehouse.l_com_type (name)
 VALUES
     ('Agriculturals'),
     ('Commodity index'),

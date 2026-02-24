@@ -24,7 +24,7 @@ FROM ce_warehouse.mv_period src
      AND tgt.ifreq > src.ifreq;
 
 CREATE INDEX IF NOT EXISTS mv_xperiod__src_datapoint__idx
-    ON ce_warehouse.mv_xperiod (src_pdi, src_freq);
+    ON ce_warehouse.mv_xperiod (src_pdi, src_ifreq);
 
 COMMENT ON MATERIALIZED VIEW ce_warehouse.mv_xperiod
     IS 'Materialized View - creates a source to target period table, for use in API calculations etc';

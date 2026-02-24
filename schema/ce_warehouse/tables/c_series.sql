@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
     gcode TEXT NOT NULL
         CHECK (
             gcode = 'INTERNAL' OR
-            ce.warehouse.fx_val_is_geo_or_com(gcode, FALSE) IS NULL
+            ce_warehouse.fx_val_is_geo_or_com(gcode, FALSE) IS NULL
         ),
     icode TEXT NOT NULL
         REFERENCES ce_warehouse.c_ind (code)

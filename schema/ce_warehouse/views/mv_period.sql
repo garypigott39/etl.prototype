@@ -140,7 +140,7 @@ SELECT
     p.lag
 
 FROM _final p
-    LEFT JOIN ce_warehouse.l_ifreq f
+    LEFT JOIN ce_warehouse.l_freq f
         ON p.ifreq = f.pk_f;
 
 CREATE UNIQUE INDEX mv_period__pk__idx

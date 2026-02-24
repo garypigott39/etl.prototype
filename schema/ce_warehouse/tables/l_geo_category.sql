@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * l_ind_broad_catg.sql
+ * l_geo_category.sql
  *
- * Lookup table - IND broad category lookup.
+ * Lookup table - GEO category lookup.
  ***********************************************************************************************************
  */
 
--- DROP TABLE IF EXISTS ce_warehouse.l_ind_broad_catg;
+-- DROP TABLE IF EXISTS ce_warehouse.l_geo_category;
 
-CREATE TABLE IF NOT EXISTS ce_warehouse.l_ind_broad_catg
+CREATE TABLE IF NOT EXISTS ce_warehouse.l_geo_category
 (
     name TEXT NOT NULL
         CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
@@ -17,15 +17,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_ind_broad_catg
     PRIMARY KEY (name)
 );
 
-COMMENT ON TABLE ce_warehouse.l_ind_broad_catg
-    IS 'Lookup table - IND broad category lookup';
+COMMENT ON TABLE ce_warehouse.l_geo_category
+    IS 'Lookup table - GEO category lookup';
 
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l_ind_broad_catg (name)
+INSERT INTO ce_warehouse.l_geo_category (name)
 VALUES
-    ('Climate'),
-    ('Commodities'),
-    ('Macro'),
-    ('Prroperty');
+    ('Country'),
+    ('Region'),
+    ('Subnational'),
+    ('Unknown');

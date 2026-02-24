@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc_v2
         CHECK (tgt_type IN ('AC', 'F')),
 
     formula_type TEXT NOT NULL
-        REFERENCES ce_warehouse.l_calc_formula_type(code)
+        REFERENCES ce_warehouse.s_formula_type(code)
             ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,

@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_central_bank
 (
     name TEXT NOT NULL
         CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
-    short_code TEXT NOT NULL
+    short_code TEXT
         CHECK (short_code ~ '^[A-Z][A-Za-z0-9 ]*$'),
 
     PRIMARY KEY (name)
@@ -159,9 +159,9 @@ VALUES
     ('European Central Bank', 'ECB'),
     ('Federal Reserve Bank of NY', 'FRBNY'),
     ('Federal Reserve System', 'FRB'),
-    ('Government of Gibraltar'),
+    ('Government of Gibraltar', NULL),
     ('Hong Kong Monetary Authority', 'HKMA'),
-    ('Isle of Man Government'),
+    ('Isle of Man Government', NULL),
     ('Jersey Financial Services Commission', 'JFSC'),
     ('Latvijas Banka', 'LB'),
     ('Liechtensteinische Landesbank', 'LLB'),

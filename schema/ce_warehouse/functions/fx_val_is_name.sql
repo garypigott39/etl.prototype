@@ -22,7 +22,6 @@ BEGIN
         IF NOT _nulls_allowed THEN
             RETURN 'Value cannot be null or empty';
         END IF;
-        RETURN NULL;
     ELSEIF LENGTH(_val) = 1 AND _val !~ '[A-Z0-9]' THEN
         RETURN 'Single character value must be an uppercase letter (A-Z) or digit (0-9)';
     ELSEIF _val !~ '^[A-Z][A-Za-z0-9 &/:,.''()£$-]*[A-Za-z0-9)]$' THEN

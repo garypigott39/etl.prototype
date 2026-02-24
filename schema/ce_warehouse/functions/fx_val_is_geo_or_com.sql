@@ -23,7 +23,6 @@ BEGIN
         IF NOT _nulls_allowed THEN
             RETURN 'GEO/COM code cannot be null';
         END IF;
-        RETURN NULL;
     ELSEIF _code ~ '^C.' THEN
         IF NOT EXISTS (SELECT 1 FROM ce_warehouse.c_com WHERE code = _code) THEN
             RETURN FORMAT('Commodity code "%s" does not exist', _code);

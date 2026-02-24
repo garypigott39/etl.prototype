@@ -55,7 +55,6 @@ BEGIN
         ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l_period p WHERE p.pk_pdi = _pdi1::INT) THEN
             RETURN FORMAT('Period "%s" does not exist', _pdi1);
         END IF;
-
         RETURN NULL;
     END IF;
 

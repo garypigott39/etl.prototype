@@ -18,15 +18,7 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_ut_date_to_dti(
     IMMUTABLE
 AS
 $$
-    SELECT
-        CASE
-            WHEN _dt IS NULL THEN
-                NULL
-            ELSE
-                (EXTRACT(YEAR FROM _dt)::INT * 10000 +
-                 EXTRACT(MONTH FROM _dt)::INT * 100 +
-                 EXTRACT(DAY FROM _dt)::INT)
-        END;
+    SELECT TO_CHAR(_dt, 'YYYYMMDD')::INT;
 $$;
 
 COMMENT ON FUNCTION ce_warehouse.fx_ut_date_to_dti

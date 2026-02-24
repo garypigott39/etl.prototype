@@ -20,31 +20,24 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_ut_date_to_pdi(
 AS
 $$
     SELECT
-        CASE
-            WHEN _dt IS NULL THEN
-                NULL
-            WHEN _freq IS NULL OR _freq < 1 OR _freq > 5 THEN
-                NULL
-            WHEN _freq = 1 THEN
+        CASE _freq
+            WHEN 1 THEN
                 -- Daily: YYYYMMDD
-                _freq * 100000000 + (EXTRACT(YEAR FROM _dt)::INT * 10000
-                                   + EXTRACT(MONTH FROM _dt)::INT * 100
-                                   + EXTRACT(DAY FROM _dt)::INT)
-            WHEN _freq = 2 THEN
+                100000000 + TO_CHAR(_dt, 'YYYYMMDD')::INT
+            WHEN 2 THEN
                 -- Weekly: ISO year + ISO week
-                _freq * 100000000 + (EXTRACT(ISOYEAR FROM _dt)::INT * 100
-                                   + EXTRACT(WEEK FROM _dt)::INT)
-            WHEN _freq = 3 THEN
+                200000000 + TO_CHAR(_dt, 'IYYYIW')::INT
+            WHEN 3 THEN
                 -- Monthly: YYYYMM
-                _freq * 100000000 + (EXTRACT(YEAR FROM _dt)::INT * 100
-                                   + EXTRACT(MONTH FROM _dt)::INT)
-            WHEN _freq = 4 THEN
+                300000000 + TO_CHAR(_dt, 'YYYYMM')::INT
+            WHEN 4 THEN
                 -- Quarterly: YYYYQ
-                _freq * 100000000 + (EXTRACT(YEAR FROM _dt)::INT * 10
-                                   + ((EXTRACT(MONTH FROM _dt)::INT - 1) / 3 + 1)::INT)
-            ELSE
+                400000000 + TO_CHAR(_dt, 'YYYYQ')::INT
+            WHEN 5 THEN
                 -- Yearly: YYYY
-                _freq * 100000000 + EXTRACT(YEAR FROM _dt)::INT
+                500000000 + TO_CHAR(_dt, 'YYYY')::INT
+            ELSE
+                NULL
         END;
 $$;
 

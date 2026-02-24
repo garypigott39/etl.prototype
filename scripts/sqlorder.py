@@ -31,7 +31,7 @@ class SqlOrder:
         "3F000",  # undefined_schema
     }
 
-    def __init__(self, sql_directory: str):
+    def __init__(self, sql_directory: str, debug: bool = False):
         if env_file := '.env' if Path('.env').exists() else None:
             load_dotenv(env_file)
         else:
@@ -46,6 +46,7 @@ class SqlOrder:
         self.temp_connection_string = self.connection_string(dbname=self.TEMP_DB)
 
         self.temp_db_created = False
+        self.debug = debug
 
         if self.temp_db_exists():
             raise Exception(f"ERROR: Database '{self.TEMP_DB}' already exists. Please drop it before running this script.")
@@ -134,10 +135,22 @@ class SqlOrder:
         Print the combined SQL of all files in the resolved order to the console.
         :return: None
         """
+
+        def _debug(filename: str) -> str:
+            return f"""
+                DO $$
+                BEGIN
+                    RAISE NOTICE 'Executing file: {filename}  @ %', TO_CHAR(clock_timestamp(), 'HH24:MI:SS');
+                END
+                $$;
+            """.replace("    ", "")
+
         with open(self.OUTPUT_SQL, "w", encoding="utf-8") as f:
             print("\n/***** COMBINED SQL IN RESOLVED ORDER *****/\n", file=f)
             for i, (filename, file) in enumerate(self.ordered_files, 1):
                 print(f"-- {i}. {filename} --", file=f)
+                if self.debug:
+                    print(_debug(filename), file=f)
                 print(file.read_text(encoding='utf-8'), file=f)
                 print("\n", file=f)
             print('/***** END OF COMBINED SQL *****/', file=f)
@@ -205,14 +218,14 @@ class SqlOrder:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: py sqlorder.py <parent_sql_directory>")
+    if len(sys.argv) not in (2, 3):
+        print("Usage: py sqlorder.py <parent_sql_directory> [--debug]")
         sys.exit(1)
 
     os.system('cls' if platform.system() == 'Windows' else 'clear')
 
     try:
-        obj = SqlOrder(sys.argv[1])
+        obj = SqlOrder(sys.argv[1], debug='--debug' in sys.argv)
         obj.resolve_sql_order()
         obj.print_order()
         obj.print_sql()

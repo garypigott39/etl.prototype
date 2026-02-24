@@ -18,7 +18,7 @@ AS
 $$
 BEGIN
     IF _include_time THEN
-        _msg := _msg || '  (@ ' || ce_warehouse.fx_ut_utc() || ')';
+        _msg := _msg || '  (@ ' || TO_CHAR(clock_timestamp(), 'DD/MM/YYYY HH24:MI:SS') || ')';
     END IF;
     RAISE INFO '# %', _msg;
 END

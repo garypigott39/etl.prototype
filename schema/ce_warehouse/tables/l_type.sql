@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_type
     pk_t SMALLINT NOT NULL GENERATED ALWAYS AS (
         CASE code
             WHEN 'AC' THEN 1
-            WHEN 'F' THEN 2
+            ELSE 2
         END
     ) STORED,
 
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_type
     name TEXT NOT NULL GENERATED ALWAYS AS (
         CASE code
             WHEN 'AC' THEN 'Actual'
-            WHEN 'F' THEN 'Forecast'
+            ELSE 'Forecast'
         END
     ) STORED,
 

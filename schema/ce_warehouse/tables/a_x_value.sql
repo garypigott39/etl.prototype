@@ -15,12 +15,13 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a_x_value
 
     fk_pk_s INT NOT NULL,
     pdi INT,
-    ifreq SMALLINT GENERATED ALWAYS AS (
-      CASE
-        WHEN pdi > 0 THEN (pdi / 100000000)
-        ELSE NULL
-      END
-    ) STORED,
+    ifreq SMALLINT GENERATED ALWAYS
+        AS (
+            CASE
+                WHEN pdi > 0 THEN (pdi / 100000000)
+                ELSE NULL
+            END
+        ) STORED,
     itype SMALLINT,
     isource SMALLINT,
     value NUMERIC,

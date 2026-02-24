@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_freq
             WHEN 'W' THEN 2
             WHEN 'M' THEN 3
             WHEN 'Q' THEN 4
-            WHEN 'Y' THEN 5
+            ELSE 5
         END
     ) STORED,
 
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_freq
             WHEN 'W' THEN 'Weekly'
             WHEN 'M' THEN 'Monthly'
             WHEN 'Q' THEN 'Quarterly'
-            WHEN 'Y' THEN 'Yearly'
+            ELSE 'Yearly'
         END
     ) STORED,
 

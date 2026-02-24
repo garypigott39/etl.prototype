@@ -70,8 +70,11 @@ SELECT
     /* ================================================================
        SEQUENCES
        ================================================================ */
-    (d.date - DATE '1900-01-01')::INT                                                 AS sequence_day,
-    (EXTRACT(YEAR FROM d.date)::INT * 12 + EXTRACT(MONTH FROM d.date)::INT)           AS sequence_month,
+    (d.date - s.value::DATE)::INT  + 1                                                AS sequence_day,
+    (
+        (EXTRACT(YEAR FROM d.date) - EXTRACT(YEAR FROM s.value::DATE)) * 12
+        + (EXTRACT(MONTH FROM d.date) - EXTRACT(MONTH FROM s.value::DATE))
+    ) + 1                                                                             AS sequence_month,
 
     /* ================================================================
        FISCAL (OCT = 1)
@@ -84,7 +87,9 @@ SELECT
         ELSE EXTRACT(YEAR FROM d.date)::INT
     END                                                                               AS yyyy_fy
 
-FROM ce_warehouse.l_dates d;
+FROM ce_warehouse.l_date d
+    JOIN ce_warehouse.s_sys_flags s
+        ON s.code = 'DATE.MIN';
 
 COMMENT ON VIEW ce_warehouse.v_date
     IS 'View - generated dates metadata';

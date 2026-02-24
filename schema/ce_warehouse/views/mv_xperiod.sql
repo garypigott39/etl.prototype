@@ -12,9 +12,9 @@
 CREATE MATERIALIZED VIEW ce_warehouse.mv_xperiod
 AS
 SELECT
-    src.pk_p           AS src_pdi,
+    src.pk_pdi         AS src_pdi,
     src.ifreq          AS src_ifreq,
-    tgt.pk_p           AS tgt_pdi,
+    tgt.pk_pdi         AS tgt_pdi,
     tgt.ifreq          AS tgt_ifreq,
     tgt.period         AS tgt_period,
     tgt.end_of_period  AS tgt_end_of_period

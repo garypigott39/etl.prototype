@@ -20,7 +20,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of series with values, see app logic!!
-    pdi INT NOT NULL,  -- reference to period identifier, see housekeeping
+    pdi INT NOT NULL
+        REFERENCES ce_warehouse.l_period (pk_pdi)
+            ON UPDATE RESTRICT
+            ON DELETE RESTRICT
+            DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of periods with values, see app logic!!
     ifreq SMALLINT NOT NULL GENERATED ALWAYS
         AS (pdi / 100000000) STORED
         CHECK (ifreq IN (1, 2, 3 , 4, 5)),  -- extract frequency from period code

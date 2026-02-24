@@ -72,9 +72,9 @@ SELECT
        ================================================================ */
     (d.date - s.value::DATE)::INT  + 1                                                AS sequence_day,
     (
-        (EXTRACT(YEAR FROM d.date) - EXTRACT(YEAR FROM s.value::DATE)) * 12
-        + (EXTRACT(MONTH FROM d.date) - EXTRACT(MONTH FROM s.value::DATE))
-    ) + 1                                                                             AS sequence_month,
+        (EXTRACT(YEAR FROM AGE(d.date, s.value::DATE)) * 12) +
+        EXTRACT(MONTH FROM AGE(d.date, s.value::DATE)) + 1
+    )                                                                              AS sequence_month,
 
     /* ================================================================
        FISCAL (OCT = 1)

@@ -19,6 +19,9 @@ from pathlib import Path
 
 class SqlOrder:
 
+    OUTPUT_SQL = "SQLORDER.sql"
+    OUTPUT_TXT = "SQLORDER.txt"
+
     TEMP_DB = "_monkeyboy"
 
     RETRYABLE_ERRORS = {
@@ -34,6 +37,11 @@ class SqlOrder:
         else:
             print("WARNING: .env file not found. Using default connection settings.")
 
+        # Remove any existing output files
+        os.unlink(self.OUTPUT_SQL) if Path(self.OUTPUT_SQL).exists() else None
+        os.unlink(self.OUTPUT_TXT) if Path(self.OUTPUT_TXT).exists() else None
+
+        #
         self.base_connection_string = self.connection_string(dbname="postgres")
         self.temp_connection_string = self.connection_string(dbname=self.TEMP_DB)
 
@@ -113,20 +121,28 @@ class SqlOrder:
         Print the resolved order of SQL files to the console.
         :return: None
         """
-        print("\nSQL Files in Resolved Order:")
-        for i, f in enumerate(self.ordered_files, 1):
-            print(f"{i:03d}: {f}")
+        with open(self.OUTPUT_TXT, 'w', encoding="utf-8") as f:
+            print("\n***** SQL Files in Resolved Order *****\n", file=f)
+            for i, (filename, _) in enumerate(self.ordered_files, 1):
+                print(f"{i:03d}: {filename}", file=f)
+            print('***** END OF FILE *****', file=f)
+
+        print(f"\nSQL File Order written to {self.OUTPUT_TXT}")
 
     def print_sql(self) -> None:
         """
         Print the combined SQL of all files in the resolved order to the console.
         :return: None
         """
-        print("\nCombined SQL in Resolved Order:\n")
-        for file in self.ordered_files:
-            print(f"-- {file} --")
-            print(file.read_text(encoding='utf-8'))
-            print("\n")
+        with open(self.OUTPUT_SQL, "w", encoding="utf-8") as f:
+            print("\n/***** COMBINED SQL IN RESOLVED ORDER *****/\n", file=f)
+            for i, (filename, file) in enumerate(self.ordered_files, 1):
+                print(f"-- {i}. {filename} --", file=f)
+                print(file.read_text(encoding='utf-8'), file=f)
+                print("\n", file=f)
+            print('/***** END OF COMBINED SQL *****/', file=f)
+
+        print(f"\nCombined SQL written to {self.OUTPUT_SQL}")
 
     def resolve_sql_order(self) -> None:
         """
@@ -149,7 +165,7 @@ class SqlOrder:
                         rel_path = str(file.relative_to(self.base_path))
                         print(f"✔ Applied: {rel_path}")
 
-                        self.ordered_files.append(rel_path)
+                        self.ordered_files.append((file.relative_to(self.base_path), file))
                         progress_made = True
                     else:
                         next_round.append(file)
@@ -207,5 +223,5 @@ if __name__ == "__main__":
         if 'obj' in locals():
             if obj.temp_db_created:
                 obj.drop_temp_database()
-                print(f"Temporary database '{obj.TEMP_DB}' dropped successfully.")
+                print(f"\nTemporary database '{obj.TEMP_DB}' dropped successfully.")
             del obj

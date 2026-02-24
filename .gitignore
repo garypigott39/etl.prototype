@@ -211,3 +211,4 @@ wip/
 test.data/
 a.sql
 *.sql.gz
+SQLORDER.*

@@ -26,7 +26,7 @@ BEGIN
     ELSEIF _ifreq NOT IN (1, 2, 3, 4, 5) THEN
         RETURN 'Invalid frequency';
     ELSEIF _ifreq = 1 THEN
-        NULL;  -- Daily frequency - any date is valid
+        RETURN NULL;  -- Daily frequency - any date is valid
     ELSEIF _ifreq =  2 THEN
         IF _dt <> date_trunc('WEEK', _dt) THEN
             RETURN 'Date must be the start of a week';

@@ -12,7 +12,7 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_stock_market
 (
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(name, FALSE) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
     short_code TEXT NOT NULL
         CHECK (short_code ~ '^[A-Z]' AND ce_warehouse.fx_val_is_text(short_code) IS NULL),
 

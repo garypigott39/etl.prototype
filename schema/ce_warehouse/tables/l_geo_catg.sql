@@ -11,10 +11,10 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_geo_catg
 (
-    code TEXT NOT NULL
-        CHECK (code ~ '^[A-Z][A-Za-z0-9 &]*$'),
+    name TEXT NOT NULL
+        CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
 
-    PRIMARY KEY (code)
+    PRIMARY KEY (name)
 );
 
 COMMENT ON TABLE ce_warehouse.l_geo_catg
@@ -23,7 +23,7 @@ COMMENT ON TABLE ce_warehouse.l_geo_catg
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l_geo_catg (code)
+INSERT INTO ce_warehouse.l_geo_catg (name)
 VALUES
     ('Country'),
     ('Region'),

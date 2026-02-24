@@ -14,10 +14,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_currency_unit
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Z]{3}$'),
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(name, FALSE) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
 
-    PRIMARY KEY (code),
-    UNIQUE (name)
+    PRIMARY KEY (code)
 );
 
 COMMENT ON TABLE ce_warehouse.l_currency_unit

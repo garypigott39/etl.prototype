@@ -26,19 +26,19 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
     series_id TEXT GENERATED ALWAYS
         AS (gcode || '_' || icode) STORED,  -- Series code
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_text(name, FALSE) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
     name1 TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name1) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name1) IS NULL),
     name2 TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name2) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name2) IS NULL),
     name3 TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name3) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name3) IS NULL),
     name4 TEXT
-        CHECK (ce_warehouse.fx_val_is_text(name4) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name4) IS NULL),
     description TEXT
-        CHECK (ce_warehouse.fx_val_is_text(description) IS NULL),
-    source_annotation TEXT
-        CHECK (ce_warehouse.fx_val_is_text(source_annotation) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(description) IS NULL),
+    data_source TEXT
+        CHECK (ce_warehouse.fx_val_is_name(data_source) IS NULL),
     units TEXT
         REFERENCES ce_warehouse.l_units (code)
             ON UPDATE CASCADE
@@ -51,7 +51,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
     active BOOL NOT NULL DEFAULT TRUE,
     ordering INT NOT NULL DEFAULT 0,
 
-    internal_notes TEXT,  -- Unvalidated!
+    internal_notes TEXT
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
 
     error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),

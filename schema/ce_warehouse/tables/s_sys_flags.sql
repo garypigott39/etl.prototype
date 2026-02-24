@@ -25,9 +25,10 @@ COMMENT ON TABLE ce_warehouse.s_sys_flags
 /**
  * Pre-populate with known values.
  */
-INSERT INTO ce_warehouse.s_sys_flags
+INSERT INTO ce_warehouse.s_sys_flags (code, value, description)
 VALUES
     ('ASCII-ONLY','FALSE','If set to "TRUE" then only allow ASCII text values. Default is value is "FALSE".'),
     ('DATE.MAX','+30 YEAR','Max date for date lookup table. This should be an INTERVAL value. Default is "+30 YEAR".'),
     ('DATE.MIN','1890-01-01','Minimum date for date lookup table, should be the beginning of a year'),
-    ('GEO.FLAG.BASEURL','https://www.capitaleconomics.com/sites/default/files/','Base URL for GEO flags. Note the trailing slash.');
+    ('GEO.FLAG.BASEURL','https://www.capitaleconomics.com/sites/default/files/','Base URL for GEO flags. Note the trailing slash.'),
+    ('PIPELINE.ERRCTL', 'SKIP', 'Pipeline errors, what to do with control table errors. Options are SKIP (default), or ABORT.');

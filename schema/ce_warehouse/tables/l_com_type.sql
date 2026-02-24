@@ -11,10 +11,10 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_com_type
 (
-    code TEXT NOT NULL
-        CHECK (code ~ '^[A-Z][a-z0-9 ]*$'),
+    name TEXT NOT NULL
+        CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
 
-    PRIMARY KEY (code)
+    PRIMARY KEY (name)
 );
 
 COMMENT ON TABLE ce_warehouse.l_com_type

@@ -32,14 +32,14 @@ BEGIN
     END IF;
 
     ----------------------------------------------------------------
-    -- 1️⃣ Numeric (positive or negative, optional decimals)
+    -- Numeric (positive or negative, optional decimals)
     ----------------------------------------------------------------
     IF _expr ~ '^[-+]?\d+(\.\d+)?$' THEN
         RETURN NULL;
     END IF;
 
     ----------------------------------------------------------------
-    -- 2️⃣ #TOKEN#,PERIOD
+    -- #TOKEN#,PERIOD
     ----------------------------------------------------------------
     SELECT REGEXP_MATCHES(_expr,
            '^#([^#]+)#,(\d{9})$')
@@ -60,14 +60,14 @@ BEGIN
     END IF;
 
     ----------------------------------------------------------------
-    -- 3️⃣ sd() or_mean()
+    -- sd() or_mean()
     ----------------------------------------------------------------
     SELECT regexp_matches(_expr,
            '^(sd|mean)\(#([^#]+)#,(\d{9}),(\d{9})\)$')
     INTO _m;
 
     IF _m IS NOT NULL THEN
-        --_m[1] = function name (sd|mean) – already validated by regex
+        --_m[1] = function name (sd|mean) -> already validated by regex
         _tok  :=_m[2];
         _pdi1 :=_m[3];
         _pdi2 :=_m[4];
@@ -93,7 +93,7 @@ BEGIN
     END IF;
 
     ----------------------------------------------------------------
-    -- Anything else → invalid
+    -- Anything else -> invalid
     ----------------------------------------------------------------
     RETURN 'Invalid expression format';
 

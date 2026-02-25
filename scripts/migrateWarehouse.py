@@ -712,6 +712,32 @@ def migrate_xvalue(src_cur, tgt_cur):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
+def update_series_meta(src_cur, tgt_cur):
+    """
+    Post-migration updates to series metadata based on new values.
+    """
+    print("\n### POST-MIGRATION: Updating series metadata...")
+
+    # Example: Mark series with any manual values as non-downloadable
+    tgt_cur.execute("""
+        UPDATE ce_warehouse.c_series_meta sm
+        SET has_values = TRUE
+        WHERE EXISTS (
+            SELECT 1 FROM ce_warehouse.x_value x
+            WHERE x.fk_pk_series = sm.fk_pk_series
+            AND x.ifreq = sm.ifreq
+            AND x.itype = sm.itype
+        );
+        UPDATE ce_warehouse.c_series_meta sm
+        SET updated_values_utc = (
+            SELECT MAX(updated_utc) FROM ce_warehouse.x_value x
+            WHERE x.fk_pk_series = sm.fk_pk_series
+            AND x.ifreq = sm.ifreq
+            AND x.itype = sm.itype
+        )
+        WHERE sm.updated_values_utc IS NULL;
+    """)
+
 # -------------------------------------------------------
 # Main migration
 # -------------------------------------------------------
@@ -740,6 +766,8 @@ def main():
         migrate_xtooltip(src_cur, tgt_cur)
         migrate_xvalue(src_cur, tgt_cur)
         migrate_avalue(src_cur, tgt_cur)
+
+        update_series_meta(src_cur, tgt_cur)
 
         tgt_conn.commit()
         print("\n### Migration complete ✔")

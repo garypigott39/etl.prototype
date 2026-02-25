@@ -39,12 +39,12 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
         CHECK (ce_warehouse.fx_val_is_name(name3_lower) IS NULL),
     name4_lower TEXT
         CHECK (ce_warehouse.fx_val_is_name(name4_lower) IS NULL),
-    catg_broad TEXT
+    category_broad TEXT
         REFERENCES ce_warehouse.l_ind_broad_category (name)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
-    catg_narrow TEXT
+    category_narrow TEXT
         REFERENCES ce_warehouse.l_ind_narrow_category (name)
             ON UPDATE CASCADE
             ON DELETE RESTRICT

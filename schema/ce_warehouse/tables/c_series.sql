@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
 
-    -- Auto generated fields
+    -- Auto generated ID-based fields
     series_id TEXT GENERATED ALWAYS
         AS (gcode || '_' || icode) STORED,  -- Series code
     sid_1 TEXT GENERATED ALWAYS

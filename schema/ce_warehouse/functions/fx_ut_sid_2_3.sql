@@ -30,7 +30,7 @@ BEGIN
         RETURN NULL;
     END IF;
 
-    _sid := (SELECT sid_1 FROM ce_warehouse.c_series WHERE pk_series = _pks);
+    _sid := (SELECT sid1 FROM ce_warehouse.c_series WHERE pk_series = _pks);
     IF _sid IS NULL THEN
         RETURN NULL;
     END IF;

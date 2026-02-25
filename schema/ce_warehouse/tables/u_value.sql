@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u_value
     uv_gcode TEXT,
     uv_icode TEXT,
     uv_period TEXT,
-    uv_freq TEXT,    -- CHAR version of frequency
-    uv_type TEXT,    -- CHAR version of type
+    uv_cfreq TEXT,    -- CHAR version of frequency
+    uv_ctype TEXT,    -- CHAR version of type
     uv_source TEXT,  -- CHAR version of source
     uv_value TEXT,
     uv_tooltip TEXT,

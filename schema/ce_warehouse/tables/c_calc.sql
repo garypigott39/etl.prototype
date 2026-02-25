@@ -21,15 +21,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc
             DEFERRABLE INITIALLY DEFERRED,
     tgt_cfreq TEXT NOT NULL
         CHECK (tgt_cfreq IN ('D', 'W', 'M', 'Q', 'Y')),
-    tgt_type TEXT NOT NULL
-        CHECK (tgt_type IN ('AC', 'F')),
+    tgt_ctype TEXT NOT NULL
+        CHECK (tgt_ctype IN ('AC', 'F')),
 
     formula_type TEXT NOT NULL
         REFERENCES ce_warehouse.s_formula_type(code)
             ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
-    formula TEXT NOT NULL,  -- Validated via APP
+    expr TEXT NOT NULL,  -- Validated via APP
 
     internal_notes TEXT
         CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_calc),
-    UNIQUE (tgt_series_id, tgt_cfreq, tgt_type)
+    UNIQUE (tgt_series_id, tgt_cfreq, tgt_ctype)
 );
 
 COMMENT ON TABLE ce_warehouse.c_calc

@@ -38,6 +38,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_meta
     internal_notes TEXT,  -- Unvalidated!
 
     -- UPDATED via trigger etc
+    first_pdi INT,
+    last_pdi INT,
+
     has_values BOOL NOT NULL DEFAULT FALSE,  -- flag to indicate if there are any values for this series/frequency/type
     new_values_utc TIMESTAMPTZ,  -- timestamp of the most recent new value
     updated_values_utc TIMESTAMPTZ,  -- timestamp of the most recent updated (or deleted) value

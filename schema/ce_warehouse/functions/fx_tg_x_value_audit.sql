@@ -95,6 +95,8 @@ BEGIN
                             WHERE fk_pk_series = OLD.fk_pk_series
                             AND ifreq = OLD.ifreq
                             AND itype = OLD.itype
+                            ORDER BY pdi
+                            LIMIT 1
                         )
                         ELSE c_series_meta.first_pdi
                     END,
@@ -103,10 +105,12 @@ BEGIN
                     CASE
                         WHEN OLD.pdi = c_series_meta.last_pdi THEN
                         (
-                            SELECT MAX(pdi) FROM ce_warehouse.x_value
+                            SELECT pdi FROM ce_warehouse.x_value
                             WHERE fk_pk_series = OLD.fk_pk_series
                             AND ifreq = OLD.ifreq
                             AND itype = OLD.itype
+                            ORDER BY pdi DESC
+                            LIMIT 1
                         )
                     ELSE c_series_meta.last_pdi
                     END,

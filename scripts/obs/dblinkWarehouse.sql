@@ -1,0 +1,415 @@
+/*
+ ***********************************************************************************************************
+ * @file
+ * dblinkWarehouse.sql
+ *
+ * Local SQL script to copy data from ce_data/ce_pipeline to ce_warehouse using dblink.
+ *
+ * Note: this is a 1-time script, not intended for regular use, it could be adapted for migration purpose
+ * if needed...
+ ***********************************************************************************************************
+ */
+
+DO
+$$
+DECLARE
+    -- Amend connection string as neededuser has appropriate permissions & dblink extension is installed on the target database.
+    _conn TEXT := 'dbname=testdb user=postgres password=postgres host=localhost';
+    _cols TEXT;
+    _sql TEXT;
+BEGIN
+
+    -- Ensure dblink exists
+    PERFORM 1 FROM pg_extension WHERE extname = 'dblink';
+    IF NOT FOUND THEN
+        EXECUTE 'CREATE EXTENSION dblink';
+    END IF;
+
+    -- Open connection
+    PERFORM dblink_connect('myconn', _conn);
+
+    ------------------------------------------------------------------
+    -- Disable triggers
+    ------------------------------------------------------------------
+    ALTER TABLE ce_warehouse.c_series DISABLE TRIGGER ALL;
+    ALTER TABLE ce_warehouse.x_value DISABLE TRIGGER ALL;
+
+    ------------------------------------------------------------------
+    -- OPTIONAL: truncate first (remove if not desired)
+    ------------------------------------------------------------------
+    TRUNCATE TABLE
+--         ce_warehouse.c_api_calc,
+--         ce_warehouse.c_calc,
+        ce_warehouse.c_calc,
+        ce_warehouse.c_com,
+        ce_warehouse.c_const,
+        ce_warehouse.c_geo,
+        ce_warehouse.c_ind,
+        ce_warehouse.c_series_meta,
+
+        ce_warehouse.x_value,
+        ce_warehouse.x_tooltip,
+        ce_warehouse.a_x_value,
+
+        ce_warehouse.c_series  -- do this last as there are FKs to it
+    RESTART IDENTITY CASCADE;
+
+    ------------------------------------------------------------------
+    -- COPY TABLES with named columns
+    ------------------------------------------------------------------
+
+    -- c_series, this must be done first as there are FKS to it!!
+    _cols := 's_gcode, s_icode, s_name, s_name1, s_name2, s_name3, s_name4, s_description, s_source, s_units, s_precision, s_date_point, s_active, s_order, internal_notes, error, updated_utc';
+    _sql :=  FORMAT($q$
+        INSERT INTO ce_warehouse.c_series (%s, pk_s)
+        OVERRIDING SYSTEM VALUE
+        SELECT %s AT TIME ZONE 'UTC', pk_s
+        FROM dblink(
+            'myconn',
+            'SELECT %s, pk_s FROM ce_data.c_series ORDER BY pk_s'
+        ) AS t(
+            s_gcode TEXT,
+            s_icode TEXT,
+            s_name TEXT,
+            s_name1 TEXT,
+            s_name2 TEXT,
+            s_name3 TEXT,
+            s_name4 TEXT,
+            s_description TEXT,
+            s_source TEXT,
+            s_units TEXT,
+            s_precision INT,
+            s_date_point TEXT,
+            s_active BOOL,
+            s_order INT,
+            internal_notes TEXT,
+            error TEXT,
+            updated_utc TIMESTAMP,
+            pk_s INT
+        )
+    $q$, _cols, _cols, _cols);
+    EXECUTE _sql;
+
+    -- c_api_calc
+    _cols := 'ca_target_series, ca_target_freq, ca_source_series, ca_source_freq, ca_formula_type, internal_notes, error, regenerate, updated_utc';
+    _sql := FORMAT($q$
+        INSERT INTO ce_warehouse.c_api_calc (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT %s AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT %s FROM ce_data.c_api_calc ORDER BY pk_api_calc'
+        ) AS t(
+            ca_target_series TEXT,
+            ca_target_freq TEXT[],
+            ca_source_series TEXT,
+            ca_source_freq TEXT,
+            ca_formula_type TEXT,
+            internal_notes TEXT,
+            error TEXT,
+            regenerate BOOLEAN,
+            updated_utc TIMESTAMP
+        )
+    $q$, _cols, _cols, _cols);
+    EXECUTE _sql;
+
+    -- c_calc
+    _cols := 'calc_series, calc_freq, calc_type, calc_formula, internal_notes, error, updated_utc';
+    _sql := FORMAT($q$
+        INSERT INTO ce_warehouse.c_calc (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT %s AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT %s FROM ce_data.c_calc ORDER BY pk_calc'
+        ) AS t(
+            calc_series TEXT,
+            calc_freq TEXT,
+            calc_type TEXT,
+            calc_formula TEXT,
+            internal_notes TEXT,
+            error TEXT,
+            updated_utc TIMESTAMP
+        )
+    $q$, _cols, _cols, _cols);
+    EXECUTE _sql;
+
+    -- c_com
+    _cols := 'com_code, com_name, com_short_name, com_tla, com_type, com_order, internal_notes, error, updated_utc';
+    _sql := FORMAT($q$
+        INSERT INTO ce_warehouse.c_com (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT %s AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT %s FROM ce_data.c_com ORDER BY pk_com'
+        ) AS t(
+            com_code TEXT,
+            com_name TEXT,
+            com_short_name TEXT,
+            com_tla TEXT,
+            com_type TEXT,
+            com_order INT,
+            internal_notes TEXT,
+            error TEXT,
+            updated_utc TIMESTAMP
+        )
+    $q$, _cols, _cols, _cols);
+    EXECUTE _sql;
+
+    -- c_const
+    _cols := 'con_code, con_expr, value, internal_notes, error, updated_utc';
+    _sql := FORMAT($q$
+        INSERT INTO ce_warehouse.c_const (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT %s AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT %s FROM ce_data.c_const ORDER BY pk_con'
+        ) AS t(
+            con_code TEXT,
+            con_expr TEXT,
+            value NUMERIC,
+            internal_notes TEXT,
+            error TEXT,
+            updated_utc TIMESTAMP
+        )
+    $q$, _cols, _cols, _cols);
+    EXECUTE _sql;
+
+    -- c_geo
+    _cols := 'geo_code, geo_name, geo_name2, geo_short_name, geo_tla, geo_iso2, geo_iso3, geo_lat, geo_long, geo_cb, geo_cb_short, geo_stockmarket, geo_stockmarket_short, geo_political_alignment, geo_lc, geo_lcu, geo_flag, geo_catg, geo_groups, geo_order, internal_notes, error, updated_utc';
+    _sql := FORMAT($q$
+        INSERT INTO ce_warehouse.c_geo (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT %s AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT %s FROM ce_data.c_geo ORDER BY pk_geo'
+        ) AS t(
+            geo_code TEXT,
+            geo_name TEXT,
+            geo_name2 TEXT,
+            geo_short_name TEXT,
+            geo_tla TEXT,
+            geo_iso2 TEXT,
+            geo_iso3 TEXT,
+            geo_lat NUMERIC,
+            geo_long NUMERIC,
+            geo_cb TEXT,
+            geo_cb_short TEXT,
+            geo_stockmarket TEXT,
+            geo_stockmarket_short TEXT,
+            geo_political_alignment TEXT,
+            geo_lc TEXT,
+            geo_lcu TEXT,
+            geo_flag TEXT,
+            geo_catg TEXT,
+            geo_groups TEXT[],
+            geo_order INT,
+            internal_notes TEXT,
+            error TEXT,
+            updated_utc TIMESTAMP
+        )
+    $q$, _cols, _cols, _cols);
+    EXECUTE _sql;
+
+    -- c_ind
+    _cols := 'i_code, i_name, i_description, i_name1, i_name2, i_name3, i_name4, i_name_lower, i_name1_lower, i_name2_lower, i_name3_lower, i_name4_lower, i_catg_broad, i_catg_narrow, i_parent_icodes, i_data_transformation, i_keyindicator, i_proprietary_data, i_order, internal_notes, error, updated_utc';
+    _sql := FORMAT($q$
+        INSERT INTO ce_warehouse.c_ind (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT %s AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT %s FROM ce_data.c_ind ORDER BY pk_i'
+        ) AS t(
+            i_code TEXT,
+            i_name TEXT,
+            i_description TEXT,
+            i_name1 TEXT,
+            i_name2 TEXT,
+            i_name3 TEXT,
+            i_name4 TEXT,
+            i_name_lower TEXT,
+            i_name1_lower TEXT,
+            i_name2_lower TEXT,
+            i_name3_lower TEXT,
+            i_name4_lower TEXT,
+            i_catg_broad TEXT,
+            i_catg_narrow TEXT,
+            i_parent_icodes TEXT[],
+            i_data_transformation TEXT,
+            i_keyindicator BOOL,
+            i_proprietary_data BOOL,
+            i_order INT,
+            internal_notes TEXT,
+            error TEXT,
+            updated_utc TIMESTAMP
+        )
+    $q$, _cols, _cols, _cols);
+    EXECUTE _sql;
+
+    -- c_series_meta, some jiggerry-pokery needed
+    --   errors in series ID, frequency or type will cause this to fail!!
+    _cols := 'fk_pk_s, freq, type, downloadable, forecast_only_lifespan, internal_notes, updated_utc';
+    _sql := FORMAT($q$
+        INSERT INTO ce_warehouse.c_series_meta (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT s.pk_s, f.pk_f, type.pk_t, t.sm_downloadable, t.forecast_only_lifespan, t.internal_notes, t.updated_utc AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT * FROM ce_data.c_series_metadata ORDER BY pk_sm'
+        ) AS t(
+            sm_gcode TEXT,
+            sm_icode TEXT,
+            sm_freq TEXT,
+            sm_type TEXT,
+            sm_downloadable TEXT,
+            forecast_only_lifespan INT,
+            internal_notes TEXT,
+            error TEXT,
+            updated_utc TIMESTAMP,
+            pk_sm INT
+        )
+            LEFT JOIN ce_warehouse.c_series s
+                ON s.s_gcode = t.sm_gcode
+                AND s.s_icode = t.sm_icode
+            LEFT JOIN ce_warehouse.l_freq f
+                ON f.code = t.sm_freq
+            LEFT JOIN ce_warehouse.l_type type
+                ON type.code = t.sm_type
+    $q$, _cols);
+    EXECUTE _sql;
+
+    -- x_tooltip
+    _cols := 'pk_tip, tooltip';
+    _sql := FORMAT($q$
+        INSERT INTO ce_warehouse.x_tooltip (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT %s
+        FROM dblink(
+            'myconn',
+            'SELECT %s FROM ce_pipeline.x_tooltip ORDER BY pk_tip'
+         ) AS t(
+            pk_tip INT,
+            tooltip TEXT
+        )
+    $q$, _cols, _cols, _cols);
+    EXECUTE _sql;
+
+    -- x_value, some jiggery-pokery needed here
+    _cols := 'fk_pk_s, pdi, type, source, value, fk_pk_tip, is_calculated, updated_utc';
+    _sql := $q$
+        INSERT INTO ce_warehouse.x_value (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT t.fk_pk_s, t.pdi, t.type, src.pk_src, t.value, %s, %L, t.updated_utc AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT * FROM ce_pipeline.%I %s ORDER BY idx'
+        ) AS t(
+            fk_pk_s INT,
+            pdi INT,
+            freq SMALLINT,
+            type SMALLINT,
+            source TEXT,
+            value NUMERIC,
+            %s INT,
+            %s
+            updated_utc TIMESTAMP,
+            idx INT
+        )
+           LEFT JOIN ce_warehouse.l_source src
+                ON src.code = t.source
+        ON CONFLICT (fk_pk_s, pdi) DO NOTHING
+    $q$;
+    EXECUTE FORMAT(_sql, _cols, 't.fk_pk_tip', FALSE, 'x_api', '', 'fk_pk_tip', '');
+    EXECUTE FORMAT(_sql, _cols, 't.fk_pk_tip', FALSE, 'x_manual', '', 'fk_pk_tip', '');
+    EXECUTE FORMAT(_sql, _cols, 'NULL::INT', TRUE, 'x_calc', 'WHERE error IS NULL', 'fk_pk_calc', 'error TEXT,');
+
+    -- a_x_value
+    _cols := 'fk_pk_s, pdi, type, source, value, new_value, realised, audit_type, audit_utc';
+    _sql := FORMAT($q$
+        INSERT INTO ce_warehouse.a_x_value (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT t.fk_pk_xs, t.pdi, t.type, src.pk_src, t.value, t.new_value, t.realised, t.aud_type, t.aud_utc AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT * FROM ce_powerbi.x_values_audit ORDER BY idx'
+         ) AS t(
+            fk_pk_xs INT,
+            pdi INT,
+            freq SMALLINT,
+            type SMALLINT,
+            source TEXT,
+            value NUMERIC,
+            new_value NUMERIC,
+            realised BOOLEAN,
+            correction INT,
+            aud_type TEXT,
+            aud_utc TIMESTAMP,
+            idx INT
+        )
+            LEFT JOIN ce_warehouse.l_source src
+                ON src.code = t.source
+    $q$, _cols);
+    EXECUTE _sql;
+
+    -- c_series_meta, UPSERT
+    _cols := 'fk_pk_s, freq, type, has_values, new_values_utc, updated_values_utc';
+    _sql := FORMAT($q$
+        INSERT INTO ce_warehouse.c_series_meta (%s)
+        OVERRIDING SYSTEM VALUE
+        SELECT fk_pk_xs, fk_pk_f, fk_pk_t, TRUE, new_values_utc AT TIME ZONE 'UTC', updated_values_utc AT TIME ZONE 'UTC'
+        FROM dblink(
+            'myconn',
+            'SELECT fk_pk_xs, fk_pk_f, fk_pk_t, new_values_utc, updated_values_utc FROM ce_powerbi.series'
+        ) AS t(
+            fk_pk_xs INT,
+            fk_pk_f SMALLINT,
+            fk_pk_t SMALLINT,
+            new_values_utc TIMESTAMP,
+            updated_values_utc TIMESTAMP
+        )
+        ON CONFLICT (fk_pk_s, freq, type)
+        DO UPDATE
+            SET has_values = EXCLUDED.has_values,
+                new_values_utc = EXCLUDED.new_values_utc,
+                updated_values_utc = EXCLUDED.updated_values_utc
+    $q$, _cols);
+    EXECUTE _sql;
+
+    UPDATE ce_warehouse.c_series_meta sm
+    SET has_values = TRUE
+    WHERE EXISTS (
+        SELECT 1 FROM ce_warehouse.x_value x
+        WHERE x.fk_pk_s = sm.fk_pk_s
+        AND x.freq = sm.freq
+        AND x.type = sm.type
+    );
+
+    UPDATE ce_warehouse.c_series_meta sm
+    SET updated_values_utc = (
+        SELECT MAX(updated_utc) FROM ce_warehouse.x_value x
+        WHERE x.fk_pk_s = sm.fk_pk_s
+        AND x.freq = sm.freq
+        AND x.type = sm.type
+    )
+    WHERE updated_values_utc IS NULL;
+
+    ------------------------------------------------------------------
+    -- Reset sequences safely
+    ------------------------------------------------------------------
+    CALL ce_warehouse.px_ut_fix_seq();
+
+    ------------------------------------------------------------------
+    -- Re-enable triggers
+    ------------------------------------------------------------------
+    ALTER TABLE ce_warehouse.c_series ENABLE TRIGGER ALL;
+    ALTER TABLE ce_warehouse.x_value ENABLE TRIGGER ALL;
+
+    -- Close connection
+    PERFORM dblink_disconnect('myconn');
+
+END
+$$;

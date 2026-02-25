@@ -11,7 +11,7 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_type
 (
-    pk_tip SMALLINT NOT NULL GENERATED ALWAYS AS (
+    pk_type SMALLINT NOT NULL GENERATED ALWAYS AS (
         CASE code
             WHEN 'AC' THEN 1
             ELSE 2
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_type
         END
     ) STORED,
 
-    PRIMARY KEY (pk_tip),
+    PRIMARY KEY (pk_type),
     UNIQUE (code)
 );
 

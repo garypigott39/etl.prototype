@@ -30,17 +30,17 @@ BEGIN
         RETURN NULL;
     END IF;
 
-    _sid := (SELECT sid_1 FROM ce_warehouse.c_series WHERE series_id = _pks);
+    _sid := (SELECT sid_1 FROM ce_warehouse.c_series WHERE pk_series = _pks);
     IF _sid IS NULL THEN
         RETURN NULL;
     END IF;
 
     IF _ifreq IN (1, 2, 3, 4, 5) THEN
-        _sid := _sid || '_' || (SELECT code FROM ce_warehouse.c_freq WHERE pk_freq = _ifreq);
+        _sid := _sid || '_' || (SELECT code FROM ce_warehouse.l_freq WHERE pk_freq = _ifreq);
     END IF;
 
     IF _itype IS NOT NULL THEN
-        _sid := _sid || '_' || (SELECT code FROM ce_warehouse.c_type WHERE pk_type = _itype);
+        _sid := _sid || '_' || (SELECT code FROM ce_warehouse.l_type WHERE pk_type = _itype);
     END IF;
 
     RETURN _sid;

@@ -7,9 +7,9 @@
  ***********************************************************************************************************
  */
 
--- DROP PROCEDURE IF EXISTS ce_warehouse.px_ut_generate_dates;
+-- DROP PROCEDURE IF EXISTS ce_warehouse.px_hk_generate_dates;
 
-CREATE OR REPLACE PROCEDURE ce_warehouse.px_ut_generate_dates(
+CREATE OR REPLACE PROCEDURE ce_warehouse.px_hk_generate_dates(
 )
     LANGUAGE plpgsql
 AS
@@ -29,9 +29,11 @@ BEGIN
     FOR _dt IN
         SELECT gs.date
         FROM generate_series(_dt1, _dt2, INTERVAL '1 DAY') AS gs(date)
-            LEFT JOIN ce_warehouse.l_date d
-                ON d.date = gs.date
-        WHERE d.date IS NULL
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM ce_warehouse.l_date d
+            WHERE d.date = gs.date
+        )
     LOOP
         INSERT INTO ce_warehouse.l_date (date)
             VALUES (_dt)
@@ -39,7 +41,7 @@ BEGIN
     END LOOP;
 
     -- 2. PERIODS
-    INSERT INTO ce_warehouse.l_period (ifreq, start_of_period, end_of_period, period, lag)
+    CREATE TEMP TABLE t__periods ON COMMIT DROP AS
         WITH _periods AS (
             SELECT 1 AS ifreq, d.date AS start_of_period, d.date AS end_of_period
             FROM ce_warehouse.v_date d
@@ -78,17 +80,25 @@ BEGIN
         SELECT
             l.*
         FROM _with_lag l
-            LEFT JOIN ce_warehouse.l_period p
-                ON p.ifreq = l.ifreq
-                AND p.start_of_period = l.start_of_period
-        WHERE p.pk_pdi IS NULL;
+        WHERE NOT EXISTS  (
+            SELECT 1
+            FROM ce_warehouse.l_period p
+            WHERE p.ifreq = l.ifreq
+            AND p.start_of_period = l.start_of_period
+        );
 
-    -- 3. Refresh materialized views
-    REFRESH MATERIALIZED VIEW ce_warehouse.mv_period;
-    REFRESH MATERIALIZED VIEW ce_warehouse.mv_xperiod;
+    IF (SELECT COUNT(*) FROM t__periods) > 0 THEN
+        INSERT INTO ce_warehouse.l_period (ifreq, start_of_period, end_of_period, period, lag)
+            SELECT ifreq, start_of_period, end_of_period, period, lag
+            FROM t__periods;
+
+        -- 3. Refresh materialized views
+        REFRESH MATERIALIZED VIEW ce_warehouse.mv_period;
+        REFRESH MATERIALIZED VIEW ce_warehouse.mv_xperiod;
+    END IF;
 
 END
 $$;
 
-COMMENT ON PROCEDURE ce_warehouse.px_ut_generate_dates
+COMMENT ON PROCEDURE ce_warehouse.px_hk_generate_dates
     IS 'Housekeeping procedure - generate missing dates & periods';

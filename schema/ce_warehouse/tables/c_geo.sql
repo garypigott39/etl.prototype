@@ -54,10 +54,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
     flag TEXT
-        CHECK (
-            ce_warehouse.fx_val_is_text(flag) IS NULL AND
-            flag ~ '^(?!https?://)[\w\-/]+\/?[\w\-]+\.(jpg|jpeg|png|gif|webp)$'
-        ),
+        CHECK (ce_warehouse.fx_val_is_flag(flag) IS NULL),
     category TEXT NOT NULL
         REFERENCES ce_warehouse.l_geo_category(name)
             ON UPDATE CASCADE

@@ -30,15 +30,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
     name4 TEXT
         CHECK (ce_warehouse.fx_val_is_name(name4) IS NULL),
     name_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name_lower) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name_lower, TRUE) IS NULL),
     name1_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name1_lower) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name1_lower, TRUE) IS NULL),
     name2_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name2_lower) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name2_lower, TRUE) IS NULL),
     name3_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name3_lower) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name3_lower, TRUE) IS NULL),
     name4_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name4_lower) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name4_lower, TRUE) IS NULL),
     category_broad TEXT
         REFERENCES ce_warehouse.l_ind_broad_category (name)
             ON UPDATE CASCADE
@@ -70,10 +70,3 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
 COMMENT ON TABLE ce_warehouse.c_ind
     IS 'Control table - indicator details, used for validation & lookup';
 
-/*
- ***********************************************************************************************************
- * Trigger to update affected IND records when an indicater code is updated or deleted.
- ***********************************************************************************************************
- */
-
--- @todo

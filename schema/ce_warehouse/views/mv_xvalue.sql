@@ -40,7 +40,7 @@ FROM (
     JOIN ce_warehouse.mv_xperiod p
         ON x.pdi = p.src_pdi
         AND x.ifreq = p.src_ifreq
-    WHERE x.itype = 1  -- 'AC' only, belt & braces
+    WHERE x.type = 1  -- 'AC' only, belt & braces
 ) s
 GROUP BY
     fk_pk_s, ifreq, tgt_ifreq, tgt_pdi;
@@ -50,7 +50,7 @@ CREATE INDEX IF NOT EXISTS mv_xvalue__fk_pk_s__idx
 
 -- For performance of "calc" JOINs
 CREATE INDEX IF NOT EXISTS mv_xvalue__ud_calc__idx
-    ON ce_warehouse.mv_xvalue (fk_pk_s, src_pdi, src_ifreq);
+    ON ce_warehouse.mv_xvalue (fk_pk_s, src_pdi, src_freq);
 
 COMMENT ON MATERIALIZED VIEW ce_warehouse.mv_xvalue
     IS 'Materialized View - used in calc API processing';

@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u_value
     uv_tooltip TEXT,
     update_type TEXT,  -- NEW, UPDATE, DELETE or UNCHANGED
     -- Calculated
-    pks INT,
+    pk_series INT,
     pdi INT,
     ifreq SMALLINT,
     itype SMALLINT,

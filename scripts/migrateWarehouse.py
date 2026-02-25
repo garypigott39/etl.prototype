@@ -103,6 +103,79 @@ def setup_and_check(src_cur, tgt_cur):
 # Individual table copy functions
 # -------------------------------------------------------
 
+def migrate_calc(src_cur, tgt_cur):
+    """Various jiggery pokery needed."""
+    src = "SELECT * FROM ce_data.c_api_calc"
+    tgt = "ce_warehouse.c_calc"
+    tmp = "t__api_calc"
+
+    print(f"\n### MIGRATE: {tgt}")
+
+    print("Disabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} DISABLE TRIGGER ALL")
+
+    print("Truncating target table...")
+    tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    # Insert into target "DX"
+    tgt_cur.execute(f"""
+        INSERT INTO {tgt} (tgt_series_id, tgt_cfreq, tgt_ctype, formula_type, expr, internal_notes, updated_utc)
+            SELECT 
+                ca_target_series,
+                UNNEST(ca_target_freq::TEXT[]),
+                'AC',
+                'DX',
+                ca_formula_type || '(#' || ca_source_series || '#,' || ca_source_freq || ')',
+                CASE 
+                    WHEN internal_notes ~ '^Auto.*generated' THEN NULL 
+                    ELSE internal_notes 
+                END,
+                updated_utc::TIMESTAMPTZ
+            FROM {tmp}
+            WHERE error IS NULL
+            ORDER BY pk_api_calc::INT
+    """)
+
+    # Now, we're gonna get the "calc" formulas
+    src = "SELECT * FROM ce_data.c_calc"
+    tgt = "ce_warehouse.c_calc"
+    tmp = "t__calc"
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    formulas_regex = '^(ann|calc|delta|growth|offset|peop|pmean|pmedian|psum|quantile|zscore)\('
+
+    tgt_cur.execute(f"""
+        INSERT INTO {tgt} (tgt_series_id, tgt_cfreq, tgt_ctype, formula_type, expr, internal_notes, updated_utc)
+            SELECT 
+                calc_series,
+                calc_freq,
+                UNNEST(
+					CASE calc_type
+					    WHEN 'BLENDED' THEN ARRAY['AC', 'F']
+					    ELSE ARRAY[calc_type] 
+					END
+				),
+                COALESCE(
+                    SUBSTRING(calc_formula FROM '{formulas_regex}'), 
+                    'basic'),
+                calc_formula,
+                internal_notes,
+                updated_utc::TIMESTAMPTZ
+            FROM {tmp}
+            WHERE error IS NULL
+            ORDER BY pk_calc::INT
+            ON CONFLICT (tgt_series_id, tgt_cfreq, tgt_ctype) DO NOTHING
+    """)
+
+    print("Re-enabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
+
+
 def migrate_com(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_com"
     tgt = "ce_warehouse.c_com"
@@ -528,11 +601,12 @@ def main():
         migrate_series(src_cur, tgt_cur)
         migrate_series_meta(src_cur, tgt_cur)
         migrate_const(src_cur, tgt_cur)
+        migrate_calc(src_cur, tgt_cur)
 
         # Datapoints & audit @TODO
 
         tgt_conn.commit()
-        print("Migration complete ✅")
+        print("\n### Migration complete ✔")
 
     except Exception as e:
         tgt_conn.rollback()

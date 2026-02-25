@@ -45,6 +45,7 @@ BEGIN
                 WHERE con_expr ~ '#([^#]+)#'
             ) const
             ON calc.token = const.code
+            AND const.code IS NOT NULL
         ) t
         GROUP BY 1
         ORDER BY 1

@@ -14,5 +14,5 @@ CREATE TRIGGER tg_c_ind_audit
     FOR EACH ROW
         EXECUTE FUNCTION ce_warehouse.fx_tg_audit('pk_ind');
 
-COMMENT ON TRIGGER tg_c_ind_audit ON ce_warehouse.x_ind
+COMMENT ON TRIGGER tg_c_ind_audit ON ce_warehouse.c_ind
     IS 'Trigger to audit changes to the c_ind table';

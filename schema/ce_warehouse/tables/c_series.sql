@@ -26,11 +26,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
 
     -- Auto generated fields
     series_id TEXT GENERATED ALWAYS
-        AS (CONCAT_WS('_', gcode, icode) STORED,  -- Series code
+        AS (gcode || '_' || icode) STORED,  -- Series code
     sid_1 TEXT GENERATED ALWAYS
         AS (
-            CASE WHEN gcode = 'INTERNAL' THEN CONCAT_WS('_', gcode, icode)
-            ELSE CONCAT_WS('_', SUBSTR(gcode, 3), icode)
+            CASE WHEN gcode = 'INTERNAL' THEN gcode || '_' || icode
+            ELSE SUBSTR(gcode, 3) || '_' || icode
             END
         ) STORED,
     is_internal BOOL NOT NULL GENERATED ALWAYS

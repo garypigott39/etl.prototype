@@ -14,7 +14,7 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_meta
 (
     pk_series_meta INT GENERATED ALWAYS
-        AS ((ifreq * 10) + itype) * 100000000 + fk_pk_series) STORED,  -- derived UNIQUE key!!
+        AS (((ifreq * 10) + itype) * 100000000 + fk_pk_series) STORED,  -- derived UNIQUE key!!
     fk_pk_series INT NOT NULL
         REFERENCES ce_warehouse.c_series (pk_series)
             ON UPDATE CASCADE

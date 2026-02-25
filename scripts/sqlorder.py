@@ -236,5 +236,5 @@ if __name__ == "__main__":
         if 'obj' in locals():
             if obj.temp_db_created:
                 obj.drop_temp_database()
-                print(f"\nTemporary database '{obj.TEMP_DB}' dropped successfully.")
+                print(f"\nTemporary database dropped successfully.")
             del obj

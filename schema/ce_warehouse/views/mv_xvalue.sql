@@ -50,7 +50,7 @@ CREATE INDEX IF NOT EXISTS mv_xvalue__fk_pk_series__idx
 
 -- For performance of "calc" JOINs
 CREATE INDEX IF NOT EXISTS mv_xvalue__ud_calc__idx
-    ON ce_warehouse.mv_xvalue (fk_pk_series, src_pdi, src_freq);
+    ON ce_warehouse.mv_xvalue (fk_pk_series, src_pdi, src_ifreq);
 
 COMMENT ON MATERIALIZED VIEW ce_warehouse.mv_xvalue
     IS 'Materialized View - used in calc API processing';

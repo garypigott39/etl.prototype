@@ -22,17 +22,17 @@ DECLARE
 
 BEGIN
     IF TG_OP = 'INSERT' THEN
-        INSERT INTO ce_warehouse.a_xvalue (fk_pk_s, pdi, itype, isource, value, realised, audit_type)
+        INSERT INTO ce_warehouse.a_xvalue (fk_pk_series, pdi, itype, isource, value, realised, audit_type)
             VALUES (
-                NEW.fk_pk_s, NEW.pdi, NEW.itype, NEW.isource, NEW.value, FALSE, 'I'
+                NEW.fk_pk_series, NEW.pdi, NEW.itype, NEW.isource, NEW.value, FALSE, 'I'
             );
 
         -- Upsert c_series_meta
-        INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, ifreq, itype, has_values, new_values_utc)
+        INSERT INTO ce_warehouse.c_series_meta (fk_pk_series, ifreq, itype, has_values, new_values_utc)
             VALUES (
-                NEW.fk_pk_s, NEW.ifreq, NEW.itype, TRUE, _now
+                NEW.fk_pk_series, NEW.ifreq, NEW.itype, TRUE, _now
             )
-            ON CONFLICT (fk_pk_s, ifreq, itype)
+            ON CONFLICT (fk_pk_series, ifreq, itype)
             DO UPDATE
                 SET has_values = TRUE,
                     updated_values_utc = _now,
@@ -48,9 +48,9 @@ BEGIN
             (OLD.source IS DISTINCT FROM NEW.source);
 
         IF _has_changed THEN
-            INSERT INTO ce_warehouse.a_xvalue (fk_pk_s, pdi, itype, isource, value, new_value, realised, audit_type)
+            INSERT INTO ce_warehouse.a_xvalue (fk_pk_series, pdi, itype, isource, value, new_value, realised, audit_type)
                 VALUES (
-                    OLD.fk_pk_s,
+                    OLD.fk_pk_series,
                     OLD.pdi,
                     OLD.itype,    -- Log the OLD type, @see CEP-633
                     OLD.isource,  -- Log the OLD source, @see CEP-633
@@ -61,11 +61,11 @@ BEGIN
                 );
 
             -- Upsert c_series_meta
-            INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, ifreq, itype, has_values, updated_values_utc)
+            INSERT INTO ce_warehouse.c_series_meta (fk_pk_series, ifreq, itype, has_values, updated_values_utc)
                 VALUES (
-                    OLD.fk_pk_s, OLD.ifreq, OLD.itype, TRUE, _now
+                    OLD.fk_pk_series, OLD.ifreq, OLD.itype, TRUE, _now
                 )
-                ON CONFLICT (fk_pk_s, ifreq, itype)
+                ON CONFLICT (fk_pk_series, ifreq, itype)
                 DO UPDATE
                     SET has_values = TRUE,
                         updated_values_utc = _now,
@@ -75,22 +75,22 @@ BEGIN
     END IF;
 
     IF TG_OP = 'DELETE' THEN
-        INSERT INTO ce_warehouse.a_xvalue (fk_pk_s, pdi, itype, isource, value, realised, audit_type)
+        INSERT INTO ce_warehouse.a_xvalue (fk_pk_series, pdi, itype, isource, value, realised, audit_type)
             VALUES (
-                OLD.fk_pk_s, OLD.pdi, OLD.itype, OLD.isource, OLD.value, FALSE, 'D'
+                OLD.fk_pk_series, OLD.pdi, OLD.itype, OLD.isource, OLD.value, FALSE, 'D'
             );
 
         -- Upsert c_series_meta
         _has_values := EXISTS(
             SELECT 1 FROM ce_warehouse.x_value
-            WHERE fk_pk_s = OLD.fk_pk_s AND ifreq = OLD.ifreq AND itype = OLD.itype
+            WHERE fk_pk_series = OLD.fk_pk_series AND ifreq = OLD.ifreq AND itype = OLD.itype
         );
 
-        INSERT INTO ce_warehouse.c_series_meta (fk_pk_s, ifreq, itype, has_values, updated_values_utc)
+        INSERT INTO ce_warehouse.c_series_meta (fk_pk_series, ifreq, itype, has_values, updated_values_utc)
             VALUES(
-                OLD.fk_pk_s, OLD.ifreq, OLD.itype, _has_values, _now
+                OLD.fk_pk_series, OLD.ifreq, OLD.itype, _has_values, _now
             )
-            ON CONFLICT (fk_pk_s, ifreq, itype)
+            ON CONFLICT (fk_pk_series, ifreq, itype)
             DO UPDATE
                 SET has_values = _has_values,
                     updated_values_utc = _now,

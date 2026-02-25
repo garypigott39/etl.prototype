@@ -14,6 +14,5 @@ CREATE TRIGGER tg_x_value_audit
     FOR EACH ROW
         EXECUTE FUNCTION ce_warehouse.fx_tg_x_value_audit();
 
-COMMENT ON TRIGGER tg_x_value_audit
-    ON ce_warehouse.x_value
+COMMENT ON TRIGGER tg_x_value_audit ON ce_warehouse.x_value
     IS 'Trigger to audit changes to the x_value table';

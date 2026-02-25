@@ -41,7 +41,7 @@ SELECT
 
 FROM ce_warehouse.l_period p
     LEFT JOIN ce_warehouse.l_freq f
-        ON p.ifreq = f.pk_f;
+        ON p.ifreq = f.pk_freq;
 
 CREATE UNIQUE INDEX mv_period__pk__idx
     ON ce_warehouse.mv_period(pk_pdi);

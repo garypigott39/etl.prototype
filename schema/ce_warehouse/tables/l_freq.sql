@@ -11,7 +11,7 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_freq
 (
-    pk_f SMALLINT NOT NULL GENERATED ALWAYS AS (
+    pk_freq SMALLINT NOT NULL GENERATED ALWAYS AS (
         CASE code
             WHEN 'D' THEN 1
             WHEN 'W' THEN 2
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_freq
 
     forecast_only_lifespan INT NOT NULL,
 
-    PRIMARY KEY (pk_f),
+    PRIMARY KEY (pk_freq),
     UNIQUE (code)
 );
 

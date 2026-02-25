@@ -12,7 +12,7 @@
 CREATE MATERIALIZED VIEW ce_warehouse.mv_xvalue
 AS
 SELECT
-    fk_pk_s,
+    fk_pk_series,
     ifreq                AS src_ifreq,
     MAX(pdi)             AS src_pdi,
     tgt_ifreq            AS tgt_ifreq,
@@ -24,7 +24,7 @@ SELECT
     COUNT(DISTINCT pdi)  AS ct_periods
 FROM (
     SELECT
-        x.fk_pk_s,
+        x.fk_pk_series,
         x.ifreq,
         x.pdi,
         p.tgt_ifreq,
@@ -33,24 +33,24 @@ FROM (
         x.value,
         ROW_NUMBER() OVER (
           PARTITION BY
-              x.fk_pk_s, x.ifreq, p.tgt_ifreq, p.tgt_pdi
+              x.fk_pk_series, x.ifreq, p.tgt_ifreq, p.tgt_pdi
           ORDER BY x.pdi DESC
         ) AS rn
     FROM ce_warehouse.x_value x
     JOIN ce_warehouse.mv_xperiod p
         ON x.pdi = p.src_pdi
         AND x.ifreq = p.src_ifreq
-    WHERE x.type = 1  -- 'AC' only, belt & braces
+    WHERE x.itype = 1  -- 'AC' only, belt & braces
 ) s
 GROUP BY
-    fk_pk_s, ifreq, tgt_ifreq, tgt_pdi;
+    fk_pk_series, ifreq, tgt_ifreq, tgt_pdi;
 
-CREATE INDEX IF NOT EXISTS mv_xvalue__fk_pk_s__idx
-    ON ce_warehouse.mv_xvalue (fk_pk_s);
+CREATE INDEX IF NOT EXISTS mv_xvalue__fk_pk_series__idx
+    ON ce_warehouse.mv_xvalue (fk_pk_series);
 
 -- For performance of "calc" JOINs
 CREATE INDEX IF NOT EXISTS mv_xvalue__ud_calc__idx
-    ON ce_warehouse.mv_xvalue (fk_pk_s, src_pdi, src_freq);
+    ON ce_warehouse.mv_xvalue (fk_pk_series, src_pdi, src_freq);
 
 COMMENT ON MATERIALIZED VIEW ce_warehouse.mv_xvalue
     IS 'Materialized View - used in calc API processing';

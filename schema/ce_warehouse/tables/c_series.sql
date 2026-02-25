@@ -23,8 +23,18 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
+
+    -- Auto generated fields
     series_id TEXT GENERATED ALWAYS
         AS (gcode || '_' || icode) STORED,  -- Series code
+    sid1 TEXT GENERATED ALWAYS
+        AS (
+            CASE WHEN gcode = 'INTERNAL' THEN gcode || '_' || icode
+            ELSE SUBSTR(gcode, 3) || '_' || icode
+        ) STORED,
+    is_internal BOOL NOT NULL GENERATED ALWAYS
+        AS (gcode = 'INTERNAL') STORED,
+
     name TEXT NOT NULL
         CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
     name1 TEXT
@@ -58,8 +68,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_series),
-    UNIQUE (gcode, icode),
-    UNIQUE (series_id)
+    UNIQUE (series_id),
+    UNIQUE (sid1)
 );
 
 COMMENT ON TABLE ce_warehouse.c_series

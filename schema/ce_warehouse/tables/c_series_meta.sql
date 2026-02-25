@@ -25,6 +25,12 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_meta
     itype SMALLINT NOT NULL,
         CHECK (itype IN (1, 2)),
 
+    -- Auto generated fields
+    sid2 TEXT NOT NULL GENERATED ALWAYS
+        AS (ce_warehouse.fx_gen_sid2_3(fk_pk_series, ifreq)) STORED,
+    sid3 TEXT NOT NULL GENERATED ALWAYS
+        AS (ce_warehouse.fx_gen_sid2_3(fk_pk_series, ifreq, itype)) STORED,
+
     -- User maintained fields
     downloadable TEXT NOT NULL DEFAULT 'ess_plugin'
         CHECK (downloadable IN ('all', 'api', 'adv_plugin', 'ess_plugin', 'internal', 'none', 'powerbi')),  -- control which series are downloadable and via which channels

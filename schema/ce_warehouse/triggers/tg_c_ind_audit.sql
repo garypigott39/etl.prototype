@@ -15,4 +15,4 @@ CREATE TRIGGER tg_c_ind_audit
         EXECUTE FUNCTION ce_warehouse.fx_tg_audit('pk_ind');
 
 COMMENT ON TRIGGER tg_c_ind_audit ON ce_warehouse.x_ind
-    IS 'Trigger to audit changes to the c_seies table';
+    IS 'Trigger to audit changes to the c_ind table';

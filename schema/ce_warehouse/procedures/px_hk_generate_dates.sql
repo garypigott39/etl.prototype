@@ -1,9 +1,9 @@
 /*
  ***********************************************************************************************************
  * @file
- * px_ut_generate_dates.sql
+ * px_hk_generate_dates.sql
  *
- * Utility procedure - generate missing dates & periods.
+ * Housekeeping procedure - generate missing dates & periods.
  ***********************************************************************************************************
  */
 
@@ -91,4 +91,4 @@ END
 $$;
 
 COMMENT ON PROCEDURE ce_warehouse.px_ut_generate_dates
-    IS 'Utility procedure - generate missing dates & periods';
+    IS 'Housekeeping procedure - generate missing dates & periods';

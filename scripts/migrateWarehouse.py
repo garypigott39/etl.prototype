@@ -121,14 +121,13 @@ def migrate_avalue(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            fk_pk_series, pdi, ifreq, itype, isource, value, new_value, realised, audit_type, audit_utc)
+            fk_pk_series, pdi, itype, isource, value, new_value, realised, audit_type, audit_utc)
             SELECT 
-                x.fk_pk_s, x.pdi, x.freq, x.type, s.pk_source, x.value::NUMERIC, x.new_value::NUMERIC, 
-                x.realised::BOOL, x.aud_type,  x.aud_utc::TIMESTAMPTZ
+                x.fk_pk_xs::INT, x.pdi::INT, x.type::INT, s.pk_source, x.value::NUMERIC, 
+                x.new_value::NUMERIC, x.realised::BOOL, x.aud_type, x.aud_utc::TIMESTAMPTZ
             FROM {tmp} x
                 JOIN ce_warehouse.l_source s
                     ON s.code = x.source
-            FROM {tmp}
             ORDER BY idx
     """)
 
@@ -659,10 +658,10 @@ def migrate_xvalue(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-                fk_pk_series, pdi, ifreq, itype, isource, value, fk_pk_tip, is_calculated, updated_utc)
+                fk_pk_series, pdi, itype, isource, value, fk_pk_tip, is_calculated, updated_utc)
             SELECT 
-                x.fk_pk_s, x.pdi, x.freq, x.type, s.pk_source, x.value::NUMERIC, x.fk_pk_tip, 
-                (x.source = 'DX')::BOOL, x.updated_utc::TIMESTAMPTZ
+                x.fk_pk_s::INT, x.pdi::INT, x.type::INT, s.pk_source, x.value::NUMERIC, 
+                x.fk_pk_tip::INT, (x.source = 'DX')::BOOL, x.updated_utc::TIMESTAMPTZ
             FROM {tmp} x
                 JOIN ce_warehouse.l_source s
                     ON s.code = x.source
@@ -678,15 +677,15 @@ def migrate_xvalue(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-                fk_pk_series, pdi, ifreq, itype, isource, value, fk_pk_tip, is_calculated, updated_utc)
+                fk_pk_series, pdi, itype, isource, value, fk_pk_tip, is_calculated, updated_utc)
             SELECT 
-                x.fk_pk_s, x.pdi, x.freq, x.type, s.pk_source, x.value::NUMERIC, x.fk_pk_tip, FALSE, 
-                x.updated_utc::TIMESTAMPTZ
+                x.fk_pk_s::INT, x.pdi::INT, x.type::INT, s.pk_source, x.value::NUMERIC, 
+                x.fk_pk_tip::INT, FALSE, x.updated_utc::TIMESTAMPTZ
             FROM {tmp} x
                 JOIN ce_warehouse.l_source s
                     ON s.code = x.source
             ORDER BY idx
-            ON CONFLICT (fk_pk_series, pdi, ifreq, itype) DO NOTHING 
+            ON CONFLICT (fk_pk_series, pdi) DO NOTHING 
     """)
 
     # 3. x_calc
@@ -698,15 +697,15 @@ def migrate_xvalue(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-                fk_pk_series, pdi, ifreq, itype, isource, value, fk_pk_tip, is_calculated, updated_utc)
+                fk_pk_series, pdi, itype, isource, value, is_calculated, updated_utc)
             SELECT 
-                x.fk_pk_s, x.pdi, x.freq, x.type, s.pk_source, x.value::NUMERIC, x.fk_pk_tip, TRUE, 
-                x.updated_utc::TIMESTAMPTZ
+                x.fk_pk_s::INT, x.pdi::INT, x.type::INT, s.pk_source, x.value::NUMERIC, 
+                TRUE, x.updated_utc::TIMESTAMPTZ
             FROM {tmp} x
                 JOIN ce_warehouse.l_source s
                     ON s.code = x.source
             ORDER BY idx
-            ON CONFLICT (fk_pk_series, pdi, ifreq, itype) DO NOTHING 
+            ON CONFLICT (fk_pk_series, pdi) DO NOTHING 
     """)
 
     print("Re-enabling triggers...")

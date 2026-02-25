@@ -103,6 +103,39 @@ def setup_and_check(src_cur, tgt_cur):
 # Individual table copy functions
 # -------------------------------------------------------
 
+def migrate_avalue(src_cur, tgt_cur):
+    src = "SELECT * FROM ce_powerbi.x_values_audit"
+    tgt = "ce_warehouse.a_x_value"
+    tmp = "t__xvalues_audit"
+
+    print(f"\n### MIGRATE: {tgt}")
+
+    print("Disabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} DISABLE TRIGGER ALL")
+
+    print("Truncating target table...")
+    tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    tgt_cur.execute(f"""
+        INSERT INTO {tgt} (
+            fk_pk_series, pdi, ifreq, itype, isource, value, new_value, realised, audit_type, audit_utc)
+            SELECT 
+                x.fk_pk_s, x.pdi, x.freq, x.type, s.pk_source, x.value::NUMERIC, x.new_value::NUMERIC, 
+                x.realised::BOOL, x.aud_type,  x.aud_utc::TIMESTAMPTZ
+            FROM {tmp} x
+                JOIN ce_warehouse.l_source s
+                    ON s.code = x.source
+            FROM {tmp}
+            ORDER BY idx
+    """)
+
+    print("Re-enabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
+
+
 def migrate_calc(src_cur, tgt_cur):
     """Various jiggery pokery needed."""
     src = "SELECT * FROM ce_data.c_api_calc"
@@ -205,7 +238,6 @@ def migrate_com(src_cur, tgt_cur):
 
 
 def migrate_const(src_cur, tgt_cur):
-    """This is a straight copy, no transformations needed."""
     src = "SELECT * FROM ce_data.c_const"
     tgt = "ce_warehouse.c_const"
     tmp = "t__const"
@@ -577,6 +609,110 @@ def migrate_series_meta(src_cur, tgt_cur):
     print("Re-enabling triggers...")
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
+
+def migrate_xtooltip(src_cur, tgt_cur):
+    src = "SELECT * FROM ce_pipeline.x_tooltip"
+    tgt = "ce_warehouse.x_tooltip"
+    tmp = "t__xtooltip"
+
+    print(f"\n### MIGRATE: {tgt}")
+
+    print("Disabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} DISABLE TRIGGER ALL")
+
+    print("Truncating target table...")
+    tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    tgt_cur.execute(f"""
+        INSERT INTO {tgt} (pk_tip, tooltip)
+            SELECT pk_tip::INT, tooltip
+            FROM {tmp}
+            ORDER BY 1    
+    """)
+
+    print("Re-enabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
+
+
+def migrate_xvalue(src_cur, tgt_cur):
+    tgt = "ce_warehouse.x_value"
+
+    print(f"\n### MIGRATE: {tgt}")
+
+    print("Disabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} DISABLE TRIGGER ALL")
+
+    print("Truncating target table...")
+    tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
+
+    # We do this in 3 steps...
+
+    # 1. x_api, API wins
+    src = "SELECT * FROM ce_pipeline.x_api"
+    tmp = "t__xapi"
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    tgt_cur.execute(f"""
+        INSERT INTO {tgt} (
+                fk_pk_series, pdi, ifreq, itype, isource, value, fk_pk_tip, is_calculated, updated_utc)
+            SELECT 
+                x.fk_pk_s, x.pdi, x.freq, x.type, s.pk_source, x.value::NUMERIC, x.fk_pk_tip, 
+                (x.source = 'DX')::BOOL, x.updated_utc::TIMESTAMPTZ
+            FROM {tmp} x
+                JOIN ce_warehouse.l_source s
+                    ON s.code = x.source
+            ORDER BY idx  
+    """)
+
+    # 2. x_manual
+    src = "SELECT * FROM ce_pipeline.x_manual"
+    tmp = "t__xmanual"
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    tgt_cur.execute(f"""
+        INSERT INTO {tgt} (
+                fk_pk_series, pdi, ifreq, itype, isource, value, fk_pk_tip, is_calculated, updated_utc)
+            SELECT 
+                x.fk_pk_s, x.pdi, x.freq, x.type, s.pk_source, x.value::NUMERIC, x.fk_pk_tip, FALSE, 
+                x.updated_utc::TIMESTAMPTZ
+            FROM {tmp} x
+                JOIN ce_warehouse.l_source s
+                    ON s.code = x.source
+            ORDER BY idx
+            ON CONFLICT (fk_pk_series, pdi, ifreq, itype) DO NOTHING 
+    """)
+
+    # 3. x_calc
+    src = "SELECT * FROM ce_pipeline.x_manual"
+    tmp = "t__xcalc"
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    tgt_cur.execute(f"""
+        INSERT INTO {tgt} (
+                fk_pk_series, pdi, ifreq, itype, isource, value, fk_pk_tip, is_calculated, updated_utc)
+            SELECT 
+                x.fk_pk_s, x.pdi, x.freq, x.type, s.pk_source, x.value::NUMERIC, x.fk_pk_tip, TRUE, 
+                x.updated_utc::TIMESTAMPTZ
+            FROM {tmp} x
+                JOIN ce_warehouse.l_source s
+                    ON s.code = x.source
+            ORDER BY idx
+            ON CONFLICT (fk_pk_series, pdi, ifreq, itype) DO NOTHING 
+    """)
+
+    print("Re-enabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
+
+
 # -------------------------------------------------------
 # Main migration
 # -------------------------------------------------------
@@ -602,8 +738,9 @@ def main():
         migrate_series_meta(src_cur, tgt_cur)
         migrate_const(src_cur, tgt_cur)
         migrate_calc(src_cur, tgt_cur)
-
-        # Datapoints & audit @TODO
+        migrate_xtooltip(src_cur, tgt_cur)
+        migrate_xvalue(src_cur, tgt_cur)
+        migrate_avalue(src_cur, tgt_cur)
 
         tgt_conn.commit()
         print("\n### Migration complete ✔")

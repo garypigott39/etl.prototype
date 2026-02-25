@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
     itype SMALLINT NOT NULL
         CHECK (itype IN (1, 2)),  -- enforce valid types: 1=actual, 2=forecast
     isource SMALLINT NOT NULL
-        REFERENCES ce_warehouse.l_source (pk_seriesrc)
+        REFERENCES ce_warehouse.l_source (pk_source)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,

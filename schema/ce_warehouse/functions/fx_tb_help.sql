@@ -29,6 +29,7 @@ AS
 $$
 DECLARE
     _regex TEXT := '^ce_';
+
 BEGIN
     RETURN QUERY (
         -- Tables

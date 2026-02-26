@@ -23,6 +23,7 @@ DECLARE
     _tok   TEXT;
     _pdi1  TEXT;
     _pdi2  TEXT;
+
 BEGIN
     IF _expr IS NULL OR TRIM(_expr) = '' THEN
         IF NOT _nulls_allowed THEN

@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
-    political_alignment SMALLINT,
+    political_alignment SMALLINT
         REFERENCES ce_warehouse.l_political_alignment(pk_political_alignment)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
@@ -73,4 +73,3 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
 
 COMMENT ON TABLE ce_warehouse.c_geo
     IS 'Control table - geography details, used for validation & extra detail';
-

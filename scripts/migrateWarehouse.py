@@ -661,7 +661,7 @@ def migrate_xvalue(src_cur, tgt_cur):
                 fk_pk_series, pdi, itype, isource, value, fk_pk_tip, is_calculated, updated_utc)
             SELECT 
                 x.fk_pk_s::INT, x.pdi::INT, x.type::INT, s.pk_source, x.value::NUMERIC, 
-                x.fk_pk_tip::INT, (x.source = 'DX')::BOOL, x.updated_utc::TIMESTAMPTZ
+                x.fk_pk_tip::INT, (x.source = 'DX'), x.updated_utc::TIMESTAMPTZ
             FROM {tmp} x
                 JOIN ce_warehouse.l_source s
                     ON s.code = x.source
@@ -718,24 +718,23 @@ def update_series_meta(src_cur, tgt_cur):
     """
     print("\n### POST-MIGRATION: Updating series metadata...")
 
-    # Example: Mark series with any manual values as non-downloadable
+    # @todo create series mata
     tgt_cur.execute("""
-        UPDATE ce_warehouse.c_series_meta sm
-        SET has_values = TRUE
-        WHERE EXISTS (
-            SELECT 1 FROM ce_warehouse.x_value x
-            WHERE x.fk_pk_series = sm.fk_pk_series
-            AND x.ifreq = sm.ifreq
-            AND x.itype = sm.itype
-        );
-        UPDATE ce_warehouse.c_series_meta sm
-        SET updated_values_utc = (
-            SELECT MAX(updated_utc) FROM ce_warehouse.x_value x
-            WHERE x.fk_pk_series = sm.fk_pk_series
-            AND x.ifreq = sm.ifreq
-            AND x.itype = sm.itype
-        )
-        WHERE sm.updated_values_utc IS NULL;
+        INSERT INTO ce_warehouse.c_series_meta (
+            fk_pk_series, ifreq, itype, first_pdi, last_pdi, has_values, updated_values_utc, updated_utc)
+            SELECT
+                x.fk_pk_series, x.ifreq, x.itype, MIN(x.pdi), MAX(x.pdi), TRUE, MAX(x.updated_utc), s.updated_utc 
+            FROM ce_warehouse.x_value x
+                JOIN ce_warehouse.c_series s 
+                     ON s.pk_series = x.fk_pk_series
+            GROUP BY x.fk_pk_series, x.ifreq, x.itype, s.updated_utc
+            ON CONFLICT (fk_pk_series, ifreq, itype) DO UPDATE
+            SET 
+                first_pdi = LEAST(EXCLUDED.first_pdi, c_series_meta.first_pdi),
+                last_pdi = GREATEST(EXCLUDED.last_pdi, c_series_meta.last_pdi),
+                has_values = TRUE,
+                updated_values_utc = GREATEST(EXCLUDED.updated_values_utc, c_series_meta.updated_values_utc),
+                updated_utc = GREATEST(EXCLUDED.updated_utc, c_series_meta.updated_utc);
     """)
 
 # -------------------------------------------------------

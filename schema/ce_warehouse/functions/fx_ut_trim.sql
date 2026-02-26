@@ -13,9 +13,9 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_ut_trim(
     _str TEXT
 )
     RETURNS TEXT
-    RETURNS NULL ON NULL INPUT
     LANGUAGE sql
     IMMUTABLE
+    STRICT  -- equivalent to "RETURNS NULL ON NULL INPUT"
 AS
 $$
     SELECT REGEXP_REPLACE(TRIM(_str), '\s+', ' ', 'g');

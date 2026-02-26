@@ -18,6 +18,7 @@ DECLARE
     _dt DATE;
     _dt1 DATE := (SELECT value::DATE FROM ce_warehouse.s_sys_flags WHERE code = 'DATE.MIN');
     _dt2 DATE := (SELECT (CURRENT_DATE + (value::INTERVAL))::DATE FROM ce_warehouse.s_sys_flags WHERE code = 'DATE.MAX');
+
 BEGIN
     -- 1. DATES
     IF _dt1 IS NULL OR _dt2 IS NULL THEN

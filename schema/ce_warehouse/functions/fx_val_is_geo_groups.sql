@@ -19,6 +19,7 @@ AS
 $$
 DECLARE
     _v TEXT;
+
 BEGIN
     -- Check for nulls
     IF _groups IS NULL THEN

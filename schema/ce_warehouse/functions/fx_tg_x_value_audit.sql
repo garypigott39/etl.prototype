@@ -93,7 +93,6 @@ BEGIN
             has_values = EXCLUDED.has_values,
             updated_values_utc = EXCLUDED.updated_values_utc;
 
-        RETURN NULL;
     END IF;
 
     RETURN NULL;

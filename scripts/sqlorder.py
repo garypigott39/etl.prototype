@@ -185,7 +185,7 @@ class SqlOrder:
 
                 if not progress_made:
                     unresolved = [str(f.relative_to(self.base_path)) for f in next_round]
-                    raise RuntimeError( f"Circular dependency detected.\nRemaining: {unresolved}")
+                    raise RuntimeError( f"\nERROR: Invalid SQL or Circular dependency detected.\nRemaining files: {unresolved}")
 
                 remaining = next_round
 
@@ -204,7 +204,7 @@ class SqlOrder:
             if self.is_retryable(e):
                 return False
             # Else...
-            raise RuntimeError(f"ERROR: Fatal error in {file}: {e}") from e
+            raise RuntimeError(f"\nERROR: Fatal error in {file}: {e}") from e
 
     def temp_db_exists(self) -> bool:
         """
@@ -236,5 +236,5 @@ if __name__ == "__main__":
         if 'obj' in locals():
             if obj.temp_db_created:
                 obj.drop_temp_database()
-                print(f"\nTemporary database dropped successfully.")
+                # print(f"\nTemporary database dropped successfully.")
             del obj

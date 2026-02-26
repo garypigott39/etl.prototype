@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_data_source
             DEFERRABLE INITIALLY DEFERRED,
 
     data_source SMALLINT NOT NULL
-        REFERENCES ce_warehouse.l_data_source (pk_geo_group)
+        REFERENCES ce_warehouse.l_data_source (pk_data_source)
             ON UPDATE CASCADE
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
@@ -36,5 +36,5 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_data_source
 CREATE INDEX IF NOT EXISTS c_series_data_source__data_source__idx
     ON ce_warehouse.c_series_data_source (data_source);
 
-COMMENT ON TABLE ce_warehouse.c_series_data_sources
+COMMENT ON TABLE ce_warehouse.c_series_data_source
     IS 'Control table - series data sources';

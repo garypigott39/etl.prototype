@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_data_source
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 
+    -- Data source ID
     data_source SMALLINT NOT NULL
         REFERENCES ce_warehouse.l_data_source (pk_data_source)
             ON UPDATE CASCADE

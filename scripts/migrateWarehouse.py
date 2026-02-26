@@ -377,7 +377,7 @@ def migrate_geo_group(src_cur, tgt_cur):
     copy_table(src_cur, tgt_cur, src, tmp)
 
     tgt_cur.execute(f"""
-        INSERT INTO {tgt} (fk_pk_geo, group_id, updated_utc)
+        INSERT INTO {tgt} (fk_pk_geo, geo_group, updated_utc)
             SELECT g.pk_geo, lgp.pk_geo_group, g.updated_utc
             FROM (
                 SELECT DISTINCT 
@@ -631,12 +631,11 @@ def migrate_series(src_cur, tgt_cur):
     # Insert into target
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-                pk_series, gcode, icode, name, name1, name2, name3, name4, description, 
-                data_source, units, precision, date_point, active, 
-                ordering, internal_notes, updated_utc)
+                pk_series, gcode, icode, name, name1, name2, name3, name4, description, units,
+                precision, date_point, active, ordering, internal_notes, updated_utc)
             SELECT 
                 s.pk_s::INT, s.s_gcode, s.s_icode, s.s_name, s.s_name1, s.s_name2, s.s_name3, s.s_name4,
-                s.s_description, s.s_source, 
+                s.s_description,
                 CASE WHEN lu.pk_units IS NOT NULL THEN lu.pk_units WHEN s.s_units IS NOT NULL THEN -1 END, 
                 s.s_precision::INT,s. s_date_point, s.s_active::BOOL,
                 s.s_order::INT, s.internal_notes, s.updated_utc::TIMESTAMPTZ
@@ -645,6 +644,81 @@ def migrate_series(src_cur, tgt_cur):
                     ON lu.name = s.s_units
             WHERE error IS NULL
             ORDER BY 1    
+    """)
+
+    print("Re-enabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
+
+
+def data_clean_data_source(tgt_cur, tmp):
+    # Data cleansing
+    fields = ["s_source"]
+    replacements = {
+        "Capital Economics Calculations": "Capital Economics",
+        "^Cap.* Eco.*ics$": "Capital Economics",
+        "Columbia": "Colombia",
+        "^CPB - ": "CPB ",
+        "^Deut.*ank$": "Deutsche Bank",
+        "E'burgh": "Edinburgh",
+        "^eGov": "E-Gov",
+        "Housing and Communities": "Housing & Communities",
+        "Instituto Brasileiro de Geografia e Estatistica.*": "Instituto Brasileiro de Geografia e Estatistica",
+        "^International Monetary Fund.*$": "IMF",
+        "Labour and Welfare": "Labour & Welfare",
+        "^LSEG.*$": "LSEG Data & Analytics",
+        "National Bureau Of Statistics$": "National Bureau of Statistics",
+        "^Office for Budget Responsibility.*$": "Office for Budget Responsibility",
+        "^Office for National Statis.*$": "Office for National Statistics",
+        "^Trade And Ind\.$": "Trade & Industry",
+        "^Trade and Industry$": "Trade & Industry",
+        "^U(\.)?K(\.)?$": "UK",
+        "^Unite.*tates\.?$": "United States",
+        "^U.S. ": "US ",
+    }
+    for old, new in replacements.items():
+        for fld in fields:
+            sql = f"UPDATE {tmp} SET {fld} = REGEXP_REPLACE({fld}, %s, %s) WHERE {fld} ~* %s"
+            tgt_cur.execute(sql, (old, new, old))
+
+
+def migrate_series_data_source(src_cur, tgt_cur):
+    src = "SELECT * FROM ce_data.c_series"
+    tgt = "ce_warehouse.c_series_data_source"
+    tmp = "t__series_data_source"
+
+    print(f"\n### MIGRATE: {tgt}")
+
+    print("Disabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} DISABLE TRIGGER ALL")
+
+    print("Truncating target table...")
+    tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    data_clean_data_source(tgt_cur, tmp)
+
+    tgt_cur.execute(f"""
+        INSERT INTO {tgt} (fk_pk_series, data_source, updated_utc)
+            SELECT s.pk_s, lds.pk_data_source, s.updated_utc
+            FROM (
+                SELECT
+                    t.pk_s::INT AS pk_s,
+                    t.updated_utc::TIMESTAMPTZ AS updated_utc,
+                    TRIM(ds.ds_name) AS ds_name,
+                    ds.idx
+                FROM {tmp} t
+                    CROSS JOIN LATERAL
+                        REGEXP_SPLIT_TO_TABLE(t.s_source, '[,/]')
+                        WITH ORDINALITY AS ds(ds_name, idx)
+                WHERE t.error IS NULL
+                AND ds.ds_name IS NOT NULL
+            ) s
+                JOIN ce_warehouse.l_data_source lds
+                    ON lds.name = s.ds_name
+            GROUP BY 1, 2, 3, s.idx
+            ORDER BY s.pk_s, s.idx  -- psuedo ordering 
     """)
 
     print("Re-enabling triggers...")
@@ -846,6 +920,7 @@ def main():
         migrate_ind_parent(src_cur, tgt_cur)
         migrate_series(src_cur, tgt_cur)
         migrate_series_downloadable(src_cur, tgt_cur)
+        migrate_series_data_source(src_cur, tgt_cur)
         migrate_const(src_cur, tgt_cur)
         migrate_calc(src_cur, tgt_cur)
         migrate_xtooltip(src_cur, tgt_cur)

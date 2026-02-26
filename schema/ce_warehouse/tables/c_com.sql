@@ -37,5 +37,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_com
     UNIQUE (code)
 );
 
+-- It's recommended to have INDICES on foreign keys for performance!!
+CREATE INDEX IF NOT EXISTS c_com__commodity_type__idx
+    ON ce_warehouse.c_com (commodity_type);
+
 COMMENT ON TABLE ce_warehouse.c_com
       IS 'Control table - commodity details, used for validation & extra detail';

@@ -48,12 +48,10 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
         CHECK (ce_warehouse.fx_val_is_name(name4) IS NULL),
     description TEXT
         CHECK (ce_warehouse.fx_val_is_name(description) IS NULL),
-    data_source TEXT
-        CHECK (ce_warehouse.fx_val_is_name(data_source) IS NULL),
     units SMALLINT
         REFERENCES ce_warehouse.l_units (pk_units)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT
+            ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
     precision INT NOT NULL
         CHECK (precision BETWEEN -1 AND 12),  -- number of decimal places for rounding in PowerBI
@@ -73,6 +71,13 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
     UNIQUE (series_id),
     UNIQUE (sid1)
 );
+
+-- It's recommended to have INDICES on foreign keys for performance!!
+CREATE INDEX IF NOT EXISTS c_series__icode__idx
+    ON ce_warehouse.c_series (icode);
+
+CREATE INDEX IF NOT EXISTS c_series__units__idx
+    ON ce_warehouse.c_series (units);
 
 COMMENT ON TABLE ce_warehouse.c_series
     IS 'Control table - series definition, lookup/validation';

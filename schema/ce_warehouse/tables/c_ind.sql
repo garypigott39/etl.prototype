@@ -42,12 +42,12 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
     category_broad SMALLINT
         REFERENCES ce_warehouse.l_ind_broad_category (pk_ind_broad_category)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT
+            ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
     category_narrow SMALLINT
         REFERENCES ce_warehouse.l_ind_narrow_category (pk_ind_narrow_category)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT
+            ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
     data_transformation TEXT NOT NULL
         REFERENCES ce_warehouse.l_data_transformation (code)
@@ -67,6 +67,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
     UNIQUE (code)
 );
 
+-- It's recommended to have INDICES on foreign keys for performance!!
+CREATE INDEX IF NOT EXISTS c_ind__category_broad__idx
+    ON ce_warehouse.c_ind (category_broad);
+
+CREATE INDEX IF NOT EXISTS c_ind__category_narrow__idx
+    ON ce_warehouse.c_ind (category_narrow);
+
+CREATE INDEX IF NOT EXISTS c_ind__data_transformation__idx
+    ON ce_warehouse.c_ind (data_transformation);
+
 COMMENT ON TABLE ce_warehouse.c_ind
     IS 'Control table - indicator details, used for validation & lookup';
-

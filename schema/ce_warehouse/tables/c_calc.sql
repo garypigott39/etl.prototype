@@ -41,5 +41,10 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc
     UNIQUE (tgt_series_id, tgt_cfreq, tgt_ctype)
 );
 
+-- It's recommended to have INDICES on foreign keys for performance!!
+-- unless we already have them on the referenced table
+CREATE INDEX IF NOT EXISTS c_calc__formula_type__idx
+    ON ce_warehouse.c_calc (formula_type);
+
 COMMENT ON TABLE ce_warehouse.c_calc
     IS 'Control table - "rules" for calculated values (vers 2)';

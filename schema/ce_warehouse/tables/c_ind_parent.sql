@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind_parent
     icode TEXT NOT NULL
         REFERENCES ce_warehouse.c_ind (code)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT
+            ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -31,6 +31,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind_parent
     PRIMARY KEY (idx),
     UNIQUE (fk_pk_ind, icode)
 );
+
+-- It's recommended to have INDICES on foreign keys for performance!!
+-- unless we already have them on the referenced table
+CREATE INDEX IF NOT EXISTS c_ind__icode__idx
+    ON ce_warehouse.c_ind_parent (icode);
 
 COMMENT ON TABLE ce_warehouse.c_ind_parent
     IS 'Control table - IND parents';

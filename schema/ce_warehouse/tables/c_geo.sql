@@ -36,29 +36,29 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
     central_bank SMALLINT
         REFERENCES ce_warehouse.l_central_bank(pk_central_bank)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT
+            ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
     stock_market SMALLINT
         REFERENCES ce_warehouse.l_stock_market(pk_stock_market)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT
+            ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
     political_alignment SMALLINT
         REFERENCES ce_warehouse.l_political_alignment(pk_political_alignment)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT
+            ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
     local_currency_unit TEXT
         REFERENCES ce_warehouse.l_currency_unit(code)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT
+            ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
     flag TEXT
         CHECK (ce_warehouse.fx_val_is_flag(flag) IS NULL),
     category SMALLINT NOT NULL
         REFERENCES ce_warehouse.l_geo_category(pk_geo_category)
             ON UPDATE CASCADE
-            ON DELETE RESTRICT
+            ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
 
     ordering INT NOT NULL DEFAULT 0,
@@ -70,6 +70,22 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
     PRIMARY KEY (pk_geo),
     UNIQUE (code)
 );
+
+-- It's recommended to have INDICES on foreign keys for performance!! 
+CREATE INDEX IF NOT EXISTS c_geo__central_bank__idx
+    ON ce_warehouse.c_geo (central_bank);
+
+CREATE INDEX IF NOT EXISTS c_geo__stock_market__idx
+    ON ce_warehouse.c_geo (stock_market);
+
+CREATE INDEX IF NOT EXISTS c_geo__political_alignment__idx
+    ON ce_warehouse.c_geo (political_alignment);
+
+CREATE INDEX IF NOT EXISTS c_geo__local_currency_unit__idx
+    ON ce_warehouse.c_geo (local_currency_unit);
+
+CREATE INDEX IF NOT EXISTS c_geo__category__idx
+    ON ce_warehouse.c_geo (category);
 
 COMMENT ON TABLE ce_warehouse.c_geo
     IS 'Control table - geography details, used for validation & extra detail';

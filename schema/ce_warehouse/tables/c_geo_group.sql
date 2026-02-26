@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo_group
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 
-    group_code TEXT NOT NULL
-        REFERENCES ce_warehouse.l_geo_group (code)
+    group_code SMALLINT NOT NULL
+        REFERENCES ce_warehouse.l_geo_group (pk_geo_group)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,

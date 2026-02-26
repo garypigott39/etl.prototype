@@ -50,8 +50,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
         CHECK (ce_warehouse.fx_val_is_name(description) IS NULL),
     data_source TEXT
         CHECK (ce_warehouse.fx_val_is_name(data_source) IS NULL),
-    units TEXT
-        REFERENCES ce_warehouse.l_units (code)
+    units SMALLINT
+        REFERENCES ce_warehouse.l_units (pk_units)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_series),
+    UNIQUE(pk_series, sid1),  -- enforce unique SID1 per series, for the FK in x_series_meta
     UNIQUE (series_id),
     UNIQUE (sid1)
 );

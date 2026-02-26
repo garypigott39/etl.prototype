@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_com
         CHECK (ce_warehouse.fx_val_is_name(short_name) IS NULL),
     tla TEXT NOT NULL
         CHECK (ce_warehouse.fx_val_is_name(tla) IS NULL),
-    commodity_type TEXT NOT NULL
-        REFERENCES ce_warehouse.l_com_type(name)
+    commodity_type SMALLINT NOT NULL
+        REFERENCES ce_warehouse.l_com_type(pk_com_type)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,

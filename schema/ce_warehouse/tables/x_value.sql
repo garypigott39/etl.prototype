@@ -50,6 +50,10 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
     UNIQUE (fk_pk_series, pdi)  -- enforce only one value per period
 );
 
+-- Optimal index for Trigger
+CREATE INDEX IF NOT EXISTS x_value__series_meta__idx
+    ON ce_warehouse.x_value (fk_pk_series, ifreq, itype, pdi);
+
 -- It's recommended to have INDICES on foreign keys for performance!! (particularly important for large tables)
 CREATE INDEX IF NOT EXISTS x_value__pdi__idx
     ON ce_warehouse.x_value (pdi);

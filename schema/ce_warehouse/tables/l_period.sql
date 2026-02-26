@@ -12,12 +12,21 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_period
 (
     pk_pdi INT NOT NULL GENERATED ALWAYS
-        AS (ce_warehouse.fx_ut_date_to_pdi(start_of_period, ifreq)) STORED,
+        AS (
+            CASE ifreq
+                WHEN 1 THEN 100000000 + TO_CHAR(start_of_period, 'YYYYMMDD')::INT  -- Daily: YYYYMMDD
+                WHEN 2 THEN 200000000 + TO_CHAR(start_of_period, 'IYYYIW')::INT  -- Weekly: ISO year + ISO week
+                WHEN 3 THEN 300000000 + TO_CHAR(start_of_period, 'YYYYMM')::INT  -- Monthly: YYYYMM
+                WHEN 4 THEN 400000000 + TO_CHAR(start_of_period, 'YYYYQ')::INT  -- Quarterly: YYYYQ
+                WHEN 5 THEN 500000000 + TO_CHAR(start_of_period, 'YYYY')::INT    -- Yearly: YYYY
+                ELSE NULL
+            END
+        ) STORED,
 
     ifreq SMALLINT NOT NULL
         CHECK (ifreq IN (1, 2, 3, 4, 5)), -- 1=DAILY, 2=WEEKLY, 3=MONTHLY, 4=QUARTERLY, 5=YEARLY
-    start_of_period DATE NOT NULL,
---         CHECK (ce_warehouse.fx_val_is_start_date(start_of_period, ifreq) IS NULL),
+    start_of_period DATE NOT NULL
+        CHECK (ce_warehouse.fx_val_is_start_date(start_of_period, ifreq) IS NULL),
 
     end_of_period DATE NOT NULL,  -- Calculated on the way in, as used in GENERATED columns below
 

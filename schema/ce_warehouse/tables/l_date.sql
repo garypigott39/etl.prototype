@@ -12,7 +12,7 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.l_date
 (
     pk_dti INT NOT NULL GENERATED ALWAYS
-        AS (ce_warehouse.fx_ut_date_to_dti(date)) STORED,
+        AS (TO_CHAR(_dt, 'YYYYMMDD')::INT) STORED,
 
     date DATE NOT NULL,
 

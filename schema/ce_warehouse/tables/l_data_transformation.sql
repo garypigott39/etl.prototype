@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_data_transformation
 );
 
 COMMENT ON TABLE ce_warehouse.l_data_transformation
-    IS 'Lookup table - data transFORMATion lookup';
+    IS 'Lookup table - data transformation lookup';
 
 /**
  * Pre-populate with known values. Update as required.

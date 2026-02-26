@@ -33,18 +33,18 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
         CHECK (lat >= -90 AND lat <= 90),
     long NUMERIC
         CHECK (long >= -180 AND long <= 180),
-    central_bank TEXT
-        REFERENCES ce_warehouse.l_central_bank(name)
+    central_bank SMALLINT
+        REFERENCES ce_warehouse.l_central_bank(pk_central_bank)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
-    stock_market TEXT
-        REFERENCES ce_warehouse.l_stock_market(name)
+    stock_market SMALLINT
+        REFERENCES ce_warehouse.l_stock_market(pk_stock_market)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
-    political_alignment TEXT
-        REFERENCES ce_warehouse.l_political_alignment(name)
+    political_alignment SMALLINT,
+        REFERENCES ce_warehouse.l_political_alignment(pk_political_alignment)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
@@ -55,8 +55,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
             DEFERRABLE INITIALLY DEFERRED,
     flag TEXT
         CHECK (ce_warehouse.fx_val_is_flag(flag) IS NULL),
-    category TEXT NOT NULL
-        REFERENCES ce_warehouse.l_geo_category(name)
+    category SMALLINT NOT NULL
+        REFERENCES ce_warehouse.l_geo_category(pk_geo_category)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
@@ -73,3 +73,4 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
 
 COMMENT ON TABLE ce_warehouse.c_geo
     IS 'Control table - geography details, used for validation & extra detail';
+

@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_tg_audit.sql
+ * fx_tg_generic_audit.sql
  *
- * Trigger function - log changes in generic audit.
+ * Trigger function - log changes to generic audit.
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg_audit;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg_generic_audit;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg_audit(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg_generic_audit(
 )
     RETURNS TRIGGER
     LANGUAGE plpgsql
@@ -50,5 +50,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_tg_audit
-    IS 'Trigger function - log changes in generic audit';
+COMMENT ON FUNCTION ce_warehouse.fx_tg_generic_audit
+    IS 'Trigger function - log changes to generic audit';

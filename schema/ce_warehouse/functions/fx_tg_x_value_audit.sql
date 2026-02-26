@@ -3,7 +3,7 @@
  * @file
  * fx_tg_x_value_audit.sql
  *
- * Trigger function - log changes in x_value.
+ * Trigger function - log changes in x_value to custom audit table.
  ***********************************************************************************************************
  */
 
@@ -101,4 +101,4 @@ END
 $$;
 
 COMMENT ON FUNCTION ce_warehouse.fx_tg_x_value_audit
-    IS 'Trigger function - log changes in x_value';
+    IS 'Trigger function - log changes in x_value to custom audit table';

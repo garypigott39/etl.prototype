@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * px_hk_generate_dates.sql
+ * px_ut_generate_dates.sql
  *
- * Housekeeping procedure - generate missing dates & periods.
+ * Utility procedure - generate missing dates & periods.
  ***********************************************************************************************************
  */
 
--- DROP PROCEDURE IF EXISTS ce_warehouse.px_hk_generate_dates;
+-- DROP PROCEDURE IF EXISTS ce_warehouse.px_ut_generate_dates;
 
-CREATE OR REPLACE PROCEDURE ce_warehouse.px_hk_generate_dates(
+CREATE OR REPLACE PROCEDURE ce_warehouse.px_ut_generate_dates(
 )
     LANGUAGE plpgsql
 AS
@@ -101,5 +101,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON PROCEDURE ce_warehouse.px_hk_generate_dates
-    IS 'Housekeeping procedure - generate missing dates & periods';
+COMMENT ON PROCEDURE ce_warehouse.px_ut_generate_dates
+    IS 'Utility procedure - generate missing dates & periods';

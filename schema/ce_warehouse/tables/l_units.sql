@@ -32,7 +32,7 @@ COMMENT ON TABLE ce_warehouse.l_units
  *     "TROJAN SOURCE WARNING, The pasted text contains bidirectional Unicode characters which could be interpreted
  *      differently than what is displayed..."
  */
-INSERT INTO ce_warehouse.l_units (code)
+INSERT INTO ce_warehouse.l_units (name)
 VALUES
     ('%'),
     ('$'),
@@ -201,7 +201,6 @@ VALUES
     ('Feb 2014 = 100'),
     ('Feb 2016 - Jan 2017 = 100'),
     ('Feb 2019 = 100'),
-    ('Feb 2020 = 100'),
     ('Feb 2020 = 100'),
     ('GBP'),
     ('GHS bn'),

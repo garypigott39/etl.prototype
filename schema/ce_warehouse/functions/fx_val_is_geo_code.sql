@@ -3,7 +3,7 @@
  * @file
  * fx_val_is_geo_code.sql
  *
- * Validation function - check if GEO code is valid (available on Add).
+ * Validation function - check if GEO/COM code is valid (in GEO table).
  ***********************************************************************************************************
  */
 
@@ -20,12 +20,10 @@ $$
 BEGIN
     IF _code IS NULL OR TRIM(_code) = '' THEN
         IF NOT _nulls_allowed THEN
-            RETURN 'GEO code cannot be null';
+            RETURN 'Code cannot be null';
         END IF;
-    ELSEIF _code !~ '^G.' OR LENGTH(_code) < 3 THEN
-        RETURN 'GEO code should start with "G." prefix and be a min of 3 characters long';
-    ELSEIF EXISTS(SELECT 1 FROM ce_warehouse.c_com WHERE SUBSTR(_code, 3) = SUBSTR(code, 3)) THEN
-        RETURN FORMAT('GEO SHORT code "%s" cannot match a COM code', SUBSTR(_code, 3));
+    ELSEIF EXISTS(SELECT 1 FROM ce_warehouse.c_geo WHERE code = _code) THEN
+        RETURN FORMAT('GEO/COM code "%s" does not exist in c_geo table', _code);
     END IF;
 
     RETURN NULL;
@@ -33,4 +31,4 @@ END
 $$;
 
 COMMENT ON FUNCTION ce_warehouse.fx_val_is_geo_code
-    IS 'Validation function - check if GEO code is valid  (available on Add)';
+    IS 'Validation function - check if GEO/COM code is valid  (available on Add)';

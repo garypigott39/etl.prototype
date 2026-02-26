@@ -808,7 +808,19 @@ def update_xseries_meta(src_cur, tgt_cur):
                 JOIN ce_warehouse.c_series s 
                      ON s.pk_series = x.fk_pk_series
             GROUP BY x.fk_pk_series, x.ifreq, x.itype, s.sid1
-            ON CONFLICT (fk_pk_series, ifreq, itype) DO NOTHING
+            ON CONFLICT (fk_pk_series, ifreq, itype) DO NOTHING;
+
+        UPDATE ce_warehouse.x_series_meta xm
+        SET new_values_utc = a.audit_utc
+        FROM (
+            SELECT fk_pk_series, ifreq, itype, MAX(audit_utc) AS audit_utc
+            FROM ce_warehouse.a_x_value
+            WHERE audit_type = 'I'
+            GROUP BY fk_pk_series, ifreq, itype 
+        ) a
+        WHERE xm.fk_pk_series = a.fk_pk_series
+        AND xm.ifreq = a.ifreq
+        AND xm.itype = a.itype;
     """)
 
 # -------------------------------------------------------

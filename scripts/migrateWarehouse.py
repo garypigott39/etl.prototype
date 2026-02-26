@@ -96,7 +96,7 @@ def setup_and_check(src_cur, tgt_cur):
 
     # Build dates & periods
     print("Setting up dates and periods...")
-    tgt_cur.execute("CALL ce_warehouse.px_hk_generate_dates()")
+    tgt_cur.execute("CALL ce_warehouse.px_ut_generate_dates()")
 
 
 # -------------------------------------------------------
@@ -226,9 +226,13 @@ def migrate_com(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (pk_com, code, name, short_name, tla, commodity_type, ordering, internal_notes, updated_utc)
-            SELECT pk_com::INT, com_code, com_name, com_short_name, com_tla, com_type, com_order::INT, internal_notes, updated_utc::TIMESTAMPTZ
-            FROM {tmp}
-            WHERE error IS NULL
+            SELECT 
+                c.pk_com::INT, c.com_code, c.com_name, c.com_short_name, c.com_tla, lt.pk_com_type, 
+                c.com_order::INT, c.internal_notes, c.updated_utc::TIMESTAMPTZ
+            FROM {tmp} c
+               LEFT JOIN ce_warehouse.l_com_type lt
+                    ON lt.name = c.com_type
+            WHERE c.error IS NULL
             ORDER BY 1    
     """)
 
@@ -264,22 +268,7 @@ def migrate_const(src_cur, tgt_cur):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_geo(src_cur, tgt_cur):
-    src = "SELECT * FROM ce_data.c_geo"
-    tgt = "ce_warehouse.c_geo"
-    tmp = "t__geo"
-
-    print(f"\n### MIGRATE: {tgt}")
-
-    print("Disabling triggers...")
-    tgt_cur.execute(f"ALTER TABLE {tgt} DISABLE TRIGGER ALL")
-
-    print("Truncating target table...")
-    tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
-
-    create_temp_from_source(src_cur, tgt_cur, src, tmp)
-    copy_table(src_cur, tgt_cur, src, tmp)
-
+def data_clean_geo(tgt_cur, tmp):
     # Data cleansing
     fields = ["geo_name", "geo_name2", "geo_short_name"]
     names = {
@@ -321,6 +310,26 @@ def migrate_geo(src_cur, tgt_cur):
             sql = f"UPDATE {tmp} SET {fld} = %s WHERE {fld} = %s"
             tgt_cur.execute(sql, (new, old))
 
+
+def migrate_geo(src_cur, tgt_cur):
+    src = "SELECT * FROM ce_data.c_geo"
+    tgt = "ce_warehouse.c_geo"
+    tmp = "t__geo"
+
+    print(f"\n### MIGRATE: {tgt}")
+
+    print("Disabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} DISABLE TRIGGER ALL")
+
+    print("Truncating target table...")
+    tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    # Data cleansing
+    data_clean_geo(tgt_cur, tmp)
+
     # Insert into target
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
@@ -328,12 +337,22 @@ def migrate_geo(src_cur, tgt_cur):
                 central_bank, stock_market, political_alignment, local_currency_unit, flag, 
                 category, ordering, internal_notes, updated_utc)
             SELECT 
-                pk_geo::INT, geo_code, geo_name, geo_name2, geo_short_name, geo_tla, geo_iso2, 
-                geo_iso3, geo_lat::NUMERIC, geo_long::NUMERIC, geo_cb, geo_stockmarket, 
-                geo_political_alignment, geo_lcu, geo_flag, geo_catg, geo_order::INT,
-                internal_notes, updated_utc::TIMESTAMPTZ
-            FROM {tmp}
-            WHERE error IS NULL
+                g.pk_geo::INT, g.geo_code, g.geo_name, g.geo_name2, g.geo_short_name, g.geo_tla, 
+                g.geo_iso2, g.geo_iso3, g.geo_lat::NUMERIC, g.geo_long::NUMERIC, lcb.pk_central_bank,
+                lsm.pk_stock_market, lpa.pk_political_alignment, lcu.code, g.geo_flag, lgc.pk_geo_category, 
+                g.geo_order::INT, g.internal_notes, g.updated_utc::TIMESTAMPTZ
+            FROM {tmp} g
+                LEFT JOIN ce_warehouse.l_central_bank lcb
+                    ON lcb.name = g.geo_cb
+                LEFT JOIN ce_warehouse.l_stock_market lsm
+                    ON lsm.name = g.geo_stockmarket
+                LEFT JOIN ce_warehouse.l_political_alignment lpa
+                    ON lpa.name = g.geo_political_alignment
+                LEFT JOIN ce_warehouse.l_currency_unit lcu
+                    ON lcu.code = g.geo_lcu
+                LEFT JOIN ce_warehouse.l_geo_category lgc
+                    ON lgc.name = g.geo_catg
+            WHERE g.error IS NULL
             ORDER BY 1    
     """)
 
@@ -358,8 +377,8 @@ def migrate_geo_group(src_cur, tgt_cur):
     copy_table(src_cur, tgt_cur, src, tmp)
 
     tgt_cur.execute(f"""
-        INSERT INTO {tgt} (fk_pk_geo, group_code, updated_utc)
-            SELECT g.pk_geo, g.code, g.updated_utc
+        INSERT INTO {tgt} (fk_pk_geo, group_id, updated_utc)
+            SELECT g.pk_geo, lgp.pk_geo_group, g.updated_utc
             FROM (
                 SELECT DISTINCT 
                     pk_geo::INT, 
@@ -369,6 +388,8 @@ def migrate_geo_group(src_cur, tgt_cur):
                 WHERE geo_groups IS NOT NULL
                 AND error IS NULL
             ) g
+                LEFT JOIN ce_warehouse.l_geo_group lgp
+                    ON lgp.code = g.code
             WHERE g.code IS NOT NULL
             ORDER BY 1    
     """)
@@ -377,22 +398,7 @@ def migrate_geo_group(src_cur, tgt_cur):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_ind(src_cur, tgt_cur):
-    src = "SELECT * FROM ce_data.c_ind"
-    tgt = "ce_warehouse.c_ind"
-    tmp = "t__ind"
-
-    print(f"\n### MIGRATE: {tgt}")
-
-    print("Disabling triggers...")
-    tgt_cur.execute(f"ALTER TABLE {tgt} DISABLE TRIGGER ALL")
-
-    print("Truncating target table...")
-    tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
-
-    create_temp_from_source(src_cur, tgt_cur, src, tmp)
-    copy_table(src_cur, tgt_cur, src, tmp)
-
+def data_clean_ind(tgt_cur, tmp):
     # Data cleansing
     fields = ["i_name", "i_description", "i_name1", "i_name2", "i_name3", "i_name4"]
     names = {
@@ -436,6 +442,26 @@ def migrate_ind(src_cur, tgt_cur):
         sql = f"UPDATE {tmp} SET {fld} = TRIM(REGEXP_REPLACE({fld}, '\\s+', ' ', 'g')) WHERE {fld} ~ '\\s{{2,}}'"
         tgt_cur.execute(sql)
 
+
+def migrate_ind(src_cur, tgt_cur):
+    src = "SELECT * FROM ce_data.c_ind"
+    tgt = "ce_warehouse.c_ind"
+    tmp = "t__ind"
+
+    print(f"\n### MIGRATE: {tgt}")
+
+    print("Disabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} DISABLE TRIGGER ALL")
+
+    print("Truncating target table...")
+    tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    # Data cleansing
+    data_clean_ind(tgt_cur, tmp)
+
     # Insert into target
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
@@ -444,12 +470,16 @@ def migrate_ind(src_cur, tgt_cur):
                 data_transformation, keyindicator, proprietary_data,
                 ordering, internal_notes, updated_utc)
             SELECT 
-                pk_i::INT, i_code, i_name, i_description, i_name1, i_name2, i_name3, i_name4,
-                i_name_lower, i_name1_lower, i_name2_lower, i_name3_lower, i_name4_lower, 
-                i_catg_broad, i_catg_narrow, i_data_transformation, i_keyindicator::BOOL, 
-                i_proprietary_data::BOOL, i_order::INT, internal_notes, updated_utc::TIMESTAMPTZ
-            FROM {tmp}
-            WHERE error IS NULL
+                i.pk_i::INT, i.i_code, i_name, i.i_description, i.i_name1, i.i_name2, i.i_name3, i.i_name4,
+                i.i_name_lower, i.i_name1_lower, i.i_name2_lower, i.i_name3_lower, i.i_name4_lower, 
+                lbc.pk_ind_broad_category, lnc.pk_ind_narrow_category, i.i_data_transformation, 
+                i.i_keyindicator::BOOL, i_proprietary_data::BOOL, i_order::INT, internal_notes, updated_utc::TIMESTAMPTZ
+            FROM {tmp} i
+                LEFT JOIN ce_warehouse.l_ind_broad_category lbc
+                    ON lbc.name = i.i_catg_broad
+                LEFT JOIN ce_warehouse.l_ind_narrow_category lnc
+                    ON lnc.name = i.i_catg_narrow
+            WHERE i.error IS NULL
             ORDER BY 1    
     """)
 
@@ -493,21 +523,49 @@ def migrate_ind_parent(src_cur, tgt_cur):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_series(src_cur, tgt_cur):
-    src = "SELECT * FROM ce_data.c_series"
-    tgt = "ce_warehouse.c_series"
-    tmp = "t__series"
-
-    print(f"\n### MIGRATE: {tgt}")
-
-    print("Disabling triggers...")
-    tgt_cur.execute(f"ALTER TABLE {tgt} DISABLE TRIGGER ALL")
-
-    print("Truncating target table...")
-    tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
-
-    create_temp_from_source(src_cur, tgt_cur, src, tmp)
-    copy_table(src_cur, tgt_cur, src, tmp)
+def data_clean_series(tgt_cur, tmp):
+    # Consolidate "units"
+    fields = ["s_units"]
+    replacements = {
+        "^\$bn": "$ bn",
+        "^\$mn": "$ mn",
+        "^\$US mn": "$ mn",
+        "^£0": "£ 0",
+        "^£bn": "£ bn",
+        "^£m ": "£ mn ",
+        "^£ Millions": "£ mn",
+        "^€bn": "€ bn",
+        "^€m ": "€ mn ",
+        "^€ per Tonne": "€ per Tonne",
+        "^000s ann\.": "000s ann.",
+        "1966=100": "1966 = 100",
+        "2015=100": "2015 = 100",
+        "^Aus \$": "Aus$",
+        "^(bps|Bps)": "BPS",
+        "^EURmn": "EUR mn",
+        "^euro mn, 2015 prices": "EURO mn (2015 prices)",
+        "^Feb\.": "Feb",
+        "2020( )?=( )?100": "2020 = 100",
+        "^index": "Index",
+        "^INRbn": "INR bn",
+        "^Jan\.": "Jan",
+        "^person": "Person",
+        "^s$": "",
+        "^s\.d\.": "S.D.",
+        "^thousands": "Thousands",
+        "^Thousands \(annual average\)": "Thousands, annual average",
+        "^Thousands \(end of year\)": "Thousands, end of year",
+        "^Thousands \(quarterly average\)": "Thousands, quarterly average",
+        "^ton ": "TON",
+        "^unit": "Unit",
+        "^US\$bn": "US$ bn",
+        "^US\$ bn, S\.A\.": "US$ bn (SA)",
+        "^(Z|Z\-Scoree|z\-score)$": "Z-Score",
+    }
+    for old, new in replacements.items():
+        for fld in fields:
+            sql = f"UPDATE {tmp} SET {fld} = REGEXP_REPLACE({fld}, %s, %s) WHERE {fld} ~* %s"
+            tgt_cur.execute(sql, (old, new, old))
 
     # Data cleansing
     fields = ["s_name", "s_name1", "s_name2", "s_name3", "s_name4", "s_description", "s_source"]
@@ -551,6 +609,25 @@ def migrate_series(src_cur, tgt_cur):
         sql = f"UPDATE {tmp} SET {fld} = TRIM(REGEXP_REPLACE({fld}, '\\s+', ' ', 'g')) WHERE {fld} ~ '\\s{{2,}}'"
         tgt_cur.execute(sql)
 
+
+def migrate_series(src_cur, tgt_cur):
+    src = "SELECT * FROM ce_data.c_series"
+    tgt = "ce_warehouse.c_series"
+    tmp = "t__series"
+
+    print(f"\n### MIGRATE: {tgt}")
+
+    print("Disabling triggers...")
+    tgt_cur.execute(f"ALTER TABLE {tgt} DISABLE TRIGGER ALL")
+
+    print("Truncating target table...")
+    tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    data_clean_series(tgt_cur, tmp)
+
     # Insert into target
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
@@ -558,10 +635,14 @@ def migrate_series(src_cur, tgt_cur):
                 data_source, units, precision, date_point, active, 
                 ordering, internal_notes, updated_utc)
             SELECT 
-                pk_s::INT, s_gcode, s_icode, s_name, s_name1, s_name2, s_name3, s_name4,
-                s_description, s_source, s_units, s_precision::INT, s_date_point, s_active::BOOL,
-                s_order::INT, internal_notes, updated_utc::TIMESTAMPTZ
-            FROM {tmp}
+                s.pk_s::INT, s.s_gcode, s.s_icode, s.s_name, s.s_name1, s.s_name2, s.s_name3, s.s_name4,
+                s.s_description, s.s_source, 
+                CASE WHEN lu.pk_units IS NOT NULL THEN lu.pk_units WHEN s.s_units IS NOT NULL THEN -1 END, 
+                s.s_precision::INT,s. s_date_point, s.s_active::BOOL,
+                s.s_order::INT, s.internal_notes, s.updated_utc::TIMESTAMPTZ
+            FROM {tmp} s
+                LEFT JOIN ce_warehouse.l_units lu
+                    ON lu.name = s.s_units
             WHERE error IS NULL
             ORDER BY 1    
     """)
@@ -570,9 +651,9 @@ def migrate_series(src_cur, tgt_cur):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_series_meta(src_cur, tgt_cur):
+def migrate_series_downloadable(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_series_metadata"
-    tgt = "ce_warehouse.c_series_meta"
+    tgt = "ce_warehouse.c_series_downloadable"
     tmp = "t__series_metadata"
 
     print(f"\n### MIGRATE: {tgt}")
@@ -712,29 +793,22 @@ def migrate_xvalue(src_cur, tgt_cur):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def update_series_meta(src_cur, tgt_cur):
+def update_xseries_meta(src_cur, tgt_cur):
     """
-    Post-migration updates to series metadata based on new values.
+    Post-migration updates to x-series metadata based on new values.
     """
-    print("\n### POST-MIGRATION: Updating series metadata...")
+    print("\n### POST-MIGRATION: Updating xseries metadata...")
 
-    # @todo create series mata
     tgt_cur.execute("""
-        INSERT INTO ce_warehouse.c_series_meta (
-            fk_pk_series, ifreq, itype, first_pdi, last_pdi, has_values, updated_values_utc, updated_utc)
+        INSERT INTO ce_warehouse.x_series_meta (
+            fk_pk_series, ifreq, itype, sid1, first_pdi, last_pdi, has_values, updated_values_utc)
             SELECT
-                x.fk_pk_series, x.ifreq, x.itype, MIN(x.pdi), MAX(x.pdi), TRUE, MAX(x.updated_utc), s.updated_utc 
+                x.fk_pk_series, x.ifreq, x.itype, s.sid1, MIN(x.pdi), MAX(x.pdi), TRUE, MAX(x.updated_utc) 
             FROM ce_warehouse.x_value x
                 JOIN ce_warehouse.c_series s 
                      ON s.pk_series = x.fk_pk_series
-            GROUP BY x.fk_pk_series, x.ifreq, x.itype, s.updated_utc
-            ON CONFLICT (fk_pk_series, ifreq, itype) DO UPDATE
-            SET 
-                first_pdi = LEAST(EXCLUDED.first_pdi, c_series_meta.first_pdi),
-                last_pdi = GREATEST(EXCLUDED.last_pdi, c_series_meta.last_pdi),
-                has_values = TRUE,
-                updated_values_utc = GREATEST(EXCLUDED.updated_values_utc, c_series_meta.updated_values_utc),
-                updated_utc = GREATEST(EXCLUDED.updated_utc, c_series_meta.updated_utc);
+            GROUP BY x.fk_pk_series, x.ifreq, x.itype, s.sid1
+            ON CONFLICT (fk_pk_series, ifreq, itype) DO NOTHING
     """)
 
 # -------------------------------------------------------
@@ -759,14 +833,14 @@ def main():
         migrate_ind(src_cur, tgt_cur)
         migrate_ind_parent(src_cur, tgt_cur)
         migrate_series(src_cur, tgt_cur)
-        migrate_series_meta(src_cur, tgt_cur)
+        migrate_series_downloadable(src_cur, tgt_cur)
         migrate_const(src_cur, tgt_cur)
         migrate_calc(src_cur, tgt_cur)
         migrate_xtooltip(src_cur, tgt_cur)
         migrate_xvalue(src_cur, tgt_cur)
         migrate_avalue(src_cur, tgt_cur)
 
-        update_series_meta(src_cur, tgt_cur)
+        update_xseries_meta(src_cur, tgt_cur)
 
         tgt_conn.commit()
         print("\n### Migration complete ✔")

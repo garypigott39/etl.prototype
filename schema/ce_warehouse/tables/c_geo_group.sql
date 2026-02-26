@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo_group
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 
-    group_code SMALLINT NOT NULL
+    group_id SMALLINT NOT NULL
         REFERENCES ce_warehouse.l_geo_group (pk_geo_group)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo_group
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),
-    UNIQUE (fk_pk_geo, group_code)
+    UNIQUE (fk_pk_geo, group_id)
 );
 
 COMMENT ON TABLE ce_warehouse.c_geo_group

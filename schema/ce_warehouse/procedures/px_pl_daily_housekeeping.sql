@@ -28,6 +28,8 @@ BEGIN
     CALL ce_warehouse.px_ut_info('Generating dates & periods', TRUE);
     CALL ce_warehouse.px_ut_generate_dates();
 
+    -- Any other housekeeping tasks could go her, @TBA
+
     -- Unlock pipeline
     CALL ce_warehouse.px_ut_lock_pipeline('ETL', 'unlock');
 

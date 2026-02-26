@@ -63,7 +63,6 @@ VALUES
     ('€ mn (2022 prices)'),
     ('€ per MWh'),
     ('€ per tonne'),
-    ('€ per Tonne'),
     ('000s'),
     ('000S'),
     ('000s ann'),

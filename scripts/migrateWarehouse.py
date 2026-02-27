@@ -306,7 +306,7 @@ def data_clean_data_source(tgt_cur, tmp):
 def migrate_avalue(src_cur, tgt_cur):
     src = "SELECT * FROM ce_powerbi.x_values_audit"
     tgt = "ce_warehouse.a_x_value"
-    tmp = "t__xvalues_audit"
+    tmp = "t__a_x_values_audit"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -340,7 +340,7 @@ def migrate_calc(src_cur, tgt_cur):
     """Various jiggery pokery needed."""
     src = "SELECT * FROM ce_data.c_api_calc"
     tgt = "ce_warehouse.c_calc"
-    tmp = "t__api_calc"
+    tmp = "t__c_api_calc"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -377,7 +377,7 @@ def migrate_calc(src_cur, tgt_cur):
     # Now, we're gonna get the "calc" formulas
     src = "SELECT * FROM ce_data.c_calc"
     tgt = "ce_warehouse.c_calc"
-    tmp = "t__calc"
+    tmp = "t__c_calc"
 
     create_temp_from_source(src_cur, tgt_cur, src, tmp)
     copy_table(src_cur, tgt_cur, src, tmp)
@@ -416,7 +416,7 @@ def migrate_calc(src_cur, tgt_cur):
 def migrate_const(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_const"
     tgt = "ce_warehouse.c_const"
-    tmp = "t__const"
+    tmp = "t__c_const"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -458,7 +458,7 @@ def migrate_geo(src_cur, tgt_cur):
 
     # 1. GEO, do this first as we need th pk_geo for the geo_group table load later
     src = "SELECT * FROM ce_data.c_geo"
-    tmp = "t__geo"
+    tmp = "t__c_geo"
 
     create_temp_from_source(src_cur, tgt_cur, src, tmp)
     copy_table(src_cur, tgt_cur, src, tmp)
@@ -495,7 +495,7 @@ def migrate_geo(src_cur, tgt_cur):
 
     # 2. COM
     src = "SELECT * FROM ce_data.c_com"
-    tmp = "t__com"
+    tmp = "t__c_com"
 
     create_temp_from_source(src_cur, tgt_cur, src, tmp)
     copy_table(src_cur, tgt_cur, src, tmp)
@@ -524,7 +524,7 @@ def migrate_geo(src_cur, tgt_cur):
 def migrate_geo_group(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_geo"
     tgt = "ce_warehouse.c_geo_group"
-    tmp = "t__geo_group"
+    tmp = "t__c_geo_group"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -564,7 +564,7 @@ def migrate_geo_group(src_cur, tgt_cur):
 def migrate_ind(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_ind"
     tgt = "ce_warehouse.c_ind"
-    tmp = "t__ind"
+    tmp = "t__c_ind"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -610,7 +610,7 @@ def migrate_ind(src_cur, tgt_cur):
 def migrate_ind_parent(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_ind"
     tgt = "ce_warehouse.c_ind_parent"
-    tmp = "t__ind_parent"
+    tmp = "t__c_ind_parent"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -648,7 +648,7 @@ def migrate_ind_parent(src_cur, tgt_cur):
 def migrate_series(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_series"
     tgt = "ce_warehouse.c_series"
-    tmp = "t__series"
+    tmp = "t__c_series"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -692,7 +692,7 @@ def migrate_series(src_cur, tgt_cur):
 def migrate_series_data_source(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_series"
     tgt = "ce_warehouse.c_series_data_source"
-    tmp = "t__series_data_source"
+    tmp = "t__c_series_data_source"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -738,7 +738,7 @@ def migrate_series_data_source(src_cur, tgt_cur):
 def migrate_series_downloadable(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_series_metadata"
     tgt = "ce_warehouse.c_series_downloadable"
-    tmp = "t__series_metadata"
+    tmp = "t__c_series_metadata"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -778,7 +778,7 @@ def migrate_series_downloadable(src_cur, tgt_cur):
 def migrate_xtooltip(src_cur, tgt_cur):
     src = "SELECT * FROM ce_pipeline.x_tooltip"
     tgt = "ce_warehouse.x_tooltip"
-    tmp = "t__xtooltip"
+    tmp = "t__c_xtooltip"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -819,7 +819,7 @@ def migrate_xvalue(src_cur, tgt_cur):
 
     # 1. x_api, API wins
     src = "SELECT * FROM ce_pipeline.x_api"
-    tmp = "t__xapi"
+    tmp = "t__x_api"
 
     create_temp_from_source(src_cur, tgt_cur, src, tmp)
     copy_table(src_cur, tgt_cur, src, tmp)
@@ -839,7 +839,7 @@ def migrate_xvalue(src_cur, tgt_cur):
 
     # 2. x_manual
     src = "SELECT * FROM ce_pipeline.x_manual"
-    tmp = "t__xmanual"
+    tmp = "t__x_manual"
 
     create_temp_from_source(src_cur, tgt_cur, src, tmp)
     copy_table(src_cur, tgt_cur, src, tmp)
@@ -860,7 +860,7 @@ def migrate_xvalue(src_cur, tgt_cur):
 
     # 3. x_calc
     src = "SELECT * FROM ce_pipeline.x_manual"
-    tmp = "t__xcalc"
+    tmp = "t__x_calc"
 
     create_temp_from_source(src_cur, tgt_cur, src, tmp)
     copy_table(src_cur, tgt_cur, src, tmp)
@@ -947,7 +947,7 @@ def main():
         migrate_xvalue(src_cur, tgt_cur)
         migrate_avalue(src_cur, tgt_cur)
 
-        update_xseries_meta(src_cur, tgt_cur)
+        post_migration_steps(src_cur, tgt_cur)
 
         tgt_conn.commit()
         print("\n### Migration complete ✔")

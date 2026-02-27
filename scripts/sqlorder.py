@@ -20,7 +20,6 @@ from pathlib import Path
 class SqlOrder:
 
     OUTPUT_SQL = "SQLORDER.sql"
-    OUTPUT_TXT = "SQLORDER.txt"
 
     TEMP_DB = "_monkeyboy"
 
@@ -39,9 +38,7 @@ class SqlOrder:
 
         # Remove any existing output files
         os.unlink(self.OUTPUT_SQL) if Path(self.OUTPUT_SQL).exists() else None
-        os.unlink(self.OUTPUT_TXT) if Path(self.OUTPUT_TXT).exists() else None
 
-        #
         self.base_connection_string = self.connection_string(dbname="postgres")
         self.temp_connection_string = self.connection_string(dbname=self.TEMP_DB)
 
@@ -117,42 +114,44 @@ class SqlOrder:
         """
         return getattr(error, "sqlstate", None) in self.RETRYABLE_ERRORS
 
-    def print_order(self) -> None:
-        """
-        Print the resolved order of SQL files to the console.
-        :return: None
-        """
-        with open(self.OUTPUT_TXT, 'w', encoding="utf-8") as f:
-            print("\n***** SQL Files in Resolved Order *****\n", file=f)
-            for i, (filename, _) in enumerate(self.ordered_files, 1):
-                print(f"{i:03d}: {filename}", file=f)
-            print('***** END OF FILE *****', file=f)
-
-        print(f"\nSQL File Order written to {self.OUTPUT_TXT}")
-
     def print_sql(self) -> None:
         """
-        Print the combined SQL of all files in the resolved order to the console.
+        Print the resolved SQL statements in the correct order to a single SQL file.
+        Each file's content is separated by a comment header indicating the filename, if "debug"
+        mode is enabled then (a) file ordering info is included as SQL comments and
+        (b) execution info is added to the SQL before each file's content.
         :return: None
         """
 
-        def _debug(filename: str) -> str:
+        def _files(f) -> None:
+            for i, (filename, file) in enumerate(self.ordered_files, 1):
+                print(f"-- {i:03d}: {filename}", file=f)
+
+        def _info(filename: str) -> str:
             return f"""
                 DO $$
                 BEGIN
-                    RAISE NOTICE 'Executing file: {filename}  @ %', TO_CHAR(clock_timestamp(), 'HH24:MI:SS');
+                    RAISE NOTICE 'Executing file: {filename}  @ %', 
+                        TO_CHAR(clock_timestamp(), 'HH24:MI:SS');
                 END
                 $$;
             """.replace("    ", "")
 
         with open(self.OUTPUT_SQL, "w", encoding="utf-8") as f:
-            print("\n/***** COMBINED SQL IN RESOLVED ORDER *****/\n", file=f)
+            # Write a header comment with the total number of files and the base directory
+            if self.debug:
+                _files(f)
+
+            # Print the resolved SQL files in order, with optional debug info and execution notices
+            print("\n/*** COMBINED SQL IN RESOLVED ORDER ***/\n", file=f)
+
             for i, (filename, file) in enumerate(self.ordered_files, 1):
                 print(f"-- {i}. {filename} --", file=f)
                 if self.debug:
-                    print(_debug(filename), file=f)
+                    print(_info(filename), file=f)
                 print(file.read_text(encoding='utf-8'), file=f)
                 print("\n", file=f)
+
             print('/***** END OF COMBINED SQL *****/', file=f)
 
         print(f"\nCombined SQL written to {self.OUTPUT_SQL}")
@@ -227,7 +226,6 @@ if __name__ == "__main__":
     try:
         obj = SqlOrder(sys.argv[1], debug='--debug' in sys.argv)
         obj.resolve_sql_order()
-        obj.print_order()
         obj.print_sql()
     except Exception as e:
         print(str(e))

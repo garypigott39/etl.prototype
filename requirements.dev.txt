@@ -5,4 +5,8 @@
 
 #  @todo: Add development dependencies here, e.g. testing frameworks, linters, etc.
 
+django-stubs  # better type checking for Django (in linters)
+flake8  # will phase out flake in favour of ruff
+mypy
 psycopg
+ruff

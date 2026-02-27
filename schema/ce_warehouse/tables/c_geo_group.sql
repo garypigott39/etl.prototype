@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo_group
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 
+    error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),

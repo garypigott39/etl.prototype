@@ -29,17 +29,26 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
     -- Fields common to both GEO & COM
     name TEXT
         CHECK (
-            (code <> 'INTERNAL' AND ce_warehouse.fx_val_is_name(name, FALSE) IS NULL)
+            (
+                code <> 'INTERNAL'
+                AND ce_warehouse.fx_val_is_name(name, 'c_geo.name', FALSE) IS NULL
+            )
             OR (code = 'INTERNAL' AND name IS NULL)
     ),
     short_name TEXT
         CHECK (
-            (code <> 'INTERNAL' AND ce_warehouse.fx_val_is_name(short_name, FALSE) IS NULL)
+            (
+                code <> 'INTERNAL'
+                AND ce_warehouse.fx_val_is_name(short_name, 'c_geo.short_name', FALSE) IS NULL
+            )
             OR (code = 'INTERNAL' AND short_name IS NULL)
     ),
     tla TEXT
         CHECK (
-            (code <> 'INTERNAL' AND ce_warehouse.fx_val_is_name(tla, FALSE) IS NULL)
+            (
+                code <> 'INTERNAL'
+                AND ce_warehouse.fx_val_is_name(tla, 'c_geo.tla', FALSE) IS NULL
+            )
             OR (code = 'INTERNAL' AND tla IS NULL)
     ),
 
@@ -60,8 +69,10 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
     name2 TEXT
         CHECK (
             (code NOT LIKE 'G.%' AND name2 IS NULL)
-            OR (code LIKE 'G.%'
-                AND ce_warehouse.fx_val_is_name(name2, FALSE) IS NULL)
+            OR (
+                code LIKE 'G.%'
+                AND ce_warehouse.fx_val_is_name(name2, 'c_geo.name2', FALSE) IS NULL
+            )
     ),
     iso2 TEXT
         CHECK (
@@ -136,8 +147,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
 
     -- Standard fields
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
 
+    error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_geo),

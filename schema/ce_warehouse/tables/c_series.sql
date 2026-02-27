@@ -37,17 +37,17 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
         AS (gcode = 'INTERNAL') STORED,
 
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name, 'c_series.name', FALSE) IS NULL),
     name1 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name1) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name1, 'c_series.name1') IS NULL),
     name2 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name2) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name2, 'c_series.name2') IS NULL),
     name3 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name3) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name3, 'c_series.name3') IS NULL),
     name4 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name4) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name4, 'c_series.name4') IS NULL),
     description TEXT
-        CHECK (ce_warehouse.fx_val_is_name(description) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(description, 'c_series.description') IS NULL),
     units SMALLINT
         REFERENCES ce_warehouse.l_units (pk_units)
             ON UPDATE CASCADE
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
     ordering INT NOT NULL DEFAULT 0,
 
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
 
     error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),

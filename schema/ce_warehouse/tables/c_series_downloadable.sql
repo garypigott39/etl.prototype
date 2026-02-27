@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_downloadable
     forecast_only_lifespan INT,  -- If NULL then will take the system default
     internal_notes TEXT,  -- Unvalidated!
 
+    error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),

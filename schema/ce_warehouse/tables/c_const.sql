@@ -22,8 +22,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_const
     value NUMERIC,  -- calculated value, can be NULL
 
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
 
+    error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_const),

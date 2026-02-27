@@ -18,27 +18,27 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Z0-9][A-Z0-9<>._\-+#%£$]*[A-Z0-9#%£$€]$'),
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name, 'c_ind.name', FALSE) IS NULL),
     description TEXT
-        CHECK (ce_warehouse.fx_val_is_name(description) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(description, 'c_ind.description') IS NULL),
     name1 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name1) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name1, 'c_ind.name1') IS NULL),
     name2 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name2) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name2, 'c_ind.name2') IS NULL),
     name3 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name3) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name3, 'c_ind.name3') IS NULL),
     name4 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name4) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name4, 'c_ind.name4') IS NULL),
     name_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name_lower, TRUE) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name_lower, 'c_ind.name_lower') IS NULL),
     name1_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name1_lower, TRUE) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name1_lower, 'c_ind.name1_lower') IS NULL),
     name2_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name2_lower, TRUE) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name2_lower, 'c_ind.name2_lower') IS NULL),
     name3_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name3_lower, TRUE) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name3_lower, 'c_ind.name3_lower') IS NULL),
     name4_lower TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name4_lower, TRUE) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_name(name4_lower, 'c_ind.name4_lower') IS NULL),
     category_broad SMALLINT
         REFERENCES ce_warehouse.l_ind_broad_category (pk_ind_broad_category)
             ON UPDATE CASCADE
@@ -59,8 +59,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
     ordering INT NOT NULL DEFAULT 0,
 
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes) IS NULL),
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
 
+    error TEXT,
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_ind),

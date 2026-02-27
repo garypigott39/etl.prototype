@@ -17,10 +17,14 @@ import sys
 from dotenv import load_dotenv
 from collections import deque
 from pathlib import Path
-from typing import Any, Deque, TextIO
+from typing import Any, TextIO
 
 # Output file for the combined SQL statements in the resolved order
 OUTPUT_SQL = "SQLORDER.sql"
+
+# Target DB NAME, adds a validation check to prevent accidental deletion of important databases.
+# Must be different from DEFAULT_DB.
+TARGET_DB = "prototype"  # replace as required!!
 
 # Default & Temporary database name for testing SQL file execution order
 DEFAULT_DB = "postgres"  # default database to connect to for creating/dropping temp database
@@ -56,7 +60,15 @@ class SqlOrder:
         # Remove any existing output files
         os.unlink(OUTPUT_SQL) if Path(OUTPUT_SQL).exists() else None
 
-        if DEFAULT_DB == TEMP_DB:
+        if TARGET_DB is None:
+            raise RuntimeError(
+                "ERROR: TARGET_DB is not set. Please set it to your target database name.")
+        elif TARGET_DB in {DEFAULT_DB, TEMP_DB}:
+            raise RuntimeError(
+                f"ERROR: TARGET_DB {TARGET_DB} cannot be the same as either DEFAULT_DB or TEMP_DB."
+                " Please change TARGET_DB to a different name."
+            )
+        elif DEFAULT_DB == TEMP_DB:
             raise RuntimeError(
                 "ERROR: DEFAULT_DB and TEMP_DB cannot be the same. Please change one of them."
             )
@@ -111,9 +123,9 @@ class SqlOrder:
 
         :return: None
         """
-        with psycopg.connect(self.base_connection_string, autocommit=True) as conn:
-            with conn.cursor() as cur:
-                cur.execute(f"CREATE DATABASE {TEMP_DB}")
+        with (psycopg.connect(self.base_connection_string, autocommit=True) as conn,
+              conn.cursor() as cur):
+            cur.execute(f"CREATE DATABASE {TEMP_DB}")
 
     def drop_temp_database(self) -> None:
         """
@@ -121,15 +133,15 @@ class SqlOrder:
 
         :return: None
         """
-        with psycopg.connect(self.base_connection_string, autocommit=True) as conn:
-            with conn.cursor() as cur:
-                # terminate active connections
-                cur.execute("""
-                    SELECT pg_terminate_backend(pid)
-                    FROM pg_stat_activity
-                    WHERE datname = %s
-                """, (TEMP_DB,))
-                cur.execute(f"DROP DATABASE IF EXISTS {TEMP_DB}")
+        with (psycopg.connect(self.base_connection_string, autocommit=True) as conn,
+              conn.cursor() as cur):
+            # terminate active connections
+            cur.execute("""
+                SELECT pg_terminate_backend(pid)
+                FROM pg_stat_activity
+                WHERE datname = %s
+            """, (TEMP_DB,))
+            cur.execute(f"DROP DATABASE IF EXISTS {TEMP_DB}")
 
     def is_retryable(self, error: psycopg.Error) -> bool:
         """
@@ -151,19 +163,33 @@ class SqlOrder:
         :return: None
         """
 
+        def _db_check(f: TextIO) -> None:
+            print(f"""
+                /*************************
+                 **** Target DB Check ****
+                 *************************/
+                DO $$
+                BEGIN
+                    IF CURRENT_DATABASE() <> '{TARGET_DB}' THEN
+                        RAISE EXCEPTION 'Current DB is different from Target DB ({TARGET_DB})';
+                    END IF;    
+                END
+                $$;
+            """.replace("    ", ""), file=f)
+
         def _files(f: TextIO) -> None:
             for i, (filename, _) in enumerate(self.ordered_files, 1):
                 print(f"-- {i:03d}: {filename}", file=f)
 
-        def _info(filename: pathlib.Path) -> str:
-            return f"""
+        def _info(filename: pathlib.Path, f: TextIO) -> None:
+            print(f"""
                 DO $$
                 BEGIN
                     RAISE NOTICE 'Executing file: {filename}  @ %', 
                         TO_CHAR(clock_timestamp(), 'HH24:MI:SS');
                 END
                 $$;
-            """.replace("    ", "")
+            """.replace("    ", ""), file=f)
 
         with open(OUTPUT_SQL, "w", encoding="utf-8") as f:
             # Write a header comment with the total number of files and the base directory
@@ -173,10 +199,13 @@ class SqlOrder:
             # Print the resolved SQL files in order, with optional debug info and execution notices
             print("\n/*** COMBINED SQL IN RESOLVED ORDER ***/\n", file=f)
 
+            # Target DB check
+            _db_check(f)
+
             for i, (filename, file) in enumerate(self.ordered_files, 1):
                 print(f"-- {i}. {filename} --", file=f)
                 if self.debug:
-                    print(_info(filename), file=f)
+                    _info(filename, f)
                 print(file.read_text(encoding='utf-8'), file=f)
                 print("\n", file=f)
 
@@ -199,7 +228,7 @@ class SqlOrder:
         with psycopg.connect(self.temp_connection_string) as conn:
             while remaining:
                 progress_made = False
-                next_round: Deque[Any] = deque()
+                next_round: deque[Any] = deque()
 
                 while remaining:
                     file = remaining.popleft()

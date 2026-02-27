@@ -22,7 +22,7 @@ BEGIN
         IF NOT _nulls_allowed THEN
             RETURN 'Code cannot be null';
         END IF;
-    ELSEIF EXISTS(SELECT 1 FROM ce_warehouse.c_geo WHERE code = _code) THEN
+    ELSEIF NOT EXISTS(SELECT 1 FROM ce_warehouse.c_geo WHERE code = _code) THEN
         RETURN FORMAT('GEO/COM code "%s" does not exist in c_geo table', _code);
     END IF;
 

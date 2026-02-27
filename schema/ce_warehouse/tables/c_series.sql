@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
     name4 TEXT
         CHECK (ce_warehouse.fx_val_is_name(name4, 'c_series.name4') IS NULL),
     description TEXT
-        CHECK (ce_warehouse.fx_val_is_name(description, 'c_series.description') IS NULL),
+        CHECK (ce_warehouse.fx_val_is_text(description, 'c_series.description') IS NULL),
     units SMALLINT
         REFERENCES ce_warehouse.l_units (pk_units)
             ON UPDATE CASCADE

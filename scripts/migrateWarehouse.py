@@ -122,13 +122,13 @@ def replace_from(tgt_cur, table, fields, replacements):
 
 
 def replace_regex_from(tgt_cur, table, fields, replacements, ignore_case=False):
-    options = 'i' if ignore_case else ''
+    options = 'i' if ignore_case else None
     operator = '~*' if ignore_case else '~'
     
     for old, new in replacements.items():
         for fld in fields:
             sql = (
-                f"UPDATE {table} SET {fld} = REGEXP_REPLACE({fld}, %s, %s, %s')"
+                f"UPDATE {table} SET {fld} = REGEXP_REPLACE({fld}, %s, %s, %s)"
                 f" WHERE {fld} {operator} %s"
             )
             tgt_cur.execute(sql, (old, new, options, old))
@@ -158,7 +158,7 @@ def data_clean_geo(tgt_cur, tmp):
     iso2 = {
         "WLD": "WW"
     }
-    replace_from(tgt_cur, tmp, ["geo-iso2"], iso2)
+    replace_from(tgt_cur, tmp, ["geo_iso2"], iso2)
 
 
 def data_clean_ind(tgt_cur, tmp):
@@ -456,29 +456,7 @@ def migrate_geo(src_cur, tgt_cur):
     print("Truncating target table...")
     tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
 
-    # 1. COM
-    src = "SELECT * FROM ce_data.c_com"
-    tmp = "t__com"
-
-    create_temp_from_source(src_cur, tgt_cur, src, tmp)
-    copy_table(src_cur, tgt_cur, src, tmp)
-
-    tgt_cur.execute(f"""
-        INSERT INTO {tgt} (
-            code, name, short_name, tla, commodity_type, ordering, internal_notes, 
-            updated_utc
-        )
-        SELECT 
-            c.com_code, c.com_name, c.com_short_name, c.com_tla, lt.pk_com_type, 
-            c.com_order::INT, c.internal_notes, c.updated_utc::TIMESTAMPTZ
-        FROM {tmp} c
-           LEFT JOIN ce_warehouse.l_com_type lt
-                ON lt.name = c.com_type
-        WHERE c.error IS NULL
-        ORDER BY 1    
-    """)
-
-    # 2. GEO
+    # 1. GEO, do this first as we need th pk_geo for the geo_group table load later
     src = "SELECT * FROM ce_data.c_geo"
     tmp = "t__geo"
 
@@ -491,12 +469,12 @@ def migrate_geo(src_cur, tgt_cur):
     # Insert into target
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            code, name, name2, short_name, tla, iso2, iso3, lat, long, 
+            pk_geo, code, name, name2, short_name, tla, iso2, iso3, lat, long, 
             central_bank, stock_market, political_alignment, local_currency_unit, flag, 
             category, ordering, internal_notes, updated_utc
         )
         SELECT 
-            g.geo_code, g.geo_name, g.geo_name2, g.geo_short_name, g.geo_tla, 
+            g.pk_geo::INT, g.geo_code, g.geo_name, g.geo_name2, g.geo_short_name, g.geo_tla, 
             g.geo_iso2, g.geo_iso3, g.geo_lat::NUMERIC, g.geo_long::NUMERIC, lcb.pk_central_bank,
             ls.pk_stock_market, lp.pk_political_alignment, lcu.code, g.geo_flag, 
             lg.pk_geo_category, g.geo_order::INT, g.internal_notes, g.updated_utc::TIMESTAMPTZ
@@ -512,6 +490,30 @@ def migrate_geo(src_cur, tgt_cur):
             LEFT JOIN ce_warehouse.l_geo_category lg
                 ON lg.name = g.geo_catg
         WHERE g.error IS NULL
+        ORDER BY 1    
+    """)
+
+    # 2. COM
+    src = "SELECT * FROM ce_data.c_com"
+    tmp = "t__com"
+
+    create_temp_from_source(src_cur, tgt_cur, src, tmp)
+    copy_table(src_cur, tgt_cur, src, tmp)
+
+    tgt_cur.execute(f"""
+        CALL ce_warehouse.px_ut_fix_seq();
+
+        INSERT INTO {tgt} (
+            code, name, short_name, tla, commodity_type, ordering, internal_notes, 
+            updated_utc
+        )
+        SELECT 
+            c.com_code, c.com_name, c.com_short_name, c.com_tla, lt.pk_com_type, 
+            c.com_order::INT, c.internal_notes, c.updated_utc::TIMESTAMPTZ
+        FROM {tmp} c
+           LEFT JOIN ce_warehouse.l_com_type lt
+                ON lt.name = c.com_type
+        WHERE c.error IS NULL
         ORDER BY 1    
     """)
 

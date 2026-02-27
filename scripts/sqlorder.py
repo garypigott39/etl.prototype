@@ -9,6 +9,7 @@ correct order.
 """
 
 import os
+import pathlib
 import platform
 import psycopg
 import sys
@@ -16,7 +17,7 @@ import sys
 from dotenv import load_dotenv
 from collections import deque
 from pathlib import Path
-from typing import TextIO
+from typing import Any, Deque, TextIO
 
 # Output file for the combined SQL statements in the resolved order
 OUTPUT_SQL = "SQLORDER.sql"
@@ -89,7 +90,7 @@ class SqlOrder:
             key=lambda p: str(p.relative_to(self.base_path))
         )
 
-        self.ordered_files = []
+        self.ordered_files: list[tuple[pathlib.Path, pathlib.Path]] = []
 
     @staticmethod
     def connection_string(dbname: str) -> str:
@@ -154,7 +155,7 @@ class SqlOrder:
             for i, (filename, _) in enumerate(self.ordered_files, 1):
                 print(f"-- {i:03d}: {filename}", file=f)
 
-        def _info(filename: str) -> str:
+        def _info(filename: pathlib.Path) -> str:
             return f"""
                 DO $$
                 BEGIN
@@ -198,7 +199,7 @@ class SqlOrder:
         with psycopg.connect(self.temp_connection_string) as conn:
             while remaining:
                 progress_made = False
-                next_round = deque()
+                next_round: Deque[Any] = deque()
 
                 while remaining:
                     file = remaining.popleft()

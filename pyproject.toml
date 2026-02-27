@@ -40,7 +40,11 @@ lint.ignore = [
 lint.isort.force-sort-within-sections = false
 format.quote-style = "single"
 
-exclude = ["scripts/obs/*"]  # Exclude anything in scripts/obs
+# Paths to exclude
+exclude = [
+    "**/obs/**",
+    "**/obsolete/**",
+]
 
 [tool.django-stubs]
 django_settings_module = "app._config.settings"

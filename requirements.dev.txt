@@ -10,3 +10,4 @@ flake8  # will phase out flake in favour of ruff
 mypy
 psycopg
 ruff
+types-psycopg2

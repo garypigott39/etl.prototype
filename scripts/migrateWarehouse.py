@@ -117,21 +117,21 @@ def remove_multi_spaces_from(tgt_cur, table, fields):
 def replace_from(tgt_cur, table, fields, replacements):
     for old, new in replacements.items():
         for fld in fields:
-            sql = f"UPDATE {table} SET {fld} = %s WHERE {fld} = %s"
-            tgt_cur.execute(sql, (new, old))
+            sql = f"UPDATE {table} SET {fld} = %(new)s WHERE {fld} = %(old)s"
+            tgt_cur.execute(sql, {'old': old, 'new': new})
 
 
 def replace_regex_from(tgt_cur, table, fields, replacements, ignore_case=False):
-    options = 'i' if ignore_case else None
+    options = 'gi' if ignore_case else 'g'
     operator = '~*' if ignore_case else '~'
     
     for old, new in replacements.items():
         for fld in fields:
-            sql = (
-                f"UPDATE {table} SET {fld} = REGEXP_REPLACE({fld}, %s, %s, %s)"
-                f" WHERE {fld} {operator} %s"
-            )
-            tgt_cur.execute(sql, (old, new, options, old))
+            sql = f"""
+                UPDATE {table} SET {fld} = REGEXP_REPLACE({fld}, %(old)s, %(new)s, %(options)s) 
+                WHERE {fld} {operator} %(old)s
+            """
+            tgt_cur.execute(sql, {'old': old, 'new': new, 'options': options})
            
 
 def data_clean_geo(tgt_cur, tmp):

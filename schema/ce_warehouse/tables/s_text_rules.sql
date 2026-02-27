@@ -67,7 +67,7 @@ VALUES
     (
      'C',
      'DEFAULT',
-     'Default is "code" rule',
+     'Default "code" rule',
      FALSE,
      FALSE,
         FALSE,
@@ -79,7 +79,7 @@ VALUES
     (
      'N',
      'DEFAULT',
-     'Default is "name" rule',
+     'Default "name" rule',
      FALSE,
      FALSE,
         FALSE,
@@ -91,14 +91,14 @@ VALUES
     (
      'T',
      'DEFAULT',
-     'Default is "text" rule',
+     'Default "text" rule',
      TRUE,
      FALSE,
      TRUE,
      'ANY',
      'ANY',
      1,
-     255
+     1000
     ),
     (
      'C',
@@ -114,26 +114,14 @@ VALUES
     ),
     (
      'T',
-     'c_ind.description',
-     'IND description, allow for longer descriptions than the default text rule',
-     FALSE,
-     FALSE,
-     FALSE,
-     NULL,
-     'ANY',
-     2,
-     1000
-    ),
-    (
-     'T',
      'c_series.description',
-     'SERIES description, allow for longer descriptions than the default text rule',
+     'SERIES description, allow for longer (& shorter) descriptions than the default text rule',
      FALSE,
      FALSE,
      FALSE,
-     NULL,
      'ANY',
-     2,
+     'ANY',
+     1,
      1000
     ),
     (

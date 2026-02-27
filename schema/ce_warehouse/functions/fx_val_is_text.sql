@@ -119,8 +119,11 @@ BEGIN
     END IF;
 
     -- Unbalanced parentheses
-    IF _rec.allow_unbalanced_parenthesis = FALSE AND _val !~ '^(?:[^()]|\([^()]*\))*$' THEN
-        RETURN 'Value contains unbalanced parentheses';
+    IF _rec.allow_unbalanced_parenthesis = FALSE THEN
+        -- Simple check for balanced parentheses - count opening and closing
+        IF LENGTH(REPLACE(_val, '(', '')) <> LENGTH(REPLACE(_val, ')', '')) THEN
+            RETURN 'Value contains unbalanced parentheses';
+        END IF;
     END IF;
 
     RETURN NULL;

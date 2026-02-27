@@ -42,6 +42,9 @@ help:
 	@echo "  make check-django      - Run lint + typecheck on Django apps"
 	@echo "  make check-python      - Run lint + typecheck on non-Django Python"
 	@echo
+	@echo "  make fix-django        - Run 'mypy --fix' on Django apps"
+	@echo "  make fix-python        - Run 'mypy --fix' on non-Django Python"
+	@echo
 
 # ---- Django Commands ----
 .PHONY: run migrate makemigrations shell test
@@ -100,6 +103,17 @@ typecheck-django:
 typecheck-python:
 	@clear
 	mypy $(SCRIPTS) $(UTILS)
+
+
+# ---- Type Checking ----
+.PHONY: fix-django fix-python
+fix-django:
+	@clear
+	mypy $(DJANGO) --fix
+
+fix-python:
+	@clear
+	mypy $(SCRIPTS) $(UTILS) --fix
 
 # ---- Combined ----
 .PHONY: check check-django check-python

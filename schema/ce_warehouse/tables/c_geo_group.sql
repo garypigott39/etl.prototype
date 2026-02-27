@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo_group
         REFERENCES ce_warehouse.c_geo (pk_geo)
             ON UPDATE CASCADE
             ON DELETE CASCADE
-            DEFERRABLE INITIALLY DEFERRED,
+            DEFERRABLE INITIALLY DEFERRED
+        CHECK(ce_warehouse.fx_val_is_geo_or_com(fk_pk_geo, 'GEO') IS NULL),
 
     -- GEO Group ID
     geo_group SMALLINT NOT NULL

@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
     iso3 TEXT
         CHECK (
             (code NOT LIKE 'G.%' AND iso3 IS NULL)
-            OR (code LIKE 'G.%' AND (iso3 IS NULL OR iso2 ~ '^[A-Z]{3}$'))
+            OR (code LIKE 'G.%' AND (iso3 IS NULL OR iso3 ~ '^[A-Z]{3}$'))
     ),
     lat NUMERIC
         CHECK (

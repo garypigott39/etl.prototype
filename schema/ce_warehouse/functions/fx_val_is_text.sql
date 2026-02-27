@@ -3,7 +3,7 @@
  * @file
  * fx_val_is_text.sql
  *
- * Validation function - check if supplied string meets "free text" rules.
+ * Validation function - check if supplied string meets relevant "text" rules.
  ***********************************************************************************************************
  */
 
@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_val_is_text(
     _val TEXT,
     _col_name TEXT DEFAULT 'DEFAULT',
     _nulls_allowed BOOL DEFAULT TRUE,
-    _text_or_name TEXT DEFAULT 'T'
+    _rule TEXT DEFAULT 'T'
 )
     RETURNS TEXT
     LANGUAGE plpgsql
@@ -24,8 +24,8 @@ DECLARE
     _ignore_case BOOL;
 
 BEGIN
-    IF _text_or_name NOT IN ('T', 'N') THEN
-        RAISE EXCEPTION 'Invalid text_or_name parameter % - must be "T" or "N"', _text_or_name;
+    IF _rule NOT IN ('C', 'T', 'N') THEN
+        RAISE EXCEPTION 'Invalid rule parameter % - must be "C", "T" or "N"', _rule;
     END IF;
 
     -- Basic checks for NULL/empty and unprintable/non-ASCII characters
@@ -44,9 +44,9 @@ BEGIN
         END IF;
     END IF;
 
-    -- ignore case is only relevant for "name" rules
+    -- Ignore case is not relevant for "text" rules as they should be pretty lax anyway!
     IF _col_name LIKE '%.ignore_case' THEN
-        _ignore_case := _text_or_name = 'N';
+        _ignore_case := _rule <> 'T';
         _col_name := REPLACE(_col_name, '.ignore_case', '');
     ELSE
         _ignore_case := FALSE;
@@ -55,7 +55,7 @@ BEGIN
     -- Get the relevant rule
     SELECT * INTO _rec
     FROM ce_warehouse.s_text_rules
-    WHERE text_or_name = _text_or_name
+    WHERE rule_type = _rule
     AND column_name IN (_col_name, 'DEFAULT')
     ORDER BY
       CASE
@@ -64,7 +64,7 @@ BEGIN
       END
     LIMIT 1;
     IF NOT FOUND THEN
-        RAISE EXCEPTION 'No validation rule found for text_or_name = % and column_name = %', _text_or_name, _col_name;
+        RAISE EXCEPTION 'No validation rule found for type % and column_name = %', _rule, _col_name;
     END IF;
 
     -- Check length
@@ -86,13 +86,13 @@ BEGIN
             END IF;
         ELSEIF _ignore_case AND _val !~* _rec.single_char_regex THEN
             RETURN 'Value does not match required format for single character (ignoring case)';
-        ELSEIF val !~ _rec.single_char_regex THEN
+        ELSEIF NOT _ignore_case AND _val !~ _rec.single_char_regex THEN
             RETURN 'Value does not match required format for single character';
         END IF;
     END IF;
 
     -- Check full regex
-    IF LENGTH(_val) > 1 AND _rec.full_regex = 'ANY' THEN
+    IF LENGTH(_val) > 1 AND _rec.full_regex <> 'ANY' THEN
         IF _rec.full_regex = 'PRINTABLE' THEN
             IF _val !~ '^[[:print:]]+$' THEN
                 RETURN 'Value contains unprintable characters';
@@ -103,7 +103,7 @@ BEGIN
             END IF;
         ELSEIF _ignore_case AND _val !~* _rec.full_regex THEN
             RETURN 'Value does not match required format (ignoring case)';
-        ELSEIF val !~ _rec.full_regex THEN
+        ELSEIF NOT _ignore_case AND _val !~ _rec.full_regex THEN
             RETURN 'Value does not match required format';
         END IF;
     END IF;
@@ -119,7 +119,7 @@ BEGIN
     END IF;
 
     -- Unbalanced parentheses
-    IF _rec.allow_unbalanced_parentheses = FALSE AND _val !~ '^(?:[^()]|\([^()]*\))*$' THEN
+    IF _rec.allow_unbalanced_parenthesis = FALSE AND _val !~ '^(?:[^()]|\([^()]*\))*$' THEN
         RETURN 'Value contains unbalanced parentheses';
     END IF;
 

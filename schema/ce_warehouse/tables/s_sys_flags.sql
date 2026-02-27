@@ -4,6 +4,10 @@
  * s_sys_flags.sql
  *
  * System table - assorted system flags.
+ *
+ * NOTE, we don't use the text validation functions in any of the "s_" system tables because they are
+ * potentially used by the validation functions, so we need to have more basic validation rules in place
+ * to avoid circular references.
  ***********************************************************************************************************
  */
 

@@ -4,6 +4,10 @@
  * s_formula_type.sql
  *
  * System table - formula types.
+ *
+ * NOTE, we don't use the text validation functions in any of the "s_" system tables because they are
+ * potentially used by the validation functions, so we need to have more basic validation rules in place
+ * to avoid circular references.
  ***********************************************************************************************************
  */
 
@@ -14,9 +18,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.s_formula_type
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Za-z][A-Za-z0-9 ]*[A-Za-z0-9]$'),
     class TEXT
-        CHECK (ce_warehouse.fx_val_is_text(class) IS NULL),
-    description TEXT
-        CHECK (ce_warehouse.fx_val_is_text(description) IS NULL),
+        CHECK (class ~ '^[A-Za-z][A-Za-z0-9\.]*[A-Za-z0-9]$'),  -- for CSS class names, e.g. in the UI, so allow apostrophes but not full stops or dashes
+    description TEXT,
     ordering INT NOT NULL DEFAULT 0,  -- for ordering in UI
     
     PRIMARY KEY (code)

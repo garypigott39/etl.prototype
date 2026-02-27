@@ -28,7 +28,7 @@ BEGIN
         IF NOT _nulls_allowed THEN
             RETURN 'Supplied GEO/primary key cannot be null';
         END IF;
-    ELSEIF EXISTS(SELECT 1 FROM ce_warehouse.c_geo WHERE pk_geo = _pk AND code LIKE _like) THEN
+    ELSEIF NOT EXISTS(SELECT 1 FROM ce_warehouse.c_geo WHERE pk_geo = _pk AND code LIKE _like) THEN
         RETURN FORMAT('Supplied GEO/COM primary key is invalid for %s code', _type);
     END IF;
 

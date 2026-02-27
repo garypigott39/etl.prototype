@@ -3,7 +3,7 @@
  * @file
  * fx_val_is_name.sql
  *
- * Validation function - check if supplied string meets "simple name" rules.
+ * Validation function -  - simple wrapper around fx_val_is_text to validate text "name" fields.
  ***********************************************************************************************************
  */
 
@@ -24,4 +24,4 @@ END
 $$;
 
 COMMENT ON FUNCTION ce_warehouse.fx_val_is_name
-    IS 'Validation function - check if supplied string meets "simple name" rules';
+    IS 'Validation function - simple wrapper around fx_val_is_text to validate text "name" fields.';

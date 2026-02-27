@@ -126,6 +126,18 @@ VALUES
     ),
     (
      'T',
+     'c_series.description',
+     'SERIES description, allow for longer descriptions than the default text rule',
+     FALSE,
+     FALSE,
+     FALSE,
+     NULL,
+     'ANY',
+     2,
+     1000
+    ),
+    (
+     'T',
      'internal_notes',
      'Internal notes',
      FALSE,

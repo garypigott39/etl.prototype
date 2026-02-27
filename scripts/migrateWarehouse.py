@@ -883,11 +883,13 @@ def migrate_xvalue(src_cur, tgt_cur):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def update_xseries_meta(src_cur, tgt_cur):
+def post_migration_steps(src_cur, tgt_cur):
     """
     Post-migration updates to x-series metadata based on new values.
     """
-    print("\n### POST-MIGRATION: Updating xseries metadata...")
+    print("\n### POST-MIGRATION: Updating x-series-meta, & fixing any SEQuences")
+
+    tgt_cur.execute("""CALL ce_warehouse.px_ut_fix_seq();""")
 
     tgt_cur.execute("""
         INSERT INTO ce_warehouse.x_series_meta (

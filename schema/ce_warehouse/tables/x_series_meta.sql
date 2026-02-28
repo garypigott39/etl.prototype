@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_series_meta
 
     FOREIGN KEY (fk_pk_series, sid1)
         REFERENCES ce_warehouse.c_series (pk_series, sid1)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of series with metadata, see app logic!!
 

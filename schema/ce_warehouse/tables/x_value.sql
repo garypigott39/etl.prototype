@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
 
     fk_pk_series INT NOT NULL
         REFERENCES ce_warehouse.c_series (pk_series)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of series with values, see app logic!!
     pdi INT NOT NULL
@@ -32,18 +32,19 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x_value
         CHECK (itype IN (1, 2)),  -- enforce valid types: 1=actual, 2=forecast
     isource SMALLINT NOT NULL
         REFERENCES ce_warehouse.l_source (pk_source)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
     value NUMERIC NOT NULL,
     fk_pk_tip INT
         REFERENCES ce_warehouse.x_tooltip (pk_tip)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,  -- optional tooltip reference
 
     is_calculated BOOL NOT NULL DEFAULT FALSE,  -- flag to indicate if the value was calculated
 
+    error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),

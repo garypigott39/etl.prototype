@@ -1,18 +1,18 @@
 /*
  ***********************************************************************************************************
  * @file
- * tg_c_ind_parent_audit.sql
+ * tg_c_ind_parent__after_99__audit.sql
  *
  * Trigger to audit changes to the c_ind_parent table.
  ***********************************************************************************************************
  */
 
--- DROP TRIGGER IF EXISTS tg_c_ind_parent_audit ON ce_warehouse.c_ind_parent;
+-- DROP TRIGGER IF EXISTS tg_c_ind_parent__after_99__audit ON ce_warehouse.c_ind_parent;
 
-CREATE TRIGGER tg_c_ind_parent_audit
+CREATE TRIGGER tg_c_ind_parent__after_99__audit
     AFTER INSERT OR UPDATE OR DELETE ON ce_warehouse.c_ind_parent
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg_generic_audit('idx');
+        EXECUTE FUNCTION ce_warehouse.fx_tg_generic__audit('idx');
 
-COMMENT ON TRIGGER tg_c_ind_parent_audit ON ce_warehouse.c_ind_parent
+COMMENT ON TRIGGER tg_c_ind_parent__after_99__audit ON ce_warehouse.c_ind_parent
     IS 'Trigger to audit changes to the c_ind_parent table';

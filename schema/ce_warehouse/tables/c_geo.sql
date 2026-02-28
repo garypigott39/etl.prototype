@@ -17,52 +17,40 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
         CHECK (code = 'INTERNAL' OR code ~ '^[GC]\.[A-Z][A-Z0-9_]*[A-Z0-9]$'),
 
     short_code TEXT NOT NULL GENERATED ALWAYS
-        AS (SUBSTRING(code, 3)) STORED,
+        AS (
+            CASE
+                WHEN code = 'INTERNAL' THEN 'n/a'
+                ELSE SUBSTRING(code, 3)
+            END
+        ) STORED,
     geo_type TEXT NOT NULL GENERATED ALWAYS
         AS (
             CASE
                 WHEN code LIKE 'G.%' THEN 'Geography'
                 WHEN code LIKE 'C.%' THEN 'Commodity'
-                WHEN code = 'INTERNAL' THEN 'Internal'
+                WHEN code = 'INTERNAL' THEN 'Internal Use'
+                ELSE NULL  -- this should never happen due to the CHECK constraint on code
             END) STORED,
 
     -- Fields common to both GEO & COM
-    name TEXT
-        CHECK (
-            (
-                code <> 'INTERNAL'
-                AND ce_warehouse.fx_val_is_name(name, 'c_geo.name', FALSE) IS NULL
-            )
-            OR (code = 'INTERNAL' AND name IS NULL)
-    ),
-    short_name TEXT
-        CHECK (
-            (
-                code <> 'INTERNAL'
-                AND ce_warehouse.fx_val_is_name(short_name, 'c_geo.short_name', FALSE) IS NULL
-            )
-            OR (code = 'INTERNAL' AND short_name IS NULL)
-    ),
-    tla TEXT
-        CHECK (
-            (
-                code <> 'INTERNAL'
-                AND ce_warehouse.fx_val_is_name(tla, 'c_geo.tla', FALSE) IS NULL
-            )
-            OR (code = 'INTERNAL' AND tla IS NULL)
-    ),
+    name TEXT NOT NULL
+        CHECK (ce_warehouse.fx_val_is_name(name, 'c_geo.name', FALSE) IS NULL),
+    short_name TEXT NOT NULL
+        CHECK (ce_warehouse.fx_val_is_name(short_name, 'c_geo.short_name', FALSE) IS NULL),
+    tla TEXT NOT NULL
+        CHECK (ce_warehouse.fx_val_is_name(tla, 'c_geo.tla', FALSE) IS NULL),
 
     ordering INT NOT NULL DEFAULT 0,
 
     -- COM specific fields (will be NULL for GEO)
-    commodity_type SMALLINT
+    lk_commodity_type SMALLINT
         REFERENCES ce_warehouse.l_com_type(pk_com_type)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-            (code LIKE 'C.%' AND commodity_type IS NOT NULL)
-            OR (code NOT LIKE 'C.%' AND commodity_type IS NULL)
+                (code LIKE 'C.%' AND lk_commodity_type IS NOT NULL)
+                OR (code NOT LIKE 'C.%' AND lk_commodity_type IS NULL)
         ),
 
     -- GEO specific fields (will be NULL for COM)
@@ -94,40 +82,40 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
             (code NOT LIKE 'G.%' AND long IS NULL)
             OR (code LIKE 'G.%' AND (long IS NULL OR long BETWEEN -180 AND 180))
     ),
-    central_bank SMALLINT
+    lk_central_bank SMALLINT
         REFERENCES ce_warehouse.l_central_bank(pk_central_bank)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-            (code NOT LIKE 'G.%' AND central_bank IS NULL)
+            (code NOT LIKE 'G.%' AND lk_central_bank IS NULL)
             OR code LIKE 'G.%'
     ),
-    stock_market SMALLINT
+    lk_stock_market SMALLINT
         REFERENCES ce_warehouse.l_stock_market(pk_stock_market)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-            (code NOT LIKE 'G.%' AND stock_market IS NULL)
+            (code NOT LIKE 'G.%' AND lk_stock_market IS NULL)
             OR code LIKE 'G.%'
     ),
-    political_alignment SMALLINT
+    lk_political_alignment SMALLINT
         REFERENCES ce_warehouse.l_political_alignment(pk_political_alignment)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-            (code NOT LIKE 'G.%' AND political_alignment IS NULL)
+            (code NOT LIKE 'G.%' AND lk_political_alignment IS NULL)
             OR code LIKE 'G.%'
     ),
-    local_currency_unit TEXT
-        REFERENCES ce_warehouse.l_currency_unit(code)
-            ON UPDATE CASCADE
+    lk_currency_unit SMALLINT
+        REFERENCES ce_warehouse.l_currency_unit(pk_currency_unit)
+            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-            (code NOT LIKE 'G.%' AND local_currency_unit IS NULL)
+            (code NOT LIKE 'G.%' AND lk_currency_unit IS NULL)
             OR code LIKE 'G.%'
     ),
     flag TEXT
@@ -135,9 +123,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
                 (code NOT LIKE 'G.%' AND flag IS NULL)
                 OR (code LIKE 'G.%' AND ce_warehouse.fx_val_is_flag(flag) IS NULL)
     ),
-    category SMALLINT
+    lk_geo_category SMALLINT
         REFERENCES ce_warehouse.l_geo_category(pk_geo_category)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
@@ -149,7 +137,10 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
     internal_notes TEXT
         CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
 
-    error TEXT,
+    status TEXT NOT NULL DEFAULT 'active'
+        CHECK (status IN ('active', 'inactive', 'deleted')),
+
+    error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_geo),
@@ -178,3 +169,42 @@ CREATE INDEX IF NOT EXISTS c_geo__category__idx
 
 COMMENT ON TABLE ce_warehouse.c_geo
     IS 'Control table - geography details, used for validation & extra detail';
+
+/**
+ * Pre-populate with System Use values.
+ */
+INSERT INTO ce_warehouse.c_geo (pk_geo, code, name, short_name, tla, internal_notes)
+VALUES
+    (-1, 'INTERNAL', 'For internal use series etc', 'n/a', 'n/a', 'Allows declaration of internal use series');
+
+/*
+ ***********************************************************************************************************
+ * Block any updates to system records
+ ***********************************************************************************************************
+ */
+
+-- DROP TRIGGER IF EXISTS tg_c_geo__before_01__block ON ce_warehouse.c_geo;
+
+CREATE TRIGGER tg_c_geo__before_01__block
+    BEFORE UPDATE OR DELETE ON ce_warehouse.c_geo
+    FOR EACH ROW
+        EXECUTE CREATE FUNCTION ce_warehouse.fx_tg_block_updates___internal('pk_geo');
+
+COMMENT ON TRIGGER tg_c_geo__before_01__block ON ce_warehouse.c_geo
+    IS 'Trigger to block changes to system records on c_geo table';
+
+/*
+ ***********************************************************************************************************
+ * Soft "DELETE"
+ ***********************************************************************************************************
+ */
+
+-- DROP TRIGGER IF EXISTS tg_c_geo__before_02__soft_delete ON ce_warehouse.c_geo;
+
+CREATE TRIGGER tg_c_geo__before_02__soft_delete
+    BEFORE UPDATE OR DELETE ON ce_warehouse.c_geo
+    FOR EACH ROW
+        EXECUTE CREATE FUNCTION ce_warehouse.fx_tg_c_geo___soft_delete();
+
+COMMENT ON TRIGGER tg_c_geo__before_02__soft_delete ON ce_warehouse.c_geo
+    IS 'Trigger to instigate soft delete on c_geo table';

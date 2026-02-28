@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_const
     internal_notes TEXT
         CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
 
-    error TEXT,
+    error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_const),

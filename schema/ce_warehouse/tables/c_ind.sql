@@ -39,19 +39,19 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
         CHECK (ce_warehouse.fx_val_is_name(name3_lower, 'c_ind.name3_lower.ignore_case') IS NULL),
     name4_lower TEXT
         CHECK (ce_warehouse.fx_val_is_name(name4_lower, 'c_ind.name4_lower.ignore_case') IS NULL),
-    category_broad SMALLINT
-        REFERENCES ce_warehouse.l_ind_broad_category (pk_ind_broad_category)
-            ON UPDATE CASCADE
+    lk_ind_category_broad SMALLINT
+        REFERENCES ce_warehouse.l_ind_broad_category (pk_ind_category_broad)
+            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
-    category_narrow SMALLINT
-        REFERENCES ce_warehouse.l_ind_narrow_category (pk_ind_narrow_category)
-            ON UPDATE CASCADE
+    lk_ind_category_narrow SMALLINT
+        REFERENCES ce_warehouse.l_ind_narrow_category (pk_ind_category_narrow)
+            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
-    data_transformation TEXT NOT NULL
-        REFERENCES ce_warehouse.l_data_transformation (code)
-            ON UPDATE CASCADE
+    lk_data_transformation TEXT NOT NULL
+        REFERENCES ce_warehouse.l_data_transformation (pk_data_transformation)
+            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
     keyindicator BOOL NOT NULL DEFAULT FALSE,
@@ -61,7 +61,10 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
     internal_notes TEXT
         CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
 
-    error TEXT,
+    status TEXT NOT NULL DEFAULT 'active'
+        CHECK (status IN ('active', 'inactive', 'deleted')),
+
+    error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_ind),
@@ -70,13 +73,45 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
 
 -- It's recommended to have INDICES on foreign keys for performance!!
 CREATE INDEX IF NOT EXISTS c_ind__category_broad__idx
-    ON ce_warehouse.c_ind (category_broad);
+    ON ce_warehouse.c_ind (lk_ind_category_broad);
 
 CREATE INDEX IF NOT EXISTS c_ind__category_narrow__idx
-    ON ce_warehouse.c_ind (category_narrow);
+    ON ce_warehouse.c_ind (lk_ind_category_narrow);
 
 CREATE INDEX IF NOT EXISTS c_ind__data_transformation__idx
-    ON ce_warehouse.c_ind (data_transformation);
+    ON ce_warehouse.c_ind (lk_data_transformation);
 
 COMMENT ON TABLE ce_warehouse.c_ind
     IS 'Control table - indicator details, used for validation & lookup';
+
+/*
+ ***********************************************************************************************************
+ * Block any updates to system records, there are none currently!!
+ ***********************************************************************************************************
+ */
+
+-- DROP TRIGGER IF EXISTS tg_c_ind__before_01__block ON ce_warehouse.c_ind;
+
+CREATE TRIGGER tg_c_ind__before_01__block
+    BEFORE UPDATE OR DELETE ON ce_warehouse.c_ind
+    FOR EACH ROW
+        EXECUTE CREATE FUNCTION ce_warehouse.fx_tg_block_updates___internal('pk_ind');
+
+COMMENT ON TRIGGER tg_c_ind__before_01__block ON ce_warehouse.c_ind
+    IS 'Trigger to block changes to system records on c_ind table';
+
+/*
+ ***********************************************************************************************************
+ * Soft "DELETE"
+ ***********************************************************************************************************
+ */
+
+-- DROP TRIGGER IF EXISTS tg_c_ind__before_02__soft_delete ON ce_warehouse.c_ind;
+
+CREATE TRIGGER tg_c_ind__before_02__soft_delete
+    BEFORE UPDATE OR DELETE ON ce_warehouse.c_ind
+    FOR EACH ROW
+        EXECUTE CREATE FUNCTION ce_warehouse.fx_tg_c_ind___soft_delete();
+
+COMMENT ON TRIGGER tg_c_ind__before_02__soft_delete ON ce_warehouse.c_ind
+    IS 'Trigger to instigate soft delete on c_ind table';

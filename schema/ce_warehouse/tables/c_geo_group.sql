@@ -16,29 +16,32 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo_group
 
     fk_pk_geo INT NOT NULL
         REFERENCES ce_warehouse.c_geo (pk_geo)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED
-        CHECK(ce_warehouse.fx_val_is_geo_or_com(fk_pk_geo, 'GEO') IS NULL),
+        CHECK(
+            fk_pk_geo > 0 AND
+            ce_warehouse.fx_val_is_geo_or_com(fk_pk_geo, 'GEO') IS NULL
+    ),
 
     -- GEO Group ID
-    geo_group SMALLINT NOT NULL
+    lk_geo_group SMALLINT NOT NULL
         REFERENCES ce_warehouse.l_geo_group (pk_geo_group)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 
-    error TEXT,
+    error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),
-    UNIQUE (fk_pk_geo, geo_group)
+    UNIQUE (fk_pk_geo, lk_geo_group)
 );
 
 -- It's recommended to have INDICES on foreign keys for performance!!
 -- unless we already have them on the referenced table
 CREATE INDEX IF NOT EXISTS c_geo_group__geo_group__idx
-    ON ce_warehouse.c_geo_group (geo_group);
+    ON ce_warehouse.c_geo_group (lk_geo_group);
 
 COMMENT ON TABLE ce_warehouse.c_geo_group
     IS 'Control table - GEO groups';

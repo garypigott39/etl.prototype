@@ -16,27 +16,32 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind_parent
 
     fk_pk_ind INT NOT NULL
         REFERENCES ce_warehouse.c_ind (pk_ind)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 
-    icode TEXT NOT NULL
-        REFERENCES ce_warehouse.c_ind (code)
-            ON UPDATE CASCADE
+    fk_pk_ind__parent INT NOT NULL
+        REFERENCES ce_warehouse.c_ind (pk_ind)
+            ON UPDATE RESTRICT
             ON DELETE CASCADE
-            DEFERRABLE INITIALLY DEFERRED,
+            DEFERRABLE INITIALLY DEFERRED
+        CHECK (
+                fk_pk_ind > 0
+                AND fk_pk_ind__parent > 0
+                AND fk_pk_ind_parent <> fk_pk_ind  -- prevent self-reference
+        ),
 
-    error TEXT,
+    error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),
-    UNIQUE (fk_pk_ind, icode)
+    UNIQUE (fk_pk_ind, fk_pk_ind__parent)
 );
 
 -- It's recommended to have INDICES on foreign keys for performance!!
 -- unless we already have them on the referenced table
-CREATE INDEX IF NOT EXISTS c_ind__icode__idx
-    ON ce_warehouse.c_ind_parent (icode);
+CREATE INDEX IF NOT EXISTS c_ind__parent__idx
+    ON ce_warehouse.c_ind_parent (fk_pk_ind__parent);
 
 COMMENT ON TABLE ce_warehouse.c_ind_parent
     IS 'Control table - IND parents';

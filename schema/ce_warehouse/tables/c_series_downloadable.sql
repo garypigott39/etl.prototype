@@ -15,9 +15,10 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_downloadable
 
     fk_pk_series INT NOT NULL
         REFERENCES ce_warehouse.c_series (pk_series)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE CASCADE
-            DEFERRABLE INITIALLY DEFERRED,
+            DEFERRABLE INITIALLY DEFERRED
+        CHECK (fk_pk_series > 0),
     ifreq SMALLINT NOT NULL
         CHECK (ifreq IN (1, 2, 3, 4, 5)),
     itype SMALLINT NOT NULL,
@@ -25,11 +26,20 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_downloadable
 
     -- User maintained fields
     downloadable TEXT NOT NULL DEFAULT 'ess_plugin'
-        CHECK (downloadable IN ('all', 'api', 'adv_plugin', 'ess_plugin', 'internal', 'none', 'powerbi')),  -- control which series are downloadable and via which channels
+        CHECK (
+                downloadable IN (
+                    'all',
+                    'api',
+                    'adv_plugin',
+                    'ess_plugin',
+                    'internal',
+                    'none',
+                    'powerbi')
+    ),
     forecast_only_lifespan INT,  -- If NULL then will take the system default
     internal_notes TEXT,  -- Unvalidated!
 
-    error TEXT,
+    error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),

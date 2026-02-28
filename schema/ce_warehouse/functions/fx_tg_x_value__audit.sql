@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_tg_x_value_audit.sql
+ * fx_tg_x_value__audit.sql
  *
- * Trigger function - log changes in x_value to custom audit table.
+ * Trigger function - log changes in x_value to custom audit table (AFTER update).
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg_x_value_audit;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg_x_value__audit;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg_x_value_audit(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg_x_value__audit(
 )
     RETURNS TRIGGER
     LANGUAGE plpgsql
@@ -119,5 +119,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_tg_x_value_audit
-    IS 'Trigger function - log changes in x_value to custom audit table';
+COMMENT ON FUNCTION ce_warehouse.fx_tg_x_value__audit
+    IS 'Trigger function - log changes in x_value to custom audit table (AFTER update)';

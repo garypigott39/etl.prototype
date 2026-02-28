@@ -17,26 +17,27 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_data_source
         REFERENCES ce_warehouse.c_series (pk_series)
             ON UPDATE CASCADE
             ON DELETE CASCADE
-            DEFERRABLE INITIALLY DEFERRED,
+            DEFERRABLE INITIALLY DEFERRED
+        CHECK (fk_pk_series > 0),
 
     -- Data source ID
-    data_source SMALLINT NOT NULL
+    lk_data_source SMALLINT NOT NULL
         REFERENCES ce_warehouse.l_data_source (pk_data_source)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 
-    error TEXT,
+    error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),
-    UNIQUE (fk_pk_series, data_source)
+    UNIQUE (fk_pk_series, lk_data_source)
 );
 
 -- It's recommended to have INDICES on foreign keys for performance!!
 -- unless we already have them on the referenced table
 CREATE INDEX IF NOT EXISTS c_series_data_source__data_source__idx
-    ON ce_warehouse.c_series_data_source (data_source);
+    ON ce_warehouse.c_series_data_source (lk_data_source);
 
 COMMENT ON TABLE ce_warehouse.c_series_data_source
     IS 'Control table - series data sources';

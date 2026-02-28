@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u_value
     is_api BOOL NOT NULL,  -- flag to indicate if the value is from an API (set via manual loader)
 
     file_name TEXT,
-    error TEXT,
+    error TEXT,  -- system generated
 
     PRIMARY KEY (idx)
 );

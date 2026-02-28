@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u_tooltip
     ut_tooltip TEXT,
 
     file_name TEXT, -- File it came from, if applicable
-    error TEXT,
+    error TEXT,  -- system generated
 
     PRIMARY KEY (idx)
 );

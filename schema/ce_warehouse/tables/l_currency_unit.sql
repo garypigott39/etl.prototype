@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_currency_unit
         CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
 
     PRIMARY KEY (pk_currency_unit),
-    UNIQUE KEY (code)
+    UNIQUE (code)
 );
 
 COMMENT ON TABLE ce_warehouse.l_currency_unit

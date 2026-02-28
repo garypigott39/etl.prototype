@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind_parent
         CHECK (
                 fk_pk_ind > 0
                 AND fk_pk_ind__parent > 0
-                AND fk_pk_ind_parent <> fk_pk_ind  -- prevent self-reference
+                AND fk_pk_ind__parent <> fk_pk_ind  -- prevent self-reference
         ),
 
     error TEXT,  -- system generated

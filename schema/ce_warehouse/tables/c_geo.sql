@@ -129,8 +129,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-                (code NOT LIKE 'G.%' AND category IS NULL)
-                OR (code LIKE 'G.%' AND category IS NOT NULL)
+                (code NOT LIKE 'G.%' AND lk_geo_category IS NULL)
+                OR (code LIKE 'G.%' AND lk_geo_category IS NOT NULL)
     ),
 
     -- Standard fields
@@ -150,22 +150,22 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
 
 -- It's recommended to have INDICES on foreign keys for performance!!
 CREATE INDEX IF NOT EXISTS c_geo__commodity_type__idx
-    ON ce_warehouse.c_geo (commodity_type);
+    ON ce_warehouse.c_geo (lk_commodity_type);
 
 CREATE INDEX IF NOT EXISTS c_geo__central_bank__idx
-    ON ce_warehouse.c_geo (central_bank);
+    ON ce_warehouse.c_geo (lk_central_bank);
 
 CREATE INDEX IF NOT EXISTS c_geo__stock_market__idx
-    ON ce_warehouse.c_geo (stock_market);
+    ON ce_warehouse.c_geo (lk_stock_market);
 
 CREATE INDEX IF NOT EXISTS c_geo__political_alignment__idx
-    ON ce_warehouse.c_geo (political_alignment);
+    ON ce_warehouse.c_geo (lk_political_alignment);
 
 CREATE INDEX IF NOT EXISTS c_geo__local_currency_unit__idx
-    ON ce_warehouse.c_geo (local_currency_unit);
+    ON ce_warehouse.c_geo (lk_currency_unit);
 
 CREATE INDEX IF NOT EXISTS c_geo__category__idx
-    ON ce_warehouse.c_geo (category);
+    ON ce_warehouse.c_geo (lk_geo_category);
 
 COMMENT ON TABLE ce_warehouse.c_geo
     IS 'Control table - geography details, used for validation & extra detail';
@@ -175,7 +175,7 @@ COMMENT ON TABLE ce_warehouse.c_geo
  */
 INSERT INTO ce_warehouse.c_geo (pk_geo, code, name, short_name, tla, internal_notes)
 VALUES
-    (-1, 'INTERNAL', 'For internal use series etc', 'n/a', 'n/a', 'Allows declaration of internal use series');
+    (-1, 'INTERNAL', 'For internal use series etc', 'N/A', 'N/A', 'Allows declaration of internal use series');
 
 /*
  ***********************************************************************************************************
@@ -188,7 +188,7 @@ VALUES
 CREATE TRIGGER tg_c_geo__before_01__block
     BEFORE UPDATE OR DELETE ON ce_warehouse.c_geo
     FOR EACH ROW
-        EXECUTE CREATE FUNCTION ce_warehouse.fx_tg_block_updates___internal('pk_geo');
+        EXECUTE FUNCTION ce_warehouse.fx_tg_block_updates__internal('pk_geo');
 
 COMMENT ON TRIGGER tg_c_geo__before_01__block ON ce_warehouse.c_geo
     IS 'Trigger to block changes to system records on c_geo table';
@@ -204,7 +204,7 @@ COMMENT ON TRIGGER tg_c_geo__before_01__block ON ce_warehouse.c_geo
 CREATE TRIGGER tg_c_geo__before_02__soft_delete
     BEFORE UPDATE OR DELETE ON ce_warehouse.c_geo
     FOR EACH ROW
-        EXECUTE CREATE FUNCTION ce_warehouse.fx_tg_c_geo___soft_delete();
+        EXECUTE FUNCTION ce_warehouse.fx_tg_c_geo__soft_delete();
 
 COMMENT ON TRIGGER tg_c_geo__before_02__soft_delete ON ce_warehouse.c_geo
     IS 'Trigger to instigate soft delete on c_geo table';

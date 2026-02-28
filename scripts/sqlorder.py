@@ -243,6 +243,9 @@ class SqlOrder:
 
                 if not progress_made:
                     unresolved = [str(f.relative_to(self.base_path)) for f in next_round]
+                    # Still want the list "so far" to help with debugging
+                    self.print_sql()
+
                     raise RuntimeError(
                         "\nERROR: Invalid SQL or Circular dependency detected."
                         f"\nRemaining files: {unresolved}"

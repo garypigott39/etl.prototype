@@ -115,6 +115,7 @@ BEGIN
 
     END IF;
 
+    -- No need to return a record since this is an AFTER trigger
     RETURN NULL;
 END
 $$;

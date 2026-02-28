@@ -40,16 +40,16 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
     name4_lower TEXT
         CHECK (ce_warehouse.fx_val_is_name(name4_lower, 'c_ind.name4_lower.ignore_case') IS NULL),
     lk_ind_category_broad SMALLINT
-        REFERENCES ce_warehouse.l_ind_broad_category (pk_ind_category_broad)
+        REFERENCES ce_warehouse.l_ind_category_broad (pk_ind_category_broad)
             ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
     lk_ind_category_narrow SMALLINT
-        REFERENCES ce_warehouse.l_ind_narrow_category (pk_ind_category_narrow)
+        REFERENCES ce_warehouse.l_ind_category_narrow (pk_ind_category_narrow)
             ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
-    lk_data_transformation TEXT NOT NULL
+    lk_data_transformation SMALLINT NOT NULL
         REFERENCES ce_warehouse.l_data_transformation (pk_data_transformation)
             ON UPDATE RESTRICT
             ON DELETE RESTRICT
@@ -95,7 +95,7 @@ COMMENT ON TABLE ce_warehouse.c_ind
 CREATE TRIGGER tg_c_ind__before_01__block
     BEFORE UPDATE OR DELETE ON ce_warehouse.c_ind
     FOR EACH ROW
-        EXECUTE CREATE FUNCTION ce_warehouse.fx_tg_block_updates___internal('pk_ind');
+        EXECUTE FUNCTION ce_warehouse.fx_tg_block_updates__internal('pk_ind');
 
 COMMENT ON TRIGGER tg_c_ind__before_01__block ON ce_warehouse.c_ind
     IS 'Trigger to block changes to system records on c_ind table';
@@ -111,7 +111,7 @@ COMMENT ON TRIGGER tg_c_ind__before_01__block ON ce_warehouse.c_ind
 CREATE TRIGGER tg_c_ind__before_02__soft_delete
     BEFORE UPDATE OR DELETE ON ce_warehouse.c_ind
     FOR EACH ROW
-        EXECUTE CREATE FUNCTION ce_warehouse.fx_tg_c_ind___soft_delete();
+        EXECUTE FUNCTION ce_warehouse.fx_tg_c_ind__soft_delete();
 
 COMMENT ON TRIGGER tg_c_ind__before_02__soft_delete ON ce_warehouse.c_ind
     IS 'Trigger to instigate soft delete on c_ind table';

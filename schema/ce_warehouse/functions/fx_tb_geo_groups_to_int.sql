@@ -10,7 +10,7 @@
 -- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb_geo_groups_to_int;
 
 CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb_geo_groups_to_int(
-    _groups TEXT[],
+    _groups TEXT[]
 )
     RETURNS TABLE (
         lk_geo_group SMALLINT

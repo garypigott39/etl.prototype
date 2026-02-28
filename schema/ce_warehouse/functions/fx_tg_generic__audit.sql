@@ -47,6 +47,8 @@ BEGIN
 
     INSERT INTO ce_warehouse.a_audit (table_name, table_pk, data, audit_type)
         VALUES (TG_TABLE_NAME, _pk::TEXT, _diff, TG_OP);
+
+    RETURN NULL;
 END
 $$;
 

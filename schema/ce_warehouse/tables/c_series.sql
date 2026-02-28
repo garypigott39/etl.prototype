@@ -87,16 +87,9 @@ CREATE INDEX IF NOT EXISTS c_series__units__idx
 COMMENT ON TABLE ce_warehouse.c_series
     IS 'Control table - series definition, lookup/validation';
 
-/**
- * Pre-populate with System Use values.
- */
-INSERT INTO ce_warehouse.c_series (pk_series, gcode, icode, name, internal_notes)
-VALUES
-    (-1, 'INTERNAL', 'DELETED', 'For internal use', 'Internal use only!');
-
 /*
  ***********************************************************************************************************
- * Block any updates to system records
+ * Block any updates to system records, there are none currently!!
  ***********************************************************************************************************
  */
 
@@ -105,7 +98,7 @@ VALUES
 CREATE TRIGGER tg_c_series__before_01__block
     BEFORE UPDATE OR DELETE ON ce_warehouse.c_series
     FOR EACH ROW
-        EXECUTE CREATE FUNCTION ce_warehouse.fx_tg_block_updates___internal('pk_ind');
+        EXECUTE FUNCTION ce_warehouse.fx_tg_block_updates__internal('pk_ind');
 
 COMMENT ON TRIGGER tg_c_series__before_01__block ON ce_warehouse.c_series
     IS 'Trigger to block changes to system records on c_series table';
@@ -121,7 +114,7 @@ COMMENT ON TRIGGER tg_c_series__before_01__block ON ce_warehouse.c_series
 CREATE TRIGGER tg_c_series__before_02__soft_delete
     BEFORE DELETE ON ce_warehouse.c_series
     FOR EACH ROW
-        EXECUTE CREATE FUNCTION ce_warehouse.fx_tg_c_series___soft_delete();
+        EXECUTE FUNCTION ce_warehouse.fx_tg_c_series__soft_delete();
 
 COMMENT ON TRIGGER tg_c_series__before_02__soft_delete ON ce_warehouse.c_series
     IS 'Trigger to instigate soft delete on c_series table';

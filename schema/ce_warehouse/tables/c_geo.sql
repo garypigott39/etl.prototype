@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
                 WHEN code LIKE 'C.%' THEN 'Commodity'
                 WHEN code = 'INTERNAL' THEN 'Internal Use'
                 ELSE NULL  -- this should never happen due to the CHECK constraint on code
-            END) STORED,
+            END
+        ) STORED,
 
     -- Fields common to both GEO & COM
     name TEXT NOT NULL
@@ -134,11 +135,16 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
         ),
 
     -- Standard fields
+    status TEXT NOT NULL DEFAULT 'active'
+        CHECK (
+            status IN ('active', 'inactive', 'deleted')
+            AND (
+                (code = 'INTERNAL' AND status <> 'deleted')  -- INTERNAL record cannot be deleted
+                OR code <> 'INTERNAL'
+            )
+        ),
     internal_notes TEXT
         CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
-
-    status TEXT NOT NULL DEFAULT 'active'
-        CHECK (status IN ('active', 'inactive', 'deleted')),
 
     error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),

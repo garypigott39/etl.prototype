@@ -62,21 +62,21 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
 
     ordering INT NOT NULL DEFAULT 0,
 
-    internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
-
     status TEXT NOT NULL DEFAULT 'active'
         CHECK (
             status IN ('active', 'inactive', 'deleted')
             AND (
                 status = 'deleted'
                 OR (
-                    status = 'active'
+                    status <> 'deleted'
                     AND ce_warehouse.fx_val_is_active(gcode, 'geo') IS NULL
                     AND ce_warehouse.fx_val_is_active(icode, 'ind') IS NULL
                 )
             )
         ),
+
+    internal_notes TEXT
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
 
     error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -128,3 +128,22 @@ CREATE TRIGGER tg_c_series__before_02__soft_delete
 
 COMMENT ON TRIGGER tg_c_series__before_02__soft_delete ON ce_warehouse.c_series
     IS 'Trigger to instigate soft delete on c_series table';
+
+/*
+ ***********************************************************************************************************
+ * Allow INTERNAL series to link to non-existent indicators.
+ * Must be AFTER trigger for "DEFERRABLE" gubbins.
+ ***********************************************************************************************************
+ */
+
+-- DROP TRIGGER IF EXISTS tg_c_series__after_03__check ON ce_warehouse.c_series;
+
+CREATE TRIGGER tg_c_series__after_03__check
+    AFTER INSERT OR UPDATE OF icode, gcode
+    ON ce_warehouse.c_series
+    DEFERRABLE  INITIALLY DEFERRED
+    FOR EACH ROW
+        EXECUTE FUNCTION ce_warehouse.fx_tg_c_series__check_icode();
+
+COMMENT ON TRIGGER tg_c_series__after_03__soft_delete ON ce_warehouse.c_series
+    IS 'Trigger to instigate IND check on c_series table';

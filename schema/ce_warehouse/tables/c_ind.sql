@@ -58,11 +58,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind
     proprietary_data BOOL NOT NULL DEFAULT FALSE,
     ordering INT NOT NULL DEFAULT 0,
 
-    internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
-
     status TEXT NOT NULL DEFAULT 'active'
         CHECK (status IN ('active', 'inactive', 'deleted')),
+
+    internal_notes TEXT
+        CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
 
     error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),

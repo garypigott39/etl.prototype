@@ -30,21 +30,21 @@ BEGIN
         END IF;
     ELSEIF _type = 'geo' THEN
         _status := (SELECT status FROM ce_warehouse.c_geo WHERE code = _code LIMIT 1);
-        IF status IS NULL THEN
+        IF _status IS NULL THEN
             RETURN FORMAT('Supplied GEO code %s is invalid', _code);
         ELSEIF _status = 'deleted' THEN
             RETURN FORMAT('Supplied GEO code %s is marked as deleted', _code);
         END IF;
     ELSEIF _type = 'ind' THEN
         _status := (SELECT status FROM ce_warehouse.c_ind WHERE code = _code LIMIT 1);
-        IF status IS NULL THEN
+        IF _status IS NULL THEN
             RETURN FORMAT('Supplied IND code %s is invalid', _code);
         ELSEIF _status = 'deleted' THEN
             RETURN FORMAT('Supplied IND code %s is marked as deleted', _code);
         END IF;
-    ELSEIF _type = 'ind' THEN
+    ELSEIF _type = 'series' THEN
         _status := (SELECT status FROM ce_warehouse.c_series WHERE series_id = _code LIMIT 1);
-        IF status IS NULL THEN
+        IF _status IS NULL THEN
             RETURN FORMAT('Supplied SERIES ID %s is invalid', _code);
         ELSEIF _status = 'deleted' THEN
             RETURN FORMAT('Supplied SERIES ID %s is marked as deleted', _code);

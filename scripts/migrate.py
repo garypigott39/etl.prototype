@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-migrateWarehouse.py
+migrate.py
 
 This is not suitable for production use, 1-off script to populate local ce_warehouse from old
 "testdb".
@@ -12,15 +12,19 @@ import io
 import os
 import platform
 import psycopg2
+import sys
 
-SOURCE_CONN = {
+from typing import Any
+
+# Connection details - adjust as needed, or better yet, pull from env vars or config file
+SOURCE_CONN: dict[str, Any] = {
     "dbname": "testdb",
     "user": "postgres",
     "password": "postgres",
     "host": "localhost",
 }
 
-TARGET_CONN = {
+TARGET_CONN: dict[str, Any] = {
     "dbname": "prototype",
     "user": "postgres",
     "password": "postgres",
@@ -935,7 +939,7 @@ def post_migration_steps(src_cur, tgt_cur):
 # -------------------------------------------------------
 
 
-def main():
+def main(commit_on_fail: bool = False):
     src_conn = psycopg2.connect(**SOURCE_CONN)
     tgt_conn = psycopg2.connect(**TARGET_CONN)
 
@@ -946,19 +950,43 @@ def main():
 
     try:
         setup_and_check(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
 
         migrate_geo(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+
         migrate_geo_group(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+
         migrate_ind(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+
         migrate_ind_parent(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+
         migrate_series(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+
         migrate_series_downloadable(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+
         migrate_series_data_source(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+
         migrate_const(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+
         migrate_calc(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+
         migrate_xtooltip(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+
         migrate_xvalue(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+
         migrate_avalue(src_cur, tgt_cur)
+        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
 
         post_migration_steps(src_cur, tgt_cur)
 
@@ -978,4 +1006,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 2 or (len(sys.argv) == 2 and sys.argv[1] not in ["--commit"]):
+        print("Usage: py migrate.py [--commit]")
+        sys.exit(1)
+
+    main(commit_on_fail=len(sys.argv) == 2 and "--commit" in sys.argv)

@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
             status IN ('active', 'inactive', 'deleted')
             AND (
                 status = 'deleted'
+                OR gcode = 'INTERNAL'
                 OR (
                     status <> 'deleted'
                     AND ce_warehouse.fx_val_is_active(gcode, 'geo') IS NULL

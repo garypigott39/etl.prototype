@@ -1,16 +1,16 @@
 /*
  ***********************************************************************************************************
  * @file
- * fg_tg_series__check_icode.sql
+ * fx_tg_c_series__check_icode.sql
  *
  * Trigger function - check ICODE/GCODE combination on c_series after change of ICODE/GCODE fields.
  * Allows INTERNAL series to have non-existent indicators.
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fg_tg_series__check_icode;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg_c_series__check_icode;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fg_tg_series__check_icode(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg_c_series__check_icode(
 )
     RETURNS TRIGGER
     LANGUAGE plpgsql
@@ -27,5 +27,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fg_tg_series__check_icode
+COMMENT ON FUNCTION ce_warehouse.fx_tg_c_series__check_icode
     IS 'Trigger function - check ICODE/GCODE combination on c_series after change of ICODE/GCODE fields';

@@ -20,11 +20,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
             DEFERRABLE INITIALLY DEFERRED,
 
     -- INTERNAL is a special series
-    icode TEXT NOT NULL
-        REFERENCES ce_warehouse.c_ind (code)
-            ON UPDATE CASCADE
-            ON DELETE RESTRICT
-            DEFERRABLE INITIALLY DEFERRED,
+    icode TEXT NOT NULL,
 
     -- Auto generated ID-based fields
     series_id TEXT GENERATED ALWAYS
@@ -136,14 +132,14 @@ COMMENT ON TRIGGER tg_c_series__before_02__soft_delete ON ce_warehouse.c_series
  ***********************************************************************************************************
  */
 
--- DROP TRIGGER IF EXISTS tg_c_series__after_03__check ON ce_warehouse.c_series;
+-- DROP TRIGGER IF EXISTS tg_c_series__after_03__check_icode ON ce_warehouse.c_series;
 
-CREATE TRIGGER tg_c_series__after_03__check
+CREATE CONSTRAINT TRIGGER tg_c_series__after_03__check_icode
     AFTER INSERT OR UPDATE OF icode, gcode
-    ON ce_warehouse.c_series
-    DEFERRABLE  INITIALLY DEFERRED
+        ON ce_warehouse.c_series
+    DEFERRABLE INITIALLY DEFERRED
     FOR EACH ROW
         EXECUTE FUNCTION ce_warehouse.fx_tg_c_series__check_icode();
 
-COMMENT ON TRIGGER tg_c_series__after_03__soft_delete ON ce_warehouse.c_series
+COMMENT ON TRIGGER tg_c_series__after_03__check_icode ON ce_warehouse.c_series
     IS 'Trigger to instigate IND check on c_series table';

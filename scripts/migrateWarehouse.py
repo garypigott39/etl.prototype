@@ -456,6 +456,14 @@ def migrate_geo(src_cur, tgt_cur):
     print("Truncating target table...")
     tgt_cur.execute(f"TRUNCATE TABLE {tgt} RESTART IDENTITY CASCADE")
 
+    # Add back the "INTERNAL" entry
+    tgt_cur.execute(f"""
+        INSERT INTO {tgt} (pk_geo, code, name, short_name, tla, internal_notes)
+        VALUES
+            (-1, 'INTERNAL', 'For internal use series etc', 'N/A', 'N/A', 
+             'Allows declaration of internal use series');
+    """)
+
     # 1. GEO, do this first as we need th pk_geo for the geo_group table load later
     src = "SELECT * FROM ce_data.c_geo"
     tmp = "t__c_geo"
@@ -470,13 +478,13 @@ def migrate_geo(src_cur, tgt_cur):
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
             pk_geo, code, name, name2, short_name, tla, iso2, iso3, lat, long, 
-            central_bank, stock_market, political_alignment, local_currency_unit, flag, 
-            category, ordering, internal_notes, updated_utc
+            lk_central_bank, lk_stock_market, lk_political_alignment, lk_currency_unit, flag, 
+            lk_geo_category, ordering, internal_notes, updated_utc
         )
         SELECT 
             g.pk_geo::INT, g.geo_code, g.geo_name, g.geo_name2, g.geo_short_name, g.geo_tla, 
             g.geo_iso2, g.geo_iso3, g.geo_lat::NUMERIC, g.geo_long::NUMERIC, lcb.pk_central_bank,
-            ls.pk_stock_market, lp.pk_political_alignment, lcu.code, g.geo_flag, 
+            ls.pk_stock_market, lp.pk_political_alignment, lcu.pk_currency_unit, g.geo_flag, 
             lg.pk_geo_category, g.geo_order::INT, g.internal_notes, g.updated_utc::TIMESTAMPTZ
         FROM {tmp} g
             LEFT JOIN ce_warehouse.l_central_bank lcb
@@ -504,15 +512,15 @@ def migrate_geo(src_cur, tgt_cur):
         CALL ce_warehouse.px_ut_fix_seq();
 
         INSERT INTO {tgt} (
-            code, name, short_name, tla, commodity_type, ordering, internal_notes, 
+            code, name, short_name, tla, lk_commodity_type, ordering, internal_notes, 
             updated_utc
         )
         SELECT 
-            c.com_code, c.com_name, c.com_short_name, c.com_tla, lt.pk_com_type, 
+            c.com_code, c.com_name, c.com_short_name, c.com_tla, l.pk_com_type, 
             c.com_order::INT, c.internal_notes, c.updated_utc::TIMESTAMPTZ
         FROM {tmp} c
-           LEFT JOIN ce_warehouse.l_com_type lt
-                ON lt.name = c.com_type
+            LEFT JOIN ce_warehouse.l_com_type l
+                ON l.name = c.com_type
         WHERE c.error IS NULL
         ORDER BY 1    
     """)
@@ -539,7 +547,7 @@ def migrate_geo_group(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            fk_pk_geo, geo_group, updated_utc
+            fk_pk_geo, lk_geo_group, updated_utc
         )
         SELECT g.pk_geo, lg.pk_geo_group, g.updated_utc
         FROM (
@@ -584,21 +592,23 @@ def migrate_ind(src_cur, tgt_cur):
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
             pk_ind, code, name, description, name1, name2, name3, name4, name_lower, 
-            name1_lower, name2_lower, name3_lower, name4_lower, category_broad, category_narrow,
-            data_transformation, keyindicator, proprietary_data,
+            name1_lower, name2_lower, name3_lower, name4_lower, lk_ind_category_broad, 
+            lk_ind_category_narrow, lk_data_transformation, keyindicator, proprietary_data,
             ordering, internal_notes, updated_utc
         )
         SELECT 
             i.pk_i::INT, i.i_code, i_name, i.i_description, i.i_name1, i.i_name2, i.i_name3, 
             i.i_name4, i.i_name_lower, i.i_name1_lower, i.i_name2_lower, i.i_name3_lower, 
-            i.i_name4_lower, lb.pk_ind_broad_category, ln.pk_ind_narrow_category, 
-            i.i_data_transformation, i.i_keyindicator::BOOL, i.i_proprietary_data::BOOL, 
+            i.i_name4_lower, lb.pk_ind_category_broad, ln.pk_ind_category_narrow, 
+            ld.pk_data_transformation, i.i_keyindicator::BOOL, i.i_proprietary_data::BOOL, 
             i.i_order::INT, i.internal_notes, i.updated_utc::TIMESTAMPTZ
         FROM {tmp} i
-            LEFT JOIN ce_warehouse.l_ind_broad_category lb
+            LEFT JOIN ce_warehouse.l_ind_category_broad lb
                 ON lb.name = i.i_catg_broad
-            LEFT JOIN ce_warehouse.l_ind_narrow_category ln
+            LEFT JOIN ce_warehouse.l_ind_category_narrow ln
                 ON ln.name = i.i_catg_narrow
+            LEFT JOIN ce_warehouse.l_data_transformation ld
+                ON ld.code = i.i_data_transformation
         WHERE i.error IS NULL
         ORDER BY 1    
     """)
@@ -625,9 +635,9 @@ def migrate_ind_parent(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            fk_pk_ind, icode, updated_utc
+            fk_pk_ind, fk_pk_ind__parent, updated_utc
         )
-        SELECT i.pk_i, i.code, i.updated_utc
+        SELECT i.pk_i, parent.pk_i::INT, i.updated_utc
         FROM (
             SELECT DISTINCT 
                 pk_i::INT, 
@@ -637,6 +647,8 @@ def migrate_ind_parent(src_cur, tgt_cur):
             WHERE i_parent_icodes IS NOT NULL
             AND error IS NULL
         ) i
+            JOIN {tmp} parent
+                ON parent.i_code = i.code
         WHERE i.code IS NOT NULL
         ORDER BY 1    
     """)
@@ -666,8 +678,8 @@ def migrate_series(src_cur, tgt_cur):
     # Insert into target
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            pk_series, gcode, icode, name, name1, name2, name3, name4, description, units,
-            precision, date_point, active, ordering, internal_notes, updated_utc
+            pk_series, gcode, icode, name, name1, name2, name3, name4, description, lk_units,
+            precision, date_point, ordering, status, internal_notes, updated_utc
         )
         SELECT 
             s.pk_s::INT, s.s_gcode, s.s_icode, s.s_name, s.s_name1, s.s_name2, s.s_name3, s.s_name4,
@@ -676,8 +688,9 @@ def migrate_series(src_cur, tgt_cur):
                 WHEN lu.pk_units IS NOT NULL THEN lu.pk_units
                 WHEN s.s_units IS NOT NULL THEN -1
             END, 
-            s.s_precision::INT,s. s_date_point, s.s_active::BOOL,
-            s.s_order::INT, s.internal_notes, s.updated_utc::TIMESTAMPTZ
+            s.s_precision::INT,s. s_date_point, s.s_order::INT,
+            CASE WHEN s.s_active::BOOL THEN 'active' ELSE 'inactive' END, 
+            s.internal_notes, s.updated_utc::TIMESTAMPTZ
         FROM {tmp} s
             LEFT JOIN ce_warehouse.l_units lu
                 ON lu.name = s.s_units
@@ -709,9 +722,9 @@ def migrate_series_data_source(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            fk_pk_series, data_source, updated_utc
+            fk_pk_series, lk_data_source, updated_utc
         )
-        SELECT s.pk_s, lds.pk_data_source, s.updated_utc
+        SELECT s.pk_s, ld.pk_data_source, s.updated_utc
         FROM (
             SELECT
                 t.pk_s::INT AS pk_s,
@@ -725,8 +738,8 @@ def migrate_series_data_source(src_cur, tgt_cur):
             WHERE t.error IS NULL
             AND ds.ds_name IS NOT NULL
         ) s
-            JOIN ce_warehouse.l_data_source lds
-                ON lds.name = s.ds_name
+            JOIN ce_warehouse.l_data_source ld
+                ON ld.name = s.ds_name
         GROUP BY 1, 2, 3, s.idx
         ORDER BY s.pk_s, s.idx  -- psuedo ordering 
     """)

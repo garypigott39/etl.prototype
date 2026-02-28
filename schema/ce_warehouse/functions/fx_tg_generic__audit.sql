@@ -16,6 +16,7 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg_generic__audit(
 AS
 $$
 DECLARE
+    _audit_type TEXT := SUBSTRING(TG_OP, 1, 1);  -- 'I', 'U', or 'D'
     _diff JSONB;
     _pk_col TEXT;
     _pk INT;
@@ -43,10 +44,12 @@ BEGIN
     ELSEIF TG_OP = 'DELETE' THEN
         _pk := (TO_JSONB(OLD) ->> _pk_col)::TEXT;
         _diff := TO_JSONB(OLD);
+    ELSE
+        RETURN NULL;
     END IF;
 
-    INSERT INTO ce_warehouse.a_audit (table_name, table_pk, data, audit_type)
-        VALUES (TG_TABLE_NAME, _pk::TEXT, _diff, TG_OP);
+    INSERT INTO ce_warehouse.a_generic_audit (table_name, table_pk, data, audit_type)
+        VALUES (TG_TABLE_NAME, _pk::TEXT, _diff, _audit_type);
 
     RETURN NULL;
 END

@@ -27,15 +27,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series_downloadable
     -- User maintained fields
     downloadable TEXT NOT NULL DEFAULT 'ess_plugin'
         CHECK (
-                downloadable IN (
-                    'all',
-                    'api',
-                    'adv_plugin',
-                    'ess_plugin',
-                    'internal',
-                    'none',
-                    'powerbi')
-    ),
+            downloadable IN (
+                'all',
+                'api',
+                'adv_plugin',
+                'ess_plugin',
+                'internal',
+                'none',
+                'powerbi')
+        ),
     forecast_only_lifespan INT,  -- If NULL then will take the system default
     internal_notes TEXT,  -- Unvalidated!
 

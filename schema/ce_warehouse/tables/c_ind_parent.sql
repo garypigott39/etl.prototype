@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_ind_parent
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-                fk_pk_ind > 0
-                AND fk_pk_ind__parent > 0
-                AND fk_pk_ind__parent <> fk_pk_ind  -- prevent self-reference
+            fk_pk_ind > 0
+            AND fk_pk_ind__parent > 0
+            AND fk_pk_ind__parent <> fk_pk_ind  -- prevent self-reference
         ),
 
     error TEXT,  -- system generated

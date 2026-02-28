@@ -19,17 +19,17 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_val_is_geo_or_com(
 AS
 $$
 DECLARE
-    _like TEXT := (CASE WHEN _type = 'GEO' THEN 'G.%' ELSE 'C.%' END);
+    _like TEXT := (CASE WHEN _type = 'geo' THEN 'G.%' ELSE 'C.%' END);
 
 BEGIN
-    IF _type IS NULL OR _type NOT IN ('GEO', 'COM') THEN
-        RAISE EXCEPTION 'Invalid type specified %, should be GEO/COM', _type;
+    IF _type IS NULL OR _type NOT IN ('geo', 'com') THEN
+        RAISE EXCEPTION 'Invalid type specified %, should be geo/com', _type;
     ELSEIF _pk IS NULL THEN
         IF NOT _nulls_allowed THEN
-            RETURN 'Supplied GEO/primary key cannot be null';
+            RETURN FORMAT('Supplied "%s" primary key cannot be null', _type);
         END IF;
     ELSEIF NOT EXISTS(SELECT 1 FROM ce_warehouse.c_geo WHERE pk_geo = _pk AND code LIKE _like) THEN
-        RETURN FORMAT('Supplied GEO/COM primary key is invalid for %s code', _type);
+        RETURN FORMAT('Supplied "%s" primary key is invalid', _type);
     END IF;
 
     RETURN NULL;

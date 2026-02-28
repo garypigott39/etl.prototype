@@ -66,7 +66,17 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
         CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
 
     status TEXT NOT NULL DEFAULT 'active'
-        CHECK (status IN ('active', 'inactive', 'deleted')),
+        CHECK (
+            status IN ('active', 'inactive', 'deleted')
+            AND (
+                status = 'deleted'
+                OR (
+                    status = 'active'
+                    AND ce_warehouse.fx_val_is_active(gcode, 'geo') IS NULL
+                    AND ce_warehouse.fx_val_is_active(icode, 'ind') IS NULL
+                )
+            )
+        ),
 
     error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),

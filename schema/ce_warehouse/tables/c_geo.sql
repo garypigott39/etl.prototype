@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-                (code LIKE 'C.%' AND lk_commodity_type IS NOT NULL)
-                OR (code NOT LIKE 'C.%' AND lk_commodity_type IS NULL)
+            (code LIKE 'C.%' AND lk_commodity_type IS NOT NULL)
+            OR (code NOT LIKE 'C.%' AND lk_commodity_type IS NULL)
         ),
 
     -- GEO specific fields (will be NULL for COM)
@@ -61,27 +61,27 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
                 code LIKE 'G.%'
                 AND ce_warehouse.fx_val_is_name(name2, 'c_geo.name2', FALSE) IS NULL
             )
-    ),
+        ),
     iso2 TEXT
         CHECK (
             (code NOT LIKE 'G.%' AND iso2 IS NULL)
             OR (code LIKE 'G.%' AND (iso2 IS NULL OR iso2 ~ '^[A-Z]{2}$'))
-    ),
+        ),
     iso3 TEXT
         CHECK (
             (code NOT LIKE 'G.%' AND iso3 IS NULL)
             OR (code LIKE 'G.%' AND (iso3 IS NULL OR iso3 ~ '^[A-Z]{3}$'))
-    ),
+        ),
     lat NUMERIC
         CHECK (
             (code NOT LIKE 'G.%' AND lat IS NULL)
             OR (code LIKE 'G.%' AND (lat IS NULL OR lat BETWEEN -90 AND 90))
-    ),
+        ),
     long NUMERIC
         CHECK (
             (code NOT LIKE 'G.%' AND long IS NULL)
             OR (code LIKE 'G.%' AND (long IS NULL OR long BETWEEN -180 AND 180))
-    ),
+        ),
     lk_central_bank SMALLINT
         REFERENCES ce_warehouse.l_central_bank(pk_central_bank)
             ON UPDATE RESTRICT
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
         CHECK (
             (code NOT LIKE 'G.%' AND lk_central_bank IS NULL)
             OR code LIKE 'G.%'
-    ),
+        ),
     lk_stock_market SMALLINT
         REFERENCES ce_warehouse.l_stock_market(pk_stock_market)
             ON UPDATE RESTRICT
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
         CHECK (
             (code NOT LIKE 'G.%' AND lk_stock_market IS NULL)
             OR code LIKE 'G.%'
-    ),
+        ),
     lk_political_alignment SMALLINT
         REFERENCES ce_warehouse.l_political_alignment(pk_political_alignment)
             ON UPDATE RESTRICT
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
         CHECK (
             (code NOT LIKE 'G.%' AND lk_political_alignment IS NULL)
             OR code LIKE 'G.%'
-    ),
+        ),
     lk_currency_unit SMALLINT
         REFERENCES ce_warehouse.l_currency_unit(pk_currency_unit)
             ON UPDATE RESTRICT
@@ -117,12 +117,12 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
         CHECK (
             (code NOT LIKE 'G.%' AND lk_currency_unit IS NULL)
             OR code LIKE 'G.%'
-    ),
+        ),
     flag TEXT
         CHECK (
                 (code NOT LIKE 'G.%' AND flag IS NULL)
                 OR (code LIKE 'G.%' AND ce_warehouse.fx_val_is_flag(flag) IS NULL)
-    ),
+        ),
     lk_geo_category SMALLINT
         REFERENCES ce_warehouse.l_geo_category(pk_geo_category)
             ON UPDATE RESTRICT
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
         CHECK (
                 (code NOT LIKE 'G.%' AND lk_geo_category IS NULL)
                 OR (code LIKE 'G.%' AND lk_geo_category IS NOT NULL)
-    ),
+        ),
 
     -- Standard fields
     internal_notes TEXT

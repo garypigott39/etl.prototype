@@ -21,7 +21,7 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__geo_groups_to_int(
 AS
 $$
     SELECT l.pk_geo_group
-    FROM ce_warehouse.l_geo_group l
+    FROM ce_warehouse.l__geo_group l
         JOIN LATERAL UNNEST(_groups) raw(code)
             ON raw.code = l.code
     GROUP BY 1

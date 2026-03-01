@@ -16,8 +16,8 @@ AS
 $$
 DECLARE
     _dt DATE;
-    _dt1 DATE := (SELECT value::DATE FROM ce_warehouse.s_sys_flags WHERE code = 'DATE.MIN');
-    _dt2 DATE := (SELECT (CURRENT_DATE + (value::INTERVAL))::DATE FROM ce_warehouse.s_sys_flags WHERE code = 'DATE.MAX');
+    _dt1 DATE := (SELECT value::DATE FROM ce_warehouse.s__sys_flag WHERE code = 'DATE.MIN');
+    _dt2 DATE := (SELECT (CURRENT_DATE + (value::INTERVAL))::DATE FROM ce_warehouse.s__sys_flag WHERE code = 'DATE.MAX');
 
 BEGIN
     -- 1. DATES
@@ -28,23 +28,23 @@ BEGIN
     END IF;
 
     FOR _dt IN
-        SELECT gs.date
+        SELECT gs.dt_date
         FROM generate_series(_dt1, _dt2, INTERVAL '1 DAY') AS gs(date)
         WHERE NOT EXISTS (
             SELECT 1
-            FROM ce_warehouse.l_date d
-            WHERE d.date = gs.date
+            FROM ce_warehouse.l__date d
+            WHERE d.dt_date = gs.date
         )
     LOOP
-        INSERT INTO ce_warehouse.l_date (date)
+        INSERT INTO ce_warehouse.l__date (dt_date)
             VALUES (_dt)
-        ON CONFLICT (date) DO NOTHING;
+        ON CONFLICT (dt_date) DO NOTHING;
     END LOOP;
 
     -- 2. PERIODS
     CREATE TEMP TABLE t__periods ON COMMIT DROP AS
         WITH _periods AS (
-            SELECT 1 AS ifreq, d.date AS start_of_period, d.date AS end_of_period
+            SELECT 1 AS ifreq, d.dt_date AS start_of_period, d.dt_date AS end_of_period
             FROM ce_warehouse.v_date d
             UNION ALL
             SELECT 2, d.start_of_week, d.end_of_week
@@ -83,13 +83,13 @@ BEGIN
         FROM _with_lag l
         WHERE NOT EXISTS  (
             SELECT 1
-            FROM ce_warehouse.l_period p
+            FROM ce_warehouse.l__period p
             WHERE p.ifreq = l.ifreq
             AND p.start_of_period = l.start_of_period
         );
 
     IF (SELECT COUNT(*) FROM t__periods) > 0 THEN
-        INSERT INTO ce_warehouse.l_period (ifreq, start_of_period, end_of_period, period, lag)
+        INSERT INTO ce_warehouse.l__period (ifreq, start_of_period, end_of_period, period, lag)
             SELECT ifreq, start_of_period, end_of_period, period, lag
             FROM t__periods;
 

@@ -28,19 +28,20 @@ BEGIN
     IF _type = 'lock' THEN
         -- Fail if active lock exists
         IF EXISTS (
-            SELECT 1 FROM ce_warehouse.s_pipeline_lock
-            WHERE name = _name AND locked_at > NOW() - _interval
+            SELECT 1 FROM ce_warehouse.s__pipeline_lock
+            WHERE name = _name
+            AND ts_locked_at > NOW() - _interval
         ) THEN
             RAISE EXCEPTION 'Pipeline "%" is already locked', _name;
         END IF;
 
         -- Insert or refresh lock
-        INSERT INTO ce_warehouse.s_pipeline_lock(name) VALUES (_name)
+        INSERT INTO ce_warehouse.s__pipeline_lock(name) VALUES (_name)
             ON CONFLICT (name)
-            DO UPDATE SET locked_at = NOW();
+            DO UPDATE SET ts_locked_at = NOW();
 
     ELSIF _type = 'unlock' THEN
-        DELETE FROM ce_warehouse.s_pipeline_lock
+        DELETE FROM ce_warehouse.s__pipeline_lock
         WHERE name = _name;
 
     ELSE

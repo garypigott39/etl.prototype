@@ -3,7 +3,7 @@
  * @file
  * utc.sql
  *
- * Set timezone to UTC for all sessions, to ensure consistent handling of timestamps (e.g. updated_utc).
+ * Set timezone to UTC for all sessions, to ensure consistent handling of timestamps (e.g. ts_updated).
  ***********************************************************************************************************
  */
 

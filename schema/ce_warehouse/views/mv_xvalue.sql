@@ -36,7 +36,7 @@ FROM (
               x.fk_pk_series, x.ifreq, p.tgt_ifreq, p.tgt_pdi
           ORDER BY x.pdi DESC
         ) AS rn
-    FROM ce_warehouse.x_value x
+    FROM ce_warehouse.x__value x
     JOIN ce_warehouse.mv_xperiod p
         ON x.pdi = p.src_pdi
         AND x.ifreq = p.src_ifreq

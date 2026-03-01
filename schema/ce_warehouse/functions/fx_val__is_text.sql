@@ -39,7 +39,7 @@ BEGIN
         RETURN 'Value contains unprintable characters';
     ELSEIF _val !~ '^[[:ascii:]]+$' THEN
         -- Contains non-ASCII characters
-        IF EXISTS (SELECT 1 FROM ce_warehouse.s_sys_flags WHERE code = 'ASCII-ONLY' AND value = 'TRUE') THEN
+        IF EXISTS (SELECT 1 FROM ce_warehouse.s__sys_flag WHERE code = 'ASCII-ONLY' AND value = 'TRUE') THEN
             RETURN 'Value contains non-ASCII characters';
         END IF;
     END IF;
@@ -54,7 +54,7 @@ BEGIN
 
     -- Get the relevant rule
     SELECT * INTO _rec
-    FROM ce_warehouse.s_text_rules
+    FROM ce_warehouse.s__text_rule
     WHERE rule_type = _rule
     AND column_name IN (_col_name, 'DEFAULT')
     ORDER BY

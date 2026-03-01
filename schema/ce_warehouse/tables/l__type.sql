@@ -1,0 +1,44 @@
+/*
+ ***********************************************************************************************************
+ * @file
+ * l_type.sql
+ *
+ * Lookup table - account type lookup.
+ ***********************************************************************************************************
+ */
+
+-- DROP TABLE IF EXISTS ce_warehouse.l__type;
+
+CREATE TABLE IF NOT EXISTS ce_warehouse.l__type
+(
+    pk_type SMALLINT NOT NULL GENERATED ALWAYS AS (
+        CASE code
+            WHEN 'AC' THEN 1
+            ELSE 2
+        END
+    ) STORED,
+
+    code TEXT NOT NULL
+        CHECK (code IN ('AC','F')),  -- restrict to valid codes
+
+    name TEXT NOT NULL GENERATED ALWAYS AS (
+        CASE code
+            WHEN 'AC' THEN 'Actual'
+            ELSE 'Forecast'
+        END
+    ) STORED,
+
+    PRIMARY KEY (pk_type),
+    UNIQUE (code)
+);
+
+COMMENT ON TABLE ce_warehouse.l__type
+    IS 'Lookup table - account type lookup';
+
+/**
+ * Pre-populate with known values. THIS WILL NEVER CHANGE!!!
+ */
+INSERT INTO ce_warehouse.l__type (code)
+VALUES
+    ('AC'),
+    ('F');

@@ -28,7 +28,7 @@ BEGIN
         IF NOT _nulls_allowed THEN
             RETURN FORMAT('Supplied "%s" primary key cannot be null', _type);
         END IF;
-    ELSEIF NOT EXISTS(SELECT 1 FROM ce_warehouse.c_geo WHERE pk_geo = _pk AND code LIKE _like) THEN
+    ELSEIF NOT EXISTS(SELECT 1 FROM ce_warehouse.c__geo WHERE pk_geo = _pk AND code LIKE _like) THEN
         RETURN FORMAT('Supplied "%s" primary key is invalid', _type);
     END IF;
 

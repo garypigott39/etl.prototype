@@ -36,7 +36,7 @@ BEGIN
 
     -- Check all elements exist in IND lookup table
     FOREACH _v IN ARRAY arr LOOP
-        IF NOT EXISTS (SELECT 1 FROM ce_warehouse.c_ind WHERE code = _v) THEN
+        IF NOT EXISTS (SELECT 1 FROM ce_warehouse.c__ind WHERE code = _v) THEN
             RETURN FORMAT('IND code "%s" does not exist', _v);
         END IF;
     END LOOP;

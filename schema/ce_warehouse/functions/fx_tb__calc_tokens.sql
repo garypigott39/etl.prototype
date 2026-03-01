@@ -10,8 +10,8 @@
 -- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__calc_tokens;
 
 CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__calc_tokens(
-    _calc_table TEXT DEFAULT 'ce_warehouse.c_calc_v2',
-    _const_table TEXT DEFAULT 'ce_warehouse.c_const'
+    _calc_table TEXT DEFAULT 'ce_warehouse.c__calc_v2',
+    _const_table TEXT DEFAULT 'ce_warehouse.c__const'
 )
     RETURNS TABLE (
         tgt_series_id TEXT,

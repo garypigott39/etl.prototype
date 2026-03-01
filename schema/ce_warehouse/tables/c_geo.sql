@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
     flag TEXT
         CHECK (
                 (code NOT LIKE 'G.%' AND flag IS NULL)
-                OR (code LIKE 'G.%' AND ce_warehouse.fx_val__is_flag(flag) IS NULL)
+                OR (code LIKE 'G.%' AND ce_warehouse.fx_val__is_name(flag, 'c_geo.flag') IS NULL)
         ),
     lk_geo_category SMALLINT
         REFERENCES ce_warehouse.l_geo_category(pk_geo_category)

@@ -160,7 +160,7 @@ VALUES
      FALSE,
         FALSE,
      NULL,
-     '.+\.(jpg|jpeg|png|gif|webp)$',
+     '[\w\-/ ]+\/?[\w\-]+\.(jpg|jpeg|png|gif|webp)$',
      FALSE,
      5,
      255

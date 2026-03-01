@@ -212,3 +212,6 @@ test.data/
 a.sql
 *.sql.gz
 SQLORDER.*
+
+# single char files
+?

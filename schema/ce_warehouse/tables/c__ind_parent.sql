@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__ind_parent
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 
-    fk_pk_ind__parent INT NOT NULL
+    fk_pk_ind_parent INT NOT NULL
         REFERENCES ce_warehouse.c__ind (pk_ind)
             ON UPDATE RESTRICT
             ON DELETE CASCADE
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__ind_parent
     ts_updated TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),
-    UNIQUE (fk_pk_ind, fk_pk_ind__parent)
+    UNIQUE (fk_pk_ind, fk_pk_ind_parent)
 );
 
 -- It's recommended to have INDICES on foreign keys for performance!!

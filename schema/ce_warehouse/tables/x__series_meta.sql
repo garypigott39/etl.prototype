@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__series_meta
     last_pdi INT,
 
     is_has_values BOOL NOT NULL DEFAULT FALSE,  -- flag to indicate if there are any values for this series/frequency/type
+
     ts_new_values TIMESTAMPTZ,  -- timestamp of the most recent new value
     ts_updated_values TIMESTAMPTZ,  -- timestamp of the most recent updated (or deleted) value
 

@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_calc
     expr TEXT NOT NULL,  -- Validated via APP
 
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
+        CHECK (ce_warehouse.fx_val__is_text(internal_notes, 'internal_notes') IS NULL),
 
     error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),

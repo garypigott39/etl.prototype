@@ -35,11 +35,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
 
     -- Fields common to both GEO & COM
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_name(name, 'c_geo.name', FALSE) IS NULL),
+        CHECK (ce_warehouse.fx_val__is_name(name, 'c_geo.name', FALSE) IS NULL),
     short_name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_name(short_name, 'c_geo.short_name', FALSE) IS NULL),
+        CHECK (ce_warehouse.fx_val__is_name(short_name, 'c_geo.short_name', FALSE) IS NULL),
     tla TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_name(tla, 'c_geo.tla', FALSE) IS NULL),
+        CHECK (ce_warehouse.fx_val__is_name(tla, 'c_geo.tla', FALSE) IS NULL),
 
     ordering INT NOT NULL DEFAULT 0,
 
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
             (code NOT LIKE 'G.%' AND name2 IS NULL)
             OR (
                 code LIKE 'G.%'
-                AND ce_warehouse.fx_val_is_name(name2, 'c_geo.name2', FALSE) IS NULL
+                AND ce_warehouse.fx_val__is_name(name2, 'c_geo.name2', FALSE) IS NULL
             )
         ),
     iso2 TEXT
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
     flag TEXT
         CHECK (
                 (code NOT LIKE 'G.%' AND flag IS NULL)
-                OR (code LIKE 'G.%' AND ce_warehouse.fx_val_is_flag(flag) IS NULL)
+                OR (code LIKE 'G.%' AND ce_warehouse.fx_val__is_flag(flag) IS NULL)
         ),
     lk_geo_category SMALLINT
         REFERENCES ce_warehouse.l_geo_category(pk_geo_category)
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo
             )
         ),
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
+        CHECK (ce_warehouse.fx_val__is_text(internal_notes, 'internal_notes') IS NULL),
 
     error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -194,7 +194,7 @@ VALUES
 CREATE TRIGGER tg_c_geo__before_01__block
     BEFORE UPDATE OR DELETE ON ce_warehouse.c_geo
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg_generic__check_block_internal('pk_geo');
+        EXECUTE FUNCTION ce_warehouse.fx_tg__generic__check_block_internal('pk_geo');
 
 COMMENT ON TRIGGER tg_c_geo__before_01__block ON ce_warehouse.c_geo
     IS 'Trigger to block changes to system records on c_geo table';
@@ -210,7 +210,7 @@ COMMENT ON TRIGGER tg_c_geo__before_01__block ON ce_warehouse.c_geo
 CREATE TRIGGER tg_c_geo__before_02__soft_delete
     BEFORE UPDATE OR DELETE ON ce_warehouse.c_geo
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg_c_geo__soft_delete();
+        EXECUTE FUNCTION ce_warehouse.fx_tg__c_geo__soft_delete();
 
 COMMENT ON TRIGGER tg_c_geo__before_02__soft_delete ON ce_warehouse.c_geo
     IS 'Trigger to instigate soft delete on c_geo table';

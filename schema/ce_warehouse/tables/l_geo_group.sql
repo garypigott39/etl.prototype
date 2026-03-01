@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l_geo_group
     code TEXT NOT NULL
         CHECK (code ~ '^[A-Z][A-Za-z0-9_-]*[A-Za-z0-9]$'),
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_name(name) IS NULL),
+        CHECK (ce_warehouse.fx_val__is_name(name) IS NULL),
 
     PRIMARY KEY (pk_geo_group),
     UNIQUE (code),

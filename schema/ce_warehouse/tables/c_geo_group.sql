@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_geo_group
             DEFERRABLE INITIALLY DEFERRED
         CHECK(
             fk_pk_geo > 0 AND
-            ce_warehouse.fx_val_is_geo_or_com(fk_pk_geo, 'geo') IS NULL
+            ce_warehouse.fx_val__is_geo_or_com(fk_pk_geo, 'geo') IS NULL
     ),
 
     -- GEO Group ID

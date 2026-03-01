@@ -20,7 +20,10 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.s_text_rules
     rule_type TEXT NOT NULL
         CHECK (rule_type IN ('C', 'N', 'T')),  -- Code/Name/Text
     column_name TEXT NOT NULL
-        CHECK (column_name = 'DEFAULT' OR column_name ~ '^[a-z0-9][a-z0-9_.]*[a-z0-9*]$'),
+        CHECK (
+            column_name IN ('DEFAULT', 'EMAIL')
+            OR column_name ~ '^[a-z0-9][a-z0-9_.]*[a-z0-9*]$'
+        ),  -- Column name format (lowercase, can include dots for table.column rules, and can end with * for wildcard rules)
     description TEXT NOT NULL,
 
     allow_consecutive_ws BOOL NOT NULL DEFAULT FALSE,
@@ -110,6 +113,18 @@ VALUES
      NULL,
      '^[A-Z0-9][A-Z0-9<>._\-+#%£$€]*[A-Z0-9#%£$€]$',
      2,
+     255
+    ),
+    (
+     'N',
+     'EMAIL',
+     'EMAIL rule',
+     FALSE,
+     FALSE,
+        FALSE,
+     NULL,
+     '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+     5,
      255
     ),
     (

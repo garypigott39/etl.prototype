@@ -35,17 +35,17 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
         AS (gcode = 'INTERNAL') STORED,
 
     name TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val_is_name(name, 'c_series.name', FALSE) IS NULL),
+        CHECK (ce_warehouse.fx_val__is_name(name, 'c_series.name', FALSE) IS NULL),
     name1 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name1, 'c_series.name1') IS NULL),
+        CHECK (ce_warehouse.fx_val__is_name(name1, 'c_series.name1') IS NULL),
     name2 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name2, 'c_series.name2') IS NULL),
+        CHECK (ce_warehouse.fx_val__is_name(name2, 'c_series.name2') IS NULL),
     name3 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name3, 'c_series.name3') IS NULL),
+        CHECK (ce_warehouse.fx_val__is_name(name3, 'c_series.name3') IS NULL),
     name4 TEXT
-        CHECK (ce_warehouse.fx_val_is_name(name4, 'c_series.name4') IS NULL),
+        CHECK (ce_warehouse.fx_val__is_name(name4, 'c_series.name4') IS NULL),
     description TEXT
-        CHECK (ce_warehouse.fx_val_is_text(description, 'c_series.description') IS NULL),
+        CHECK (ce_warehouse.fx_val__is_text(description, 'c_series.description') IS NULL),
     lk_units SMALLINT
         REFERENCES ce_warehouse.l_units (pk_units)
             ON UPDATE RESTRICT
@@ -66,14 +66,14 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c_series
                 OR gcode = 'INTERNAL'
                 OR (
                     status <> 'deleted'
-                    AND ce_warehouse.fx_val_is_active(gcode, 'geo') IS NULL
-                    AND ce_warehouse.fx_val_is_active(icode, 'ind') IS NULL
+                    AND ce_warehouse.fx_val__is_active(gcode, 'geo') IS NULL
+                    AND ce_warehouse.fx_val__is_active(icode, 'ind') IS NULL
                 )
             )
         ),
 
     internal_notes TEXT
-        CHECK (ce_warehouse.fx_val_is_text(internal_notes, 'internal_notes') IS NULL),
+        CHECK (ce_warehouse.fx_val__is_text(internal_notes, 'internal_notes') IS NULL),
 
     error TEXT,  -- system generated
     updated_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -105,7 +105,7 @@ COMMENT ON TABLE ce_warehouse.c_series
 CREATE TRIGGER tg_c_series__before_01__block
     BEFORE UPDATE OR DELETE ON ce_warehouse.c_series
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg_generic__check_block_internal('pk_ind');
+        EXECUTE FUNCTION ce_warehouse.fx_tg__generic__check_block_internal('pk_ind');
 
 COMMENT ON TRIGGER tg_c_series__before_01__block ON ce_warehouse.c_series
     IS 'Trigger to block changes to system records on c_series table';
@@ -121,7 +121,7 @@ COMMENT ON TRIGGER tg_c_series__before_01__block ON ce_warehouse.c_series
 CREATE TRIGGER tg_c_series__before_02__soft_delete
     BEFORE DELETE ON ce_warehouse.c_series
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg_c_series__soft_delete();
+        EXECUTE FUNCTION ce_warehouse.fx_tg__c_series__soft_delete();
 
 COMMENT ON TRIGGER tg_c_series__before_02__soft_delete ON ce_warehouse.c_series
     IS 'Trigger to instigate soft delete on c_series table';
@@ -140,7 +140,7 @@ CREATE CONSTRAINT TRIGGER tg_c_series__after_03__check_icode
         ON ce_warehouse.c_series
     DEFERRABLE INITIALLY DEFERRED
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg_c_series__check_icode();
+        EXECUTE FUNCTION ce_warehouse.fx_tg__c_series__check_icode();
 
 COMMENT ON TRIGGER tg_c_series__after_03__check_icode ON ce_warehouse.c_series
     IS 'Trigger to instigate IND check on c_series table';

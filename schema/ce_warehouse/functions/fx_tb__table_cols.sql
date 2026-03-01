@@ -20,7 +20,7 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__table_cols(
     LANGUAGE sql
 AS
 $$
-    SELECT s.column_name::NAME
+    SELECT s.column_name
     FROM information_schema.columns s
     WHERE s.table_name   = _tablename
     AND s.table_schema = _schema

@@ -3,7 +3,7 @@
  * @file
  * fx_tb__help.sql
  *
- * Pseudo table function - provide a list of (and document) the database _structure.
+ * Pseudo table function - list/document database structure (named schemas).
  *
  * Thanks to:
  * - https://www.commandprompt.com/education/how-to-list-user-defined-functions-in-postgresql/
@@ -16,89 +16,77 @@
 -- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__help;
 
 CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__help(
+    _regex TEXT DEFAULT '^ce_'
 )
     RETURNS TABLE (
-        schema    NAME,
-        name      NAME,
-        type      TEXT,
-        comments  TEXT,
-        full_name TEXT
+        type       TEXT,
+        schema     NAME,
+        name       NAME,
+        tigger_on  TEXT,
+        comments   TEXT,
+        full_name  TEXT
     )
-    LANGUAGE plpgsql
+    LANGUAGE sql
 AS
 $$
-DECLARE
-    _regex TEXT := '^ce_';
-
-BEGIN
-    RETURN QUERY (
-        -- Tables
+    WITH _objects AS (
+        -- Tables, Views, MatViews
         SELECT
-            table_schema,
-            table_name,
-            'table' AS type,
-            obj_description((table_schema || '.' || table_name)::regclass, 'pg_class') AS comments,
-            table_schema || '.' || table_name AS full_name
-        FROM information_schema.tables
-        WHERE table_schema ~ _regex
-        AND table_type = 'BASE TABLE'
-
-        UNION
-
-        -- Views
-        SELECT
-            table_schema,
-            table_name,
-            'view',
-            obj_description((table_schema || '.' || table_name)::regclass, 'pg_class'),
-            table_schema || '.' || table_name
-        FROM information_schema.views
-        WHERE table_schema ~ _regex
-
-        UNION
-
-        -- Materialized Views
-        SELECT
-            schemaname,
-            matviewname,
-            'view.m',
-            obj_description((schemaname || '.' || matviewname)::regclass, 'pg_class'),
-            schemaname || '.' || matviewname
-        FROM pg_matviews
-        WHERE schemaname ~ _regex
-
-        UNION
+            CASE c.relkind
+                WHEN 'r' THEN 'table'
+                WHEN 'v' THEN 'view'
+                WHEN 'm' THEN 'view.m'
+            END                                 AS type,
+            n.nspname                           AS schema,
+            c.relname                           AS name,
+            '-'                                 AS tigger_on,
+            obj_description(c.oid, 'pg_class')  AS comments,
+            n.nspname || '.' || c.relname       AS full_name
+        FROM pg_class c
+            JOIN pg_namespace n
+                ON n.oid = c.relnamespace
+        WHERE n.nspname ~ _regex
+        AND c.relkind IN ('r', 'v', 'm')
+        UNION ALL
 
         -- Functions & Procedures
         SELECT
-            routine_schema,
-            routine_name,
-            LOWER(routine_type),
-            obj_description((routine_schema || '.' || routine_name)::regproc, 'pg_proc'),
-            routine_schema || '.' || routine_name
-        FROM information_schema.routines
-        WHERE routine_schema ~ _regex
-            AND routine_type IN ('FUNCTION', 'PROCEDURE')
+            CASE LOWER(p.prokind::text)
+                WHEN 'p' THEN 'procedure'
+                ELSE 'function'
+            END,
+            n.nspname,
+            p.proname,
+            '-',
+            obj_description(p.oid, 'pg_proc'),
+            n.nspname || '.' || p.proname
+        FROM pg_proc p
+            JOIN pg_namespace n
+                ON n.oid = p.pronamespace
+        WHERE n.nspname ~ _regex
+        AND p.prokind IN ('f', 'p')
+        UNION ALL
 
-        UNION
-
-        -- Triggers, @thanks ChatGPT
-        -- If you don't need the description then use much simpler "information_schema.triggers"
+        -- Triggers
         SELECT
-            nsp.nspname,                         -- schema name
-            tg.tgname || ' ON ' || tbl.relname,  -- trigger name, on table name
             'trigger',
-            obj_description(tg.oid, 'pg_trigger'),
-            nsp.nspname || '.' || tbl.relname || '::' || tg.tgname
-        FROM pg_trigger tg
-        JOIN pg_class tbl ON tg.tgrelid = tbl.oid
-        JOIN pg_namespace nsp ON tbl.relnamespace = nsp.oid
-        WHERE nsp.nspname ~ _regex
-
-        ORDER BY 1, 2, 3
-    );
-END;
+            n.nspname,
+            t.tgname,
+            c.relname,
+            obj_description(t.oid, 'pg_trigger'),
+            t.tgname || ' ON ' || n.nspname || '.' || c.relname
+        FROM pg_trigger t
+            JOIN pg_class c
+                ON c.oid = t.tgrelid
+            JOIN pg_namespace n
+                ON n.oid = c.relnamespace
+        WHERE n.nspname ~ _regex
+        AND NOT t.tgisinternal
+    )
+    SELECT *
+    FROM _objects
+    ORDER BY 1, 2, 3, 4;
 $$;
 
 COMMENT ON FUNCTION ce_warehouse.fx_tb__help
-    IS 'Pseudo table function - list of/document the database _structure, based on agreed naming conventions';
+    IS 'Pseudo table function - list/document database structure (named schemas)';

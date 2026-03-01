@@ -18,7 +18,6 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__geo_groups_to_int(
     LANGUAGE sql
     IMMUTABLE
     STRICT
-
 AS
 $$
     SELECT l.pk_geo_group

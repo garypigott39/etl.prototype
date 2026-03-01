@@ -11,16 +11,13 @@
 
 CREATE OR REPLACE FUNCTION ce_warehouse.fx_val__is_email(
     _val TEXT,
-    _col_email TEXT DEFAULT 'EMAIL',
     _nulls_allowed BOOL DEFAULT TRUE
 )
     RETURNS TEXT
-    LANGUAGE plpgsql
+    LANGUAGE sql
 AS
 $$
-BEGIN
-    RETURN ce_warehouse.fx_val__is_text(_val, _col_email, _nulls_allowed, 'N');
-END
+    SELECT ce_warehouse.fx_val__is_text(_val, 'email', _nulls_allowed, 'N');
 $$;
 
 COMMENT ON FUNCTION ce_warehouse.fx_val__is_email

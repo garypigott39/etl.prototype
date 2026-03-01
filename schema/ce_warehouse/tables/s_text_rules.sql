@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.s_text_rules
         CHECK (rule_type IN ('C', 'N', 'T')),  -- Code/Name/Text
     column_name TEXT NOT NULL
         CHECK (
-            column_name IN ('DEFAULT', 'EMAIL')
+            column_name = 'DEFAULT'
             OR column_name ~ '^[a-z0-9][a-z0-9_.]*[a-z0-9*]$'
         ),  -- Column name format (lowercase, can include dots for table.column rules, and can end with * for wildcard rules)
     description TEXT NOT NULL,
@@ -38,7 +38,14 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.s_text_rules
 
     full_regex TEXT NOT NULL,
 
-    -- NULL rules at the table level will override these
+    -- Allow for disallowed patterns
+    negate_regex bool not null default false
+        check(
+            negate_regex = false
+            or (full_regex <> 'any')
+        ),
+
+    -- null rules at the table level will override these
     min_length INT NOT NULL DEFAULT 1
         CHECK (min_length >= 1),
     max_length INT NOT NULL DEFAULT 255
@@ -64,7 +71,7 @@ COMMENT ON TABLE ce_warehouse.s_text_rules
  */
 INSERT INTO ce_warehouse.s_text_rules (
     rule_type, column_name, description, allow_consecutive_ws, allow_leading_or_trailing_ws, allow_unbalanced_parenthesis,
-    single_char_regex, full_regex, min_length, max_length
+    single_char_regex, full_regex, negate_regex, min_length, max_length
 )
 VALUES
     (
@@ -76,6 +83,7 @@ VALUES
         FALSE,
      '^[A-Z0-9]$',
      '^[A-Z0-9][A-Z0-9_.-]*[A-Z0-9]$',
+     FALSE,
      1,
      30
     ),
@@ -88,6 +96,7 @@ VALUES
         FALSE,
      '^[A-Z0-9%£$€-]$',
      '^[A-Za-z0-9<>''"(%£$€][A-Za-z0-9 &/:,;.\*<>=''"()%£$€+-]*[A-Za-z0-9).%£$€+"]$',
+     FALSE,
      1,
      255
     ),
@@ -100,6 +109,7 @@ VALUES
      TRUE,
      'ANY',
      'ANY',
+     FALSE,
      1,
      1000
     ),
@@ -112,19 +122,60 @@ VALUES
      FALSE,
      NULL,
      '^[A-Z0-9][A-Z0-9<>._\-+#%£$€]*[A-Z0-9#%£$€]$',
+     FALSE,
      2,
      255
     ),
     (
      'N',
-     'EMAIL',
-     'EMAIL rule',
+     'c_geo.flag',
+     'GEO flag',
+     FALSE,
+     FALSE,
+        FALSE,
+     NULL,
+     '^(?!https?://)[\w\-/ ]+\/?[\w\-]+\.(jpg|jpeg|png|gif|webp)$',
+     FALSE,
+     5,
+     255
+    ),
+    (
+     'N',
+     'email',
+     'Generic EMAIL rule',
      FALSE,
      FALSE,
         FALSE,
      NULL,
      '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+     FALSE,
      5,
+     255
+    ),
+    (
+     'N',
+     'image',
+     'Generic IMAGE rule',
+     FALSE,
+     FALSE,
+        FALSE,
+     NULL,
+     '.+\.(jpg|jpeg|png|gif|webp)$',
+     FALSE,
+     5,
+     255
+    ),
+    (
+     'N',
+     'url',
+     'URL rule',
+     FALSE,
+     FALSE,
+        FALSE,
+     NULL,
+     '^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:/?#[\]@!$&''()*+,;%=]*)?$',
+     FALSE,
+     10,
      255
     ),
     (
@@ -136,6 +187,7 @@ VALUES
      FALSE,
      'ANY',
      'ANY',
+     FALSE,
      1,
      1000
     ),
@@ -148,6 +200,7 @@ VALUES
      FALSE,
      'ANY',
      'ANY',
+     FALSE,
      1,
      5000
     );

@@ -181,7 +181,7 @@ COMMENT ON TABLE ce_warehouse.c_geo
  */
 INSERT INTO ce_warehouse.c_geo (pk_geo, code, name, short_name, tla, internal_notes)
 VALUES
-    (-1, 'INTERNAL', 'For internal use series etc', 'N/A', 'N/A', 'Allows declaration of internal use series');
+    (-1, 'INTERNAL', 'For internal use series etc', 'n/a', 'n/a', 'Allows declaration of internal use series');
 
 /*
  ***********************************************************************************************************
@@ -194,7 +194,7 @@ VALUES
 CREATE TRIGGER tg_c_geo__before_01__block
     BEFORE UPDATE OR DELETE ON ce_warehouse.c_geo
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg_block_updates__internal('pk_geo');
+        EXECUTE FUNCTION ce_warehouse.fx_tg_generic__check_block_internal('pk_geo');
 
 COMMENT ON TRIGGER tg_c_geo__before_01__block ON ce_warehouse.c_geo
     IS 'Trigger to block changes to system records on c_geo table';

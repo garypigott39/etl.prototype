@@ -4,7 +4,7 @@
  * fx_tg_c_series__check_icode.sql
  *
  * Trigger function - check ICODE/GCODE combination on c_series after change of ICODE/GCODE fields.
- * Allows INTERNAL series to have non-existent indicators.
+ * Allows INTERNAL series to have non-existent indicators. CONSTRAINT TRIGGER.
  ***********************************************************************************************************
  */
 

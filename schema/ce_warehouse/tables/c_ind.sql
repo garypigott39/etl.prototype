@@ -95,7 +95,7 @@ COMMENT ON TABLE ce_warehouse.c_ind
 CREATE TRIGGER tg_c_ind__before_01__block
     BEFORE UPDATE OR DELETE ON ce_warehouse.c_ind
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg_block_updates__internal('pk_ind');
+        EXECUTE FUNCTION ce_warehouse.fx_tg_generic__check_block_internal('pk_ind');
 
 COMMENT ON TRIGGER tg_c_ind__before_01__block ON ce_warehouse.c_ind
     IS 'Trigger to block changes to system records on c_ind table';

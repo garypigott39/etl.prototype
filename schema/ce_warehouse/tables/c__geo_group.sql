@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo_group
     ),
 
     -- GEO Group ID
-    lk_geo_group SMALLINT NOT NULL
+    lk_pk_geo_group SMALLINT NOT NULL
         REFERENCES ce_warehouse.l__geo_group (pk_geo_group)
             ON UPDATE RESTRICT
             ON DELETE CASCADE
@@ -35,13 +35,13 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo_group
     ts_updated TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),
-    UNIQUE (fk_pk_geo, lk_geo_group)
+    UNIQUE (fk_pk_geo, lk_pk_geo_group)
 );
 
 -- It's recommended to have INDICES on foreign keys for performance!!
 -- unless we already have them on the referenced table
 CREATE INDEX IF NOT EXISTS c_geo_group__geo_group__idx
-    ON ce_warehouse.c__geo_group (lk_geo_group);
+    ON ce_warehouse.c__geo_group (lk_pk_geo_group);
 
 COMMENT ON TABLE ce_warehouse.c__geo_group
     IS 'Control table - GEO groups';

@@ -38,7 +38,7 @@ _Typically: double underscore separates metadata from object name._
 | `pk__`   | Primary key     | `pk_freq`            | Primary key, that is intended to be used as a foreign key in other tables |
 | `idx`    | Primary key     | `idx_date`           | Primary key, that is **not** useful as a foreign key                      | 
 | `fk__`   | Foreign key     | `fk_pk_pdi`          | Foreign key, that references a primary key in another table               |
-| `lk__`   | Foreign key     | `fk_pk_pdi`          | Foreign key, to lookup table                                              |
+| `lk__`   | Foreign key     | `lk_pk_pdi`          | Foreign key, to lookup table                                              |
 | `is__`   | Boolean flag    | `is_active`          | Boolean flag, typically used for soft deletes or status indicators        |
 | `dt__`   | Date            | `dt_start_of_period` | Date column, typically used for tracking creation or modification         |
 

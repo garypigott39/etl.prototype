@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l__source
         CHECK (code ~ '^[A-Z][A-Z0-9]{0,5}$'),   -- restrict to valid codes (max 6 chars, starting with a letter)
     name TEXT NOT NULL
         CHECK (ce_warehouse.fx_val__is_name(name) IS NULL),
-    source_is TEXT NOT NULL DEFAULT 'B',
-        CHECK (source_is IN ('A', 'M', 'B', '-')),     -- A=Api/M=Manual/B=Both/-=N/A
+    allowed_source TEXT NOT NULL DEFAULT 'B',
+        CHECK (allowed_source IN ('A', 'M', 'B', '-')),     -- A=Api/M=Manual/B=Both/-=N/A
     is_active BOOL NOT NULL DEFAULT TRUE,  -- enables the source to be marked as inactive if required
     is_api_available BOOL NOT NULL DEFAULT TRUE,  -- this is used to determine if the source is available for API calls (@see plugin)
 
@@ -35,7 +35,7 @@ COMMENT ON TABLE ce_warehouse.l__source
 /**
  * Pre-populate with known values. We will NEVER delete these values, but we might deactivate them if required!!
  */
-INSERT INTO ce_warehouse.l__source (code, name, source_is, api_available)
+INSERT INTO ce_warehouse.l__source (code, name, allowed_source, is_api_available)
 VALUES
     ('BLS','U.S. Bureau of Labour Statistics', 'A', TRUE),
     ('DS','LSEG Data & Analytics', 'A', FALSE),

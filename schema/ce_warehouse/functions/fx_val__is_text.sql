@@ -85,13 +85,13 @@ BEGIN
                 RETURN 'Value contains non-ASCII characters';
             END IF;
         ELSEIF _ignore_case AND (
-                    (NOT _rec.negate_regex AND _val !~* _rec.single_char_regex) OR
-                    (_rec.negate_regex AND _val ~* _rec.single_char_regex)
+                    (NOT _rec.is_negated AND _val !~* _rec.single_char_regex) OR
+                    (_rec.is_negated AND _val ~* _rec.single_char_regex)
             ) THEN
             RETURN 'Value does not match required format for single character (ignoring case)';
         ELSEIF NOT _ignore_case AND (
-                    (NOT _rec.negate_regex AND _val !~ _rec.single_char_regex) OR
-                    (_rec.negate_regex AND _val ~ _rec.single_char_regex)
+                    (NOT _rec.is_negated AND _val !~ _rec.single_char_regex) OR
+                    (_rec.is_negated AND _val ~ _rec.single_char_regex)
             ) THEN
             RETURN 'Value does not match required format for single character';
         END IF;
@@ -108,30 +108,30 @@ BEGIN
                 RETURN 'Value contains non-ASCII characters';
             END IF;
         ELSEIF _ignore_case AND (
-                    (NOT _rec.negate_regex AND _val !~* _rec.full_regex) OR
-                    (_rec.negate_regex AND _val ~* _rec.full_regex)
+                    (NOT _rec.is_negated AND _val !~* _rec.full_regex) OR
+                    (_rec.is_negated AND _val ~* _rec.full_regex)
             ) THEN
             RETURN 'Value does not match required format (ignoring case)';
         ELSEIF NOT _ignore_case AND (
-               (NOT _rec.negate_regex AND _val !~ _rec.full_regex) OR
-               (_rec.negate_regex AND _val ~ _rec.full_regex)
+               (NOT _rec.is_negated AND _val !~ _rec.full_regex) OR
+               (_rec.is_negated AND _val ~ _rec.full_regex)
             ) THEN
             RETURN 'Value does not match required format';
         END IF;
     END IF;
 
     -- Consecutive whitespace
-    IF NOT _rec.allow_consecutive_ws AND ( _val ~ '^\s' OR _val ~ '\s$' ) THEN
+    IF NOT _rec.is_allow_consecutive_ws AND ( _val ~ '^\s' OR _val ~ '\s$' ) THEN
         RETURN 'Value must not contain consecutive whitespace characters';
     END IF;
 
     -- Leading/trailing whitespace
-    IF NOT _rec.allow_leading_or_trailing_ws AND ( _val ~ '^\s' OR _val ~ '\s$' ) THEN
+    IF NOT _rec.is_allow_leading_or_trailing_ws AND ( _val ~ '^\s' OR _val ~ '\s$' ) THEN
         RETURN 'Value must not start or end with whitespace';
     END IF;
 
     -- Unbalanced parentheses
-    IF NOT _rec.allow_unbalanced_parenthesis THEN
+    IF NOT _rec.is_allow_unbalanced_parenthesis THEN
         -- Simple check for balanced parentheses - count opening and closing
         IF LENGTH(REPLACE(_val, '(', '')) <> LENGTH(REPLACE(_val, ')', '')) THEN
             RETURN 'Value contains unbalanced parentheses';

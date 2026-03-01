@@ -44,14 +44,14 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
     ordering INT NOT NULL DEFAULT 0,
 
     -- COM specific fields (will be NULL for GEO)
-    lk_commodity_type SMALLINT
+    lk_pk_commodity_type SMALLINT
         REFERENCES ce_warehouse.l__com_type(pk_com_type)
             ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-            (code LIKE 'C.%' AND lk_commodity_type IS NOT NULL)
-            OR (code NOT LIKE 'C.%' AND lk_commodity_type IS NULL)
+            (code LIKE 'C.%' AND lk_pk_commodity_type IS NOT NULL)
+            OR (code NOT LIKE 'C.%' AND lk_pk_commodity_type IS NULL)
         ),
 
     -- GEO specific fields (will be NULL for COM)
@@ -83,40 +83,40 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
             (code NOT LIKE 'G.%' AND long IS NULL)
             OR (code LIKE 'G.%' AND (long IS NULL OR long BETWEEN -180 AND 180))
         ),
-    lk_central_bank SMALLINT
+    lk_pk_central_bank SMALLINT
         REFERENCES ce_warehouse.l__central_bank(pk_central_bank)
             ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-            (code NOT LIKE 'G.%' AND lk_central_bank IS NULL)
+            (code NOT LIKE 'G.%' AND lk_pk_central_bank IS NULL)
             OR code LIKE 'G.%'
         ),
-    lk_stock_market SMALLINT
+    lk_pk_stock_market SMALLINT
         REFERENCES ce_warehouse.l__stock_market(pk_stock_market)
             ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-            (code NOT LIKE 'G.%' AND lk_stock_market IS NULL)
+            (code NOT LIKE 'G.%' AND lk_pk_stock_market IS NULL)
             OR code LIKE 'G.%'
         ),
-    lk_political_alignment SMALLINT
+    lk_pk_political_alignment SMALLINT
         REFERENCES ce_warehouse.l__political_alignment(pk_political_alignment)
             ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-            (code NOT LIKE 'G.%' AND lk_political_alignment IS NULL)
+            (code NOT LIKE 'G.%' AND lk_pk_political_alignment IS NULL)
             OR code LIKE 'G.%'
         ),
-    lk_currency_unit SMALLINT
+    lk_pk_currency_unit SMALLINT
         REFERENCES ce_warehouse.l__currency_unit(pk_currency_unit)
             ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-            (code NOT LIKE 'G.%' AND lk_currency_unit IS NULL)
+            (code NOT LIKE 'G.%' AND lk_pk_currency_unit IS NULL)
             OR code LIKE 'G.%'
         ),
     flag TEXT
@@ -124,14 +124,14 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
                 (code NOT LIKE 'G.%' AND flag IS NULL)
                 OR (code LIKE 'G.%' AND ce_warehouse.fx_val__is_name(flag, 'c_geo.flag') IS NULL)
         ),
-    lk_geo_category SMALLINT
+    lk_pk_geo_category SMALLINT
         REFERENCES ce_warehouse.l__geo_category(pk_geo_category)
             ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
-                (code NOT LIKE 'G.%' AND lk_geo_category IS NULL)
-                OR (code LIKE 'G.%' AND lk_geo_category IS NOT NULL)
+                (code NOT LIKE 'G.%' AND lk_pk_geo_category IS NULL)
+                OR (code LIKE 'G.%' AND lk_pk_geo_category IS NOT NULL)
         ),
 
     -- Standard fields
@@ -156,22 +156,22 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
 
 -- It's recommended to have INDICES on foreign keys for performance!!
 CREATE INDEX IF NOT EXISTS c_geo__commodity_type__idx
-    ON ce_warehouse.c__geo (lk_commodity_type);
+    ON ce_warehouse.c__geo (lk_pk_commodity_type);
 
 CREATE INDEX IF NOT EXISTS c_geo__central_bank__idx
-    ON ce_warehouse.c__geo (lk_central_bank);
+    ON ce_warehouse.c__geo (lk_pk_central_bank);
 
 CREATE INDEX IF NOT EXISTS c_geo__stock_market__idx
-    ON ce_warehouse.c__geo (lk_stock_market);
+    ON ce_warehouse.c__geo (lk_pk_stock_market);
 
 CREATE INDEX IF NOT EXISTS c_geo__political_alignment__idx
-    ON ce_warehouse.c__geo (lk_political_alignment);
+    ON ce_warehouse.c__geo (lk_pk_political_alignment);
 
 CREATE INDEX IF NOT EXISTS c_geo__local_currency_unit__idx
-    ON ce_warehouse.c__geo (lk_currency_unit);
+    ON ce_warehouse.c__geo (lk_pk_currency_unit);
 
 CREATE INDEX IF NOT EXISTS c_geo__category__idx
-    ON ce_warehouse.c__geo (lk_geo_category);
+    ON ce_warehouse.c__geo (lk_pk_geo_category);
 
 COMMENT ON TABLE ce_warehouse.c__geo
     IS 'Control table - geography details, used for validation & extra detail';

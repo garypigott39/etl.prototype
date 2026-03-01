@@ -39,11 +39,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.s__text_rule
     full_regex TEXT NOT NULL,
 
     -- Allow for disallowed patterns
-    is_negate_regex bool not null default false
-        check(
-            is_negate_regex = false
-            or (full_regex <> 'any')
-        ),
+    is_negated BOOL NOT NULL DEFAULT FALSE
+        CHECK (is_negated = FALSE OR full_regex <> 'ANY'),
 
     -- null rules at the table level will override these
     min_length INT NOT NULL DEFAULT 1
@@ -70,8 +67,8 @@ COMMENT ON TABLE ce_warehouse.s__text_rule
  * like causing all control tables  to be marked as invalid, so always test your regexes first.
  */
 INSERT INTO ce_warehouse.s__text_rule (
-    rule_type, column_name, description, allow_consecutive_ws, allow_leading_or_trailing_ws, allow_unbalanced_parenthesis,
-    single_char_regex, full_regex, negate_regex, min_length, max_length
+    rule_type, column_name, description, is_allow_consecutive_ws, is_allow_leading_or_trailing_ws,
+    is_allow_unbalanced_parenthesis, single_char_regex, full_regex, is_negated, min_length, max_length
 )
 VALUES
     (

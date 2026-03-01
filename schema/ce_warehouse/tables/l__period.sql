@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l__period
         AS (DATERANGE(dt_start_of_period, dt_end_of_period + 1, '[)')) STORED,
 
     PRIMARY KEY (pk_pdi),
-    UNIQUE (ifreq, start_of_period)
+    UNIQUE (ifreq, dt_start_of_period)
 );
 
 COMMENT ON TABLE ce_warehouse.l__period

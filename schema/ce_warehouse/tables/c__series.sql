@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series
         CHECK (ce_warehouse.fx_val__is_name(name4, 'c_series.name4') IS NULL),
     description TEXT
         CHECK (ce_warehouse.fx_val__is_text(description, 'c_series.description') IS NULL),
-    lk_units SMALLINT
+    lk_pk_units SMALLINT
         REFERENCES ce_warehouse.l__units (pk_units)
             ON UPDATE RESTRICT
             ON DELETE SET NULL
@@ -89,7 +89,7 @@ CREATE INDEX IF NOT EXISTS c_series__icode__idx
     ON ce_warehouse.c__series (icode);
 
 CREATE INDEX IF NOT EXISTS c_series__units__idx
-    ON ce_warehouse.c__series (lk_units);
+    ON ce_warehouse.c__series (lk_pk_units);
 
 COMMENT ON TABLE ce_warehouse.c__series
     IS 'Control table - series definition, lookup/validation';

@@ -26,19 +26,20 @@ FROM (
     SELECT
         x.fk_pk_series,
         x.ifreq,
-        x.pdi,
+        x.lk_pk_pdi AS pdi,
         p.tgt_ifreq,
         p.tgt_period,
         p.tgt_pdi,
         x.value,
         ROW_NUMBER() OVER (
-          PARTITION BY
-              x.fk_pk_series, x.ifreq, p.tgt_ifreq, p.tgt_pdi
-          ORDER BY x.pdi DESC
+            PARTITION BY
+                x.fk_pk_series, x.ifreq, p.tgt_ifreq, p.tgt_pdi
+            ORDER BY
+                x.lk_pk_pdi DESC
         ) AS rn
     FROM ce_warehouse.x__value x
     JOIN ce_warehouse.mv_xperiod p
-        ON x.pdi = p.src_pdi
+        ON x.lk_pk_pdi = p.src_pdi
         AND x.ifreq = p.src_ifreq
     WHERE x.itype = 1  -- 'AC' only, belt & braces
 ) s

@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__value
 
     -- These exist in l_freq & l_type, but aren't really worth the join
     ifreq SMALLINT NOT NULL GENERATED ALWAYS
-        AS (pdi / 100000000) STORED
+        AS (lk_pk_pdi / 100000000) STORED
         CHECK (ifreq IN (1, 2, 3 , 4, 5)),  -- extract frequency from period code
     itype SMALLINT NOT NULL
         CHECK (itype IN (1, 2)),  -- enforce valid types: 1=actual, 2=forecast
@@ -63,7 +63,7 @@ CREATE INDEX IF NOT EXISTS x_value__series_meta__idx
 CREATE INDEX IF NOT EXISTS x_value__pdi__idx
     ON ce_warehouse.x__value (lk_pk_pdi);
 
-CREATE INDEX IF NOT EXISTS x_value__isource__idx
+CREATE INDEX IF NOT EXISTS x_value__source__idx
     ON ce_warehouse.x__value (lk_pk_source);
 
 CREATE INDEX IF NOT EXISTS x_value__fk_pk_tip__idx

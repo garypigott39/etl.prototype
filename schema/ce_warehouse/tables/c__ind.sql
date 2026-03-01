@@ -39,17 +39,17 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__ind
         CHECK (ce_warehouse.fx_val__is_name(name3_lower, 'c_ind.name3_lower.ignore_case') IS NULL),
     name4_lower TEXT
         CHECK (ce_warehouse.fx_val__is_name(name4_lower, 'c_ind.name4_lower.ignore_case') IS NULL),
-    lk_ind_category_broad SMALLINT
+    lk_pk_ind_category_broad SMALLINT
         REFERENCES ce_warehouse.l__ind_category_broad (pk_ind_category_broad)
             ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
-    lk_ind_category_narrow SMALLINT
+    lk_pk_ind_category_narrow SMALLINT
         REFERENCES ce_warehouse.l__ind_category_narrow (pk_ind_category_narrow)
             ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
-    lk_data_transformation SMALLINT NOT NULL
+    lk_pk_data_transformation SMALLINT NOT NULL
         REFERENCES ce_warehouse.l__data_transformation (pk_data_transformation)
             ON UPDATE RESTRICT
             ON DELETE RESTRICT
@@ -73,13 +73,13 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__ind
 
 -- It's recommended to have INDICES on foreign keys for performance!!
 CREATE INDEX IF NOT EXISTS c_ind__category_broad__idx
-    ON ce_warehouse.c__ind (lk_ind_category_broad);
+    ON ce_warehouse.c__ind (lk_pk_ind_category_broad);
 
 CREATE INDEX IF NOT EXISTS c_ind__category_narrow__idx
-    ON ce_warehouse.c__ind (lk_ind_category_narrow);
+    ON ce_warehouse.c__ind (lk_pk_ind_category_narrow);
 
 CREATE INDEX IF NOT EXISTS c_ind__data_transformation__idx
-    ON ce_warehouse.c__ind (lk_data_transformation);
+    ON ce_warehouse.c__ind (lk_pk_data_transformation);
 
 COMMENT ON TABLE ce_warehouse.c__ind
     IS 'Control table - indicator details, used for validation & lookup';

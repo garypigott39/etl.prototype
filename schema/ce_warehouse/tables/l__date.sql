@@ -12,7 +12,7 @@
 CREATE TABLE IF NOT EXISTS ce_warehouse.l__date
 (
     pk_dti INT NOT NULL GENERATED ALWAYS
-        AS (ce_warehouse.fx_ut__date_to_pdi_or_dti(date, -1)) STORED,
+        AS (ce_warehouse.fx_ut__date_to_pdi_or_dti(dt_date, -1)) STORED,
 
     dt_date DATE NOT NULL,
 

@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__geo_groups_to_int(
     _groups TEXT[]
 )
     RETURNS TABLE (
-        lk_geo_group SMALLINT
+        lk_pk_geo_group SMALLINT
     )
     LANGUAGE sql
     IMMUTABLE

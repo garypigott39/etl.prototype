@@ -12,15 +12,15 @@
 CREATE MATERIALIZED VIEW ce_warehouse.mv_xperiod
 AS
 SELECT
-    src.pk_pdi         AS src_pdi,
-    src.ifreq          AS src_ifreq,
-    tgt.pk_pdi         AS tgt_pdi,
-    tgt.ifreq          AS tgt_ifreq,
-    tgt.period         AS tgt_period,
-    tgt.end_of_period  AS tgt_end_of_period
+    src.pk_pdi            AS src_pdi,
+    src.ifreq             AS src_ifreq,
+    tgt.pk_pdi            AS tgt_pdi,
+    tgt.ifreq             AS tgt_ifreq,
+    tgt.period            AS tgt_period,
+    tgt.dt_end_of_period  AS tgt_dt_end_of_period
 FROM ce_warehouse.mv_period src
     JOIN ce_warehouse.mv_period tgt
-      ON tgt.date_range @> src.mid_of_period
+      ON tgt.date_range @> src.dt_mid_of_period
      AND tgt.ifreq > src.ifreq;
 
 CREATE INDEX IF NOT EXISTS mv_xperiod__src_datapoint__idx

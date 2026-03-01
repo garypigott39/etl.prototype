@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_data_source
         CHECK (fk_pk_series > 0),
 
     -- Data source ID
-    lk_data_source SMALLINT NOT NULL
+    lk_pk_data_source SMALLINT NOT NULL
         REFERENCES ce_warehouse.l__data_source (pk_data_source)
             ON UPDATE RESTRICT
             ON DELETE CASCADE
@@ -31,13 +31,13 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_data_source
     ts_updated TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),
-    UNIQUE (fk_pk_series, lk_data_source)
+    UNIQUE (fk_pk_series, lk_pk_data_source)
 );
 
 -- It's recommended to have INDICES on foreign keys for performance!!
 -- unless we already have them on the referenced table
 CREATE INDEX IF NOT EXISTS c_series_data_source__data_source__idx
-    ON ce_warehouse.c__series_data_source (lk_data_source);
+    ON ce_warehouse.c__series_data_source (lk_pk_data_source);
 
 COMMENT ON TABLE ce_warehouse.c__series_data_source
     IS 'Control table - series data sources';

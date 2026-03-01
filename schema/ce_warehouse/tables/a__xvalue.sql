@@ -1,7 +1,7 @@
 /*
  ***********************************************************************************************************
  * @file
- * a_x_value.sql
+ * a_xvalue.sql
  *
  * Audit table - datapoint values.
  ***********************************************************************************************************
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a__xvalue
     PRIMARY KEY (idx)
 );
 
-CREATE INDEX IF NOT EXISTS a_x_value__datapoint__idx
+CREATE INDEX IF NOT EXISTS a_xvalue__datapoint__idx
     ON ce_warehouse.a__xvalue (fk_pk_series, pdi, idx DESC);
 
 COMMENT ON TABLE ce_warehouse.a__xvalue

@@ -49,8 +49,6 @@ BEGIN
     END IF;
 
     RAISE INFO 'Pipeline "%" %ed successfully', _name, _type;
-
-    COMMIT;  -- Ensure lock state Persists immediately
 END;
 $$;
 

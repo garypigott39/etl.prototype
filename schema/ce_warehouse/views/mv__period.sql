@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * mv_period.sql
+ * mv__period.sql
  *
  * Materialized View - generated periods.
  ***********************************************************************************************************
  */
 
--- DROP MATERIALIZED VIEW IF EXISTS ce_warehouse.mv_period;
+-- DROP MATERIALIZED VIEW IF EXISTS ce_warehouse.mv__period;
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS ce_warehouse.mv_period
+CREATE MATERIALIZED VIEW IF NOT EXISTS ce_warehouse.mv__period
 AS
 SELECT
     p.pk_pdi                AS pk_pdi,
@@ -43,15 +43,15 @@ FROM ce_warehouse.l__period p
     LEFT JOIN ce_warehouse.l__freq f
         ON p.ifreq = f.pk_freq;
 
-CREATE UNIQUE INDEX mv_period__pk__idx
-    ON ce_warehouse.mv_period(pk_pdi);
+CREATE UNIQUE INDEX mv__period__pk__idx
+    ON ce_warehouse.mv__period(pk_pdi);
 
-CREATE UNIQUE INDEX mv_period__period__idx
-    ON ce_warehouse.mv_period(period);
+CREATE UNIQUE INDEX mv__period__period__idx
+    ON ce_warehouse.mv__period(period);
 
 -- GIST "Generalized Search Tree" index -> performant for range queries
-CREATE INDEX IF NOT EXISTS mv_period__date_range__idx
-    ON ce_warehouse.mv_period USING GIST (date_range);
+CREATE INDEX IF NOT EXISTS mv__period__date_range__idx
+    ON ce_warehouse.mv__period USING GIST (date_range);
 
-COMMENT ON MATERIALIZED VIEW ce_warehouse.mv_period
+COMMENT ON MATERIALIZED VIEW ce_warehouse.mv__period
     IS 'Materialized View - generated periods';

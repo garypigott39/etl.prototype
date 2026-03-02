@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * v_date.sql
+ * v__date.sql
  *
  * View - generated dates metadata.
  ***********************************************************************************************************
  */
 
--- DROP VIEW IF EXISTS ce_warehouse.v_date;
+-- DROP VIEW IF EXISTS ce_warehouse.v__date;
 
-CREATE OR REPLACE VIEW ce_warehouse.v_date
+CREATE OR REPLACE VIEW ce_warehouse.v__date
 AS
 SELECT
     d.pk_dti                                                                             AS pk_dti,
@@ -91,5 +91,5 @@ FROM ce_warehouse.l__date d
     JOIN ce_warehouse.s__sys_flag s
         ON s.code = 'DATE.MIN';
 
-COMMENT ON VIEW ce_warehouse.v_date
+COMMENT ON VIEW ce_warehouse.v__date
     IS 'View - generated dates metadata';

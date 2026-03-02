@@ -48,34 +48,34 @@ BEGIN
                 1           AS ifreq,
                 d.dt_date   AS dt_start_of_period,
                 d.dt_date   AS dt_end_of_period
-            FROM ce_warehouse.v_date d
+            FROM ce_warehouse.v__date d
             UNION ALL
             SELECT
                 2,
                 d.dt_start_of_week,
                 d.dt_end_of_week
-            FROM ce_warehouse.v_date d
+            FROM ce_warehouse.v__date d
             GROUP BY 2, 3
             UNION ALL
             SELECT
                 3,
                 d.dt_start_of_month,
                 d.dt_end_of_month
-            FROM ce_warehouse.v_date d
+            FROM ce_warehouse.v__date d
             GROUP BY 2, 3
             UNION ALL
             SELECT
                 4,
                 d.dt_start_of_quarter,
                 d.dt_end_of_quarter
-            FROM ce_warehouse.v_date d
+            FROM ce_warehouse.v__date d
             GROUP BY 2, 3
             UNION  ALL
             SELECT
                 5,
                 d.dt_start_of_year,
                 d.dt_end_of_year
-            FROM ce_warehouse.v_date d
+            FROM ce_warehouse.v__date d
             GROUP BY 2, 3
         ),
         _with_lag AS (
@@ -115,8 +115,8 @@ BEGIN
             FROM t__period;
 
         -- 3. Refresh materialized views
-        REFRESH MATERIALIZED VIEW ce_warehouse.mv_period;
-        REFRESH MATERIALIZED VIEW ce_warehouse.mv_xperiod;
+        REFRESH MATERIALIZED VIEW ce_warehouse.mv__period;
+        REFRESH MATERIALIZED VIEW ce_warehouse.mv__xperiod;
     END IF;
 
 END

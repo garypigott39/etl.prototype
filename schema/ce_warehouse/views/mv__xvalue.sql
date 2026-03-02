@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * mv_xvalue.sql
+ * mv__xvalue.sql
  *
  * Materialized View - used in calc API processing.
  ***********************************************************************************************************
  */
 
--- DROP MATERIALIZED VIEW IF EXISTS ce_warehouse.mv_xvalue;
+-- DROP MATERIALIZED VIEW IF EXISTS ce_warehouse.mv__xvalue;
 
-CREATE MATERIALIZED VIEW ce_warehouse.mv_xvalue
+CREATE MATERIALIZED VIEW ce_warehouse.mv__xvalue
 AS
 SELECT
     fk_pk_series,
@@ -38,20 +38,20 @@ FROM (
                 x.lk_pk_pdi DESC
         ) AS rn
     FROM ce_warehouse.x__value x
-    JOIN ce_warehouse.mv_xperiod p
-        ON x.lk_pk_pdi = p.src_pdi
-        AND x.ifreq = p.src_ifreq
+        JOIN ce_warehouse.mv__xperiod p
+            ON x.lk_pk_pdi = p.src_pdi
+            AND x.ifreq = p.src_ifreq
     WHERE x.itype = 1  -- 'AC' only, belt & braces
 ) s
 GROUP BY
     fk_pk_series, ifreq, tgt_ifreq, tgt_pdi;
 
-CREATE INDEX IF NOT EXISTS mv_xvalue__fk_pk_series__idx
-    ON ce_warehouse.mv_xvalue (fk_pk_series);
+CREATE INDEX IF NOT EXISTS mv__xvalue__fk_pk_series__idx
+    ON ce_warehouse.mv__xvalue (fk_pk_series);
 
 -- For performance of "calc" JOINs
-CREATE INDEX IF NOT EXISTS mv_xvalue__ud_calc__idx
-    ON ce_warehouse.mv_xvalue (fk_pk_series, src_pdi, src_ifreq);
+CREATE INDEX IF NOT EXISTS mv__xvalue__ud_calc__idx
+    ON ce_warehouse.mv__xvalue (fk_pk_series, src_pdi, src_ifreq);
 
-COMMENT ON MATERIALIZED VIEW ce_warehouse.mv_xvalue
+COMMENT ON MATERIALIZED VIEW ce_warehouse.mv__xvalue
     IS 'Materialized View - used in calc API processing';

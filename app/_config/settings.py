@@ -43,10 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ce_warehouse',
-    'ce_plugin',
-    'ce_powerbi',
-    'ce_powerbi_v02',
 ]
 
 MIDDLEWARE = [

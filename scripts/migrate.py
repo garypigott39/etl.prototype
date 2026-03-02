@@ -94,7 +94,7 @@ def create_temp_from_source(src_cur, tgt_cur, source_query, temp_name):
 def setup_and_check(src_cur, tgt_cur):
     # Ensure we have no datapoint values
     print("Checking for existing datapoint/values...")
-    tgt_cur.execute("SELECT COUNT(*) FROM ce_warehouse.x_value")
+    tgt_cur.execute("SELECT COUNT(*) FROM ce_warehouse.x__value")
     count = tgt_cur.fetchone()[0]
     if count > 0:
         raise RuntimeError(f"Target values table is not empty! Found {count} records. Aborting.")
@@ -309,7 +309,7 @@ def data_clean_data_source(tgt_cur, tmp):
 
 def migrate_avalue(src_cur, tgt_cur):
     src = "SELECT * FROM ce_powerbi.x_values_audit"
-    tgt = "ce_warehouse.a_x_value"
+    tgt = "ce_warehouse.a__xvalue"
     tmp = "t__a_x_values_audit"
 
     print(f"\n### MIGRATE: {tgt}")
@@ -325,14 +325,14 @@ def migrate_avalue(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            fk_pk_series, pdi, itype, isource, value, new_value, realised, audit_type, audit_utc
+            fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, new_value, realised, audit_type, audit_utc
         )
         SELECT 
-            x.fk_pk_xs::INT, x.pdi::INT, x.type::INT, ls.pk_source, x.value::NUMERIC, 
+            x.fk_pk_xs::INT, x.pdi::INT, x.type::INT, l.pk_source, x.value::NUMERIC, 
             x.new_value::NUMERIC, x.realised::BOOL, x.aud_type, x.aud_utc::TIMESTAMPTZ
         FROM {tmp} x
-            JOIN ce_warehouse.l_source ls
-                ON ls.code = x.source
+            JOIN ce_warehouse.l__source l
+                ON l.code = x.source
         ORDER BY idx
     """)
 
@@ -343,7 +343,7 @@ def migrate_avalue(src_cur, tgt_cur):
 def migrate_calc(src_cur, tgt_cur):
     """Various jiggery pokery needed."""
     src = "SELECT * FROM ce_data.c_api_calc"
-    tgt = "ce_warehouse.c_calc"
+    tgt = "ce_warehouse.c__calc"
     tmp = "t__c_api_calc"
 
     print(f"\n### MIGRATE: {tgt}")
@@ -419,7 +419,7 @@ def migrate_calc(src_cur, tgt_cur):
 
 def migrate_const(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_const"
-    tgt = "ce_warehouse.c_const"
+    tgt = "ce_warehouse.c__const"
     tmp = "t__c_const"
 
     print(f"\n### MIGRATE: {tgt}")
@@ -450,7 +450,7 @@ def migrate_const(src_cur, tgt_cur):
 
 
 def migrate_geo(src_cur, tgt_cur):
-    tgt = "ce_warehouse.c_geo"
+    tgt = "ce_warehouse.c__geo"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -482,8 +482,8 @@ def migrate_geo(src_cur, tgt_cur):
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
             pk_geo, code, name, name2, short_name, tla, iso2, iso3, lat, long, 
-            lk_central_bank, lk_stock_market, lk_political_alignment, lk_currency_unit, flag, 
-            lk_geo_category, ordering, internal_notes, updated_utc
+            lk_pk_central_bank, lk_pk_stock_market, lk_pk_political_alignment, lk_pk_currency_unit, 
+            flag, lk_pk_geo_category, ordering, internal_notes, updated_utc
         )
         SELECT 
             g.pk_geo::INT, g.geo_code, g.geo_name, g.geo_name2, g.geo_short_name, g.geo_tla, 
@@ -491,15 +491,15 @@ def migrate_geo(src_cur, tgt_cur):
             ls.pk_stock_market, lp.pk_political_alignment, lcu.pk_currency_unit, g.geo_flag, 
             lg.pk_geo_category, g.geo_order::INT, g.internal_notes, g.updated_utc::TIMESTAMPTZ
         FROM {tmp} g
-            LEFT JOIN ce_warehouse.l_central_bank lcb
+            LEFT JOIN ce_warehouse.l__central_bank lcb
                 ON lcb.name = g.geo_cb
-            LEFT JOIN ce_warehouse.l_stock_market ls
+            LEFT JOIN ce_warehouse.l__stock_market ls
                 ON ls.name = g.geo_stockmarket
-            LEFT JOIN ce_warehouse.l_political_alignment lp
+            LEFT JOIN ce_warehouse.l__political_alignment lp
                 ON lp.name = g.geo_political_alignment
-            LEFT JOIN ce_warehouse.l_currency_unit lcu
+            LEFT JOIN ce_warehouse.l__currency_unit lcu
                 ON lcu.code = g.geo_lcu
-            LEFT JOIN ce_warehouse.l_geo_category lg
+            LEFT JOIN ce_warehouse.l__geo_category lg
                 ON lg.name = g.geo_catg
         WHERE g.error IS NULL
         ORDER BY 1    
@@ -535,7 +535,7 @@ def migrate_geo(src_cur, tgt_cur):
 
 def migrate_geo_group(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_geo"
-    tgt = "ce_warehouse.c_geo_group"
+    tgt = "ce_warehouse.c__geo_group"
     tmp = "t__c_geo_group"
 
     print(f"\n### MIGRATE: {tgt}")
@@ -551,9 +551,9 @@ def migrate_geo_group(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            fk_pk_geo, lk_geo_group, updated_utc
+            fk_pk_geo, lk_pk_geo_group, updated_utc
         )
-        SELECT g.pk_geo, lg.pk_geo_group, g.updated_utc
+        SELECT g.pk_geo, l.pk_geo_group, g.updated_utc
         FROM (
             SELECT DISTINCT 
                 pk_geo::INT, 
@@ -563,7 +563,7 @@ def migrate_geo_group(src_cur, tgt_cur):
             WHERE geo_groups IS NOT NULL
             AND error IS NULL
         ) g
-            LEFT JOIN ce_warehouse.l_geo_group lg
+            LEFT JOIN ce_warehouse.l__geo_group l
                 ON lg.code = g.code
         WHERE g.code IS NOT NULL
         ORDER BY 1    
@@ -575,7 +575,7 @@ def migrate_geo_group(src_cur, tgt_cur):
 
 def migrate_ind(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_ind"
-    tgt = "ce_warehouse.c_ind"
+    tgt = "ce_warehouse.c__ind"
     tmp = "t__c_ind"
 
     print(f"\n### MIGRATE: {tgt}")
@@ -596,9 +596,9 @@ def migrate_ind(src_cur, tgt_cur):
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
             pk_ind, code, name, description, name1, name2, name3, name4, name_lower, 
-            name1_lower, name2_lower, name3_lower, name4_lower, lk_ind_category_broad, 
-            lk_ind_category_narrow, lk_data_transformation, keyindicator, proprietary_data,
-            ordering, internal_notes, updated_utc
+            name1_lower, name2_lower, name3_lower, name4_lower, lk_pk_ind_category_broad, 
+            lk_pk_ind_category_narrow, lk_pk_data_transformation, is_keyindicator, 
+            is_proprietary_data, ordering, internal_notes, updated_utc
         )
         SELECT 
             i.pk_i::INT, i.i_code, i_name, i.i_description, i.i_name1, i.i_name2, i.i_name3, 
@@ -623,7 +623,7 @@ def migrate_ind(src_cur, tgt_cur):
 
 def migrate_ind_parent(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_ind"
-    tgt = "ce_warehouse.c_ind_parent"
+    tgt = "ce_warehouse.c__ind_parent"
     tmp = "t__c_ind_parent"
 
     print(f"\n### MIGRATE: {tgt}")
@@ -639,7 +639,7 @@ def migrate_ind_parent(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            fk_pk_ind, fk_pk_ind__parent, updated_utc
+            fk_pk_ind, fk_pk_ind_parent, updated_utc
         )
         SELECT i.pk_i, parent.pk_i::INT, i.updated_utc
         FROM (
@@ -663,7 +663,7 @@ def migrate_ind_parent(src_cur, tgt_cur):
 
 def migrate_series(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_series"
-    tgt = "ce_warehouse.c_series"
+    tgt = "ce_warehouse.c__series"
     tmp = "t__c_series"
 
     print(f"\n### MIGRATE: {tgt}")
@@ -682,22 +682,22 @@ def migrate_series(src_cur, tgt_cur):
     # Insert into target
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            pk_series, gcode, icode, name, name1, name2, name3, name4, description, lk_units,
+            pk_series, gcode, icode, name, name1, name2, name3, name4, description, lk_pk__units,
             precision, date_point, ordering, status, internal_notes, updated_utc
         )
         SELECT 
             s.pk_s::INT, s.s_gcode, s.s_icode, s.s_name, s.s_name1, s.s_name2, s.s_name3, s.s_name4,
             s.s_description,
             CASE
-                WHEN lu.pk_units IS NOT NULL THEN lu.pk_units
+                WHEN l.pk_units IS NOT NULL THEN l.pk_units
                 WHEN s.s_units IS NOT NULL THEN -1
             END, 
             s.s_precision::INT,s. s_date_point, s.s_order::INT,
             CASE WHEN s.s_active::BOOL THEN 'active' ELSE 'inactive' END, 
             s.internal_notes, s.updated_utc::TIMESTAMPTZ
         FROM {tmp} s
-            LEFT JOIN ce_warehouse.l_units lu
-                ON lu.name = s.s_units
+            LEFT JOIN ce_warehouse.l__units l
+                ON l.name = s.s_units
         WHERE error IS NULL
         ORDER BY 1    
     """)
@@ -708,7 +708,7 @@ def migrate_series(src_cur, tgt_cur):
 
 def migrate_series_data_source(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_series"
-    tgt = "ce_warehouse.c_series_data_source"
+    tgt = "ce_warehouse.c__series_data_source"
     tmp = "t__c_series_data_source"
 
     print(f"\n### MIGRATE: {tgt}")
@@ -726,9 +726,9 @@ def migrate_series_data_source(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            fk_pk_series, lk_data_source, updated_utc
+            fk_pk_series, lk_pk_data_source, updated_utc
         )
-        SELECT s.pk_s, ld.pk_data_source, s.updated_utc
+        SELECT s.pk_s, l.pk_data_source, s.updated_utc
         FROM (
             SELECT
                 t.pk_s::INT AS pk_s,
@@ -742,7 +742,7 @@ def migrate_series_data_source(src_cur, tgt_cur):
             WHERE t.error IS NULL
             AND ds.ds_name IS NOT NULL
         ) s
-            JOIN ce_warehouse.l_data_source ld
+            JOIN ce_warehouse.l__data_source l
                 ON ld.name = s.ds_name
         GROUP BY 1, 2, 3, s.idx
         ORDER BY s.pk_s, s.idx  -- psuedo ordering 
@@ -771,7 +771,7 @@ def migrate_series_downloadable(src_cur, tgt_cur):
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
             fk_pk_series, ifreq, itype, downloadable, forecast_only_lifespan, 
-            internal_notes, updated_utc
+            internal_notes, ts_updated
         )
         SELECT 
             s.pk_series, lf.pk_freq, lt.pk_type, sm.sm_downloadable, sm.forecast_only_lifespan::INT,
@@ -794,7 +794,7 @@ def migrate_series_downloadable(src_cur, tgt_cur):
 
 def migrate_xtooltip(src_cur, tgt_cur):
     src = "SELECT * FROM ce_pipeline.x_tooltip"
-    tgt = "ce_warehouse.x_tooltip"
+    tgt = "ce_warehouse.x__tooltip"
     tmp = "t__c_xtooltip"
 
     print(f"\n### MIGRATE: {tgt}")
@@ -822,7 +822,7 @@ def migrate_xtooltip(src_cur, tgt_cur):
 
 
 def migrate_xvalue(src_cur, tgt_cur):
-    tgt = "ce_warehouse.x_value"
+    tgt = "ce_warehouse.x__value"
 
     print(f"\n### MIGRATE: {tgt}")
 
@@ -843,14 +843,14 @@ def migrate_xvalue(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            fk_pk_series, pdi, itype, isource, value, fk_pk_tip, is_calculated, updated_utc
+            fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, fk_pk_tip, is_calculated, updated_utc
         )
         SELECT 
-            x.fk_pk_s::INT, x.pdi::INT, x.type::INT, ls.pk_source, x.value::NUMERIC, 
+            x.fk_pk_s::INT, x.pdi::INT, x.type::INT, l.pk_source, x.value::NUMERIC, 
             x.fk_pk_tip::INT, (x.source = 'DX'), x.updated_utc::TIMESTAMPTZ
         FROM {tmp} x
-            JOIN ce_warehouse.l_source ls
-                ON ls.code = x.source
+            JOIN ce_warehouse.l__source l
+                ON l.code = x.source
         ORDER BY idx  
     """)
 
@@ -863,16 +863,16 @@ def migrate_xvalue(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            fk_pk_series, pdi, itype, isource, value, fk_pk_tip, is_calculated, updated_utc
+            fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, fk_pk_tip, is_calculated, updated_utc
         )
         SELECT 
-            x.fk_pk_s::INT, x.pdi::INT, x.type::INT, ls.pk_source, x.value::NUMERIC, 
+            x.fk_pk_s::INT, x.pdi::INT, x.type::INT, l.pk_source, x.value::NUMERIC, 
             x.fk_pk_tip::INT, FALSE, x.updated_utc::TIMESTAMPTZ
         FROM {tmp} x
-            JOIN ce_warehouse.l_source ls
-                ON ls.code = x.source
+            JOIN ce_warehouse.l_source l
+                ON l.code = x.source
         ORDER BY idx
-        ON CONFLICT (fk_pk_series, pdi) DO NOTHING 
+        ON CONFLICT (fk_pk_series, lk_pk_pdi) DO NOTHING 
     """)
 
     # 3. x_calc
@@ -884,16 +884,16 @@ def migrate_xvalue(src_cur, tgt_cur):
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
-            fk_pk_series, pdi, itype, isource, value, is_calculated, updated_utc
+            fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, is_calculated, updated_utc
         )
         SELECT 
-            x.fk_pk_s::INT, x.pdi::INT, x.type::INT, ls.pk_source, x.value::NUMERIC, 
+            x.fk_pk_s::INT, x.pdi::INT, x.type::INT, l.pk_source, x.value::NUMERIC, 
             TRUE, x.updated_utc::TIMESTAMPTZ
         FROM {tmp} x
-            JOIN ce_warehouse.l_source ls
+            JOIN ce_warehouse.l_source l
                 ON ls.code = x.source
         ORDER BY idx
-        ON CONFLICT (fk_pk_series, pdi) DO NOTHING 
+        ON CONFLICT (fk_pk_series, lk_pk_pdi) DO NOTHING 
     """)
 
     print("Re-enabling triggers...")
@@ -906,26 +906,26 @@ def post_migration_steps(src_cur, tgt_cur):
     """
     print("\n### POST-MIGRATION: Updating x-series-meta, & fixing any SEQuences")
 
-    tgt_cur.execute("""CALL ce_warehouse.px_ut_fix_seq();""")
+    tgt_cur.execute("""CALL ce_warehouse.px_ut__fix_seq();""")
 
     tgt_cur.execute("""
-        INSERT INTO ce_warehouse.x_series_meta (
+        INSERT INTO ce_warehouse.x__series_meta (
             fk_pk_series, ifreq, itype, sid1, first_pdi, last_pdi, has_values, updated_values_utc
         )
         SELECT
-            x.fk_pk_series, x.ifreq, x.itype, s.sid1, MIN(x.pdi), MAX(x.pdi), TRUE, 
-            MAX(x.updated_utc) 
-        FROM ce_warehouse.x_value x
+            x.fk_pk_series, x.ifreq, x.itype, s.sid1, MIN(x.lk_pk_pdi), MAX(x.lk_pk_pdi), TRUE, 
+            MAX(x.ts_updated) 
+        FROM ce_warehouse.x__value x
             JOIN ce_warehouse.c_series s 
                 ON s.pk_series = x.fk_pk_series
         GROUP BY x.fk_pk_series, x.ifreq, x.itype, s.sid1
         ON CONFLICT (fk_pk_series, ifreq, itype) DO NOTHING;
 
-        UPDATE ce_warehouse.x_series_meta xm
-        SET new_values_utc = a.audit_utc
+        UPDATE ce_warehouse.x__series_meta xm
+        SET ts_new_values = a.ts_audit_time
         FROM (
-            SELECT fk_pk_series, ifreq, itype, MAX(audit_utc) AS audit_utc
-            FROM ce_warehouse.a_x_value
+            SELECT fk_pk_series, ifreq, itype, MAX(ts_audit_time) AS ts_audit_time
+            FROM ce_warehouse.a__xvalue
             WHERE audit_type = 'I'
             GROUP BY fk_pk_series, ifreq, itype 
         ) a

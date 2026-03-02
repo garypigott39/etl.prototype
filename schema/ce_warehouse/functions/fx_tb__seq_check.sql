@@ -102,7 +102,7 @@ BEGIN
             END,
             CASE
                 WHEN t_seq_last_value < t_col_last_value THEN
-                    FORMAT('SELECT setval(''%s'', %s);', seq_name, col_max_value)
+                    FORMAT('SELECT setval(''%s'', %s);', t_seq_name, t_col_last_value)
                 ELSE NULL
             END
         FROM t__seq_check

@@ -75,9 +75,9 @@ BEGIN
         -- Period 1_must be <= Period 2, Token_must exist, and both periods_must exist
         IF _pdi1 > _pdi2 THEN
             RETURN 'Period 1_must be less than or equal to Period 2';
-        ELSEIF _pdi1 ~ '^[1-5]' THEN
+        ELSEIF _pdi1 !~ '^[1-5]' THEN
             RETURN FORMAT('Period 1 %s is invalid,_must start with 1-5', _pdi1);
-        ELSEIF _pdi2 ~ '^[1-5]' THEN
+        ELSEIF _pdi2 !~ '^[1-5]' THEN
             RETURN FORMAT('Period 2 %s is invalid,_must start with 1-5', _pdi1);
         ELSEIF LEFT(_pdi1, 1) <> LEFT(_pdi2,  1) THEN
             RETURN 'Period 1 and Period 2_must be in the same frequency group';
@@ -85,7 +85,7 @@ BEGIN
             RETURN FORMAT('Token "%s" does not exist', _tok);
         ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l__period p WHERE p.pk_pdi = _pdi1::INT) THEN
             RETURN FORMAT('Period "%s" does not exist', _pdi1);
-        ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l__period p WHERE p.pk_pd2 = _pdi2::INT) THEN
+        ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l__period p WHERE p.pk_pdi = _pdi2::INT) THEN
             RETURN FORMAT('Period "%s" does not exist', _pdi2);
         END IF;
 
@@ -98,7 +98,7 @@ BEGIN
     RETURN 'Invalid expression format';
 
     EXCEPTION WHEN others THEN
-        RETURN FORMAT('Unable to parse expression %s', _expr);  -- catch any unexpected errors and treat as invalid
+        RETURN FORMAT('Exception occurred, unable to parse expression %s', _expr);  -- catch any unexpected errors and treat as invalid
 END;
 $$;
 

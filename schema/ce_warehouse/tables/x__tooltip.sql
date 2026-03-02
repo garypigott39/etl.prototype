@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__tooltip
     tooltip TEXT NOT NULL
         CHECK (ce_warehouse.fx_val__is_text(tooltip, 'x_tooltip.tooltip', FALSE) IS NULL),
 
+    ts_created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
     PRIMARY KEY(pk_tip),
     UNIQUE (tooltip)
 );

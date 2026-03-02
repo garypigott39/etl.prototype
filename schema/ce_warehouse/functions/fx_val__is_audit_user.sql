@@ -21,8 +21,8 @@ AS
 $$
 SELECT
     CASE
-        -- Allow unknown/system/migration
-        WHEN _value IN ('unknown', 'system', 'migration') THEN NULL
+        -- Allow unknown/system/migrate
+        WHEN _value IN ('unknown', 'system', 'migrate') THEN NULL
 
         -- Check SQL user exists
         WHEN _value LIKE 'sql:%'

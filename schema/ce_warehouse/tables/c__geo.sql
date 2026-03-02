@@ -119,11 +119,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
             (code NOT LIKE 'G.%' AND lk_pk_currency_unit IS NULL)
             OR code LIKE 'G.%'
         ),
-    flag TEXT
-        CHECK (
-                (code NOT LIKE 'G.%' AND flag IS NULL)
-                OR (code LIKE 'G.%' AND ce_warehouse.fx_val__is_name(flag, 'c_geo.flag') IS NULL)
-        ),
     lk_pk_geo_category SMALLINT
         REFERENCES ce_warehouse.l__geo_category(pk_geo_category)
             ON UPDATE RESTRICT
@@ -132,6 +127,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
         CHECK (
                 (code NOT LIKE 'G.%' AND lk_pk_geo_category IS NULL)
                 OR (code LIKE 'G.%' AND lk_pk_geo_category IS NOT NULL)
+        ),
+    flag TEXT
+        CHECK (
+                (code NOT LIKE 'G.%' AND flag IS NULL)
+                OR (code LIKE 'G.%' AND ce_warehouse.fx_val__is_name(flag, 'c_geo.flag') IS NULL)
         ),
 
     -- Standard fields

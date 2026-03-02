@@ -28,6 +28,10 @@ BEGIN
     CALL ce_warehouse.px_ut__info('Generating dates & periods', TRUE);
     CALL ce_warehouse.px_ut__generate_dates();
 
+    -- Pull over any Django users, &/or mark deletions
+    CALL ce_warehouse.px_ut__info('Syncing users', TRUE);
+    CALL ce_warehouse.px_ut__sync_users();
+
     -- Any other housekeeping tasks could go her, @TBA
 
     -- Unlock pipeline

@@ -7,9 +7,9 @@
  ***********************************************************************************************************
  */
 
--- DROP TABLE IF EXISTS ce_warehouse.l__date;
+-- DROP TABLE IF EXISTS ce_warehouse.l__dti;
 
-CREATE TABLE IF NOT EXISTS ce_warehouse.l__date
+CREATE TABLE IF NOT EXISTS ce_warehouse.l__dti
 (
     pk_dti INT NOT NULL GENERATED ALWAYS
         AS (ce_warehouse.fx_ut__date_to_pdi_or_dti(dt_date, -1)) STORED,
@@ -20,5 +20,5 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l__date
     UNIQUE (dt_date)
 );
 
-COMMENT ON TABLE ce_warehouse.l__date
+COMMENT ON TABLE ce_warehouse.l__dti
     IS 'Lookup table - date lookup. System generated';

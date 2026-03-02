@@ -90,22 +90,22 @@ base_db_settings = {
 
 DATABASES = {
     'default': base_db_settings,
-    'ce_warehouse': base_db_settings + {
+    'ce_warehouse': base_db_settings | {
         'OPTIONS': {
             'options': '-c search_path=ce_warehouse',
             }
     },
-    'ce_plugin': base_db_settings + {
+    'ce_plugin': base_db_settings | {
         'OPTIONS': {
             'options': '-c search_path=ce_plugin',
         }
     },
-    'ce_powerbi': base_db_settings + {
+    'ce_powerbi': base_db_settings | {
         'OPTIONS': {
             'options': '-c search_path=ce_powerbi',
         }
     },
-    'ce_powerbi_v02': base_db_settings + {
+    'ce_powerbi_v02': base_db_settings | {
         'OPTIONS': {
             'options': '-c search_path=ce_powerbi_v02',
         }

@@ -30,6 +30,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a__xvalue
 
     audit_type TEXT NOT NULL
         CHECK (audit_type IN ('I', 'U', 'D', 'init', 'pipeline')),
+
+    audit_user TEXT NOT NULL,  -- annotate with user name/ID
+
     ts_audit_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx)

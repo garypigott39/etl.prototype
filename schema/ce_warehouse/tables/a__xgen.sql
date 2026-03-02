@@ -19,13 +19,19 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a__xgen
 
     audit_type TEXT NOT NULL
         CHECK (audit_type IN ('I', 'U', 'D')),
+
+    audit_user TEXT NOT NULL,  -- annotate with username/ID
+
     ts_audit_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx)
 );
 
-CREATE INDEX IF NOT EXISTS a__xgen__tname__idx
+CREATE INDEX IF NOT EXISTS a__xgen__table__idx
     ON ce_warehouse.a__xgen (t_name, t_pkey, idx DESC);  -- index to optimize queries for specific tables/records, with most recent changes first
+
+CREATE INDEX IF NOT EXISTS a__xgen__user__idx
+    ON ce_warehouse.a__xgen (audit_user, idx DESC);  -- index to optimize queries for specific tables/records, with most recent changes first
 
 COMMENT ON TABLE ce_warehouse.a__xgen
     IS 'Audit table - generic audit table';

@@ -87,7 +87,7 @@ SELECT
         ELSE EXTRACT(YEAR FROM d.dt_date)::INT
     END                                                                                  AS yyyy_fy
 
-FROM ce_warehouse.l__date d
+FROM ce_warehouse.l__dti d
     JOIN ce_warehouse.s__sys_flag s
         ON s.code = 'DATE.MIN';
 

@@ -31,10 +31,17 @@ BEGIN
          ***************************************************************************/
 
         INSERT INTO ce_warehouse.a_xvalue (
-            fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, realised, audit_type
+            fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, realised, audit_type, audit_user
         )
         VALUES (
-            NEW.fk_pk_series, NEW.lk_pk_pdi, NEW.itype, NEW.lk_pk_source, NEW.value, FALSE, 'I'
+            NEW.fk_pk_series,
+            NEW.lk_pk_pdi,
+            NEW.itype,
+            NEW.lk_pk_source,
+            NEW.value,
+            FALSE,
+            'I',
+            ce_warehouse.fx_ut__current_uid()
         );
 
         -- upsert x_series_meta
@@ -62,11 +69,18 @@ BEGIN
             OR (OLD.lk_pk_source IS DISTINCT FROM NEW.lk_pk_source) THEN
 
             INSERT INTO ce_warehouse.a_xvalue (
-                fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, new_value, realised, audit_type
+                fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, new_value, realised, audit_type, audit_user
             )
             VALUES (
-                OLD.fk_pk_series, OLD.lk_pk_pdi, OLD.itype, OLD.lk_pk_source, OLD.value, NEW.value,
-                (OLD.itype = 2 AND NEW.itype = 1), 'U'
+                OLD.fk_pk_series,
+                OLD.lk_pk_pdi,
+                OLD.itype,
+                OLD.lk_pk_source,
+                OLD.value,
+                NEW.value,
+                (OLD.itype = 2 AND NEW.itype = 1),
+                'U',
+                ce_warehouse.fx_ut__current_uid()
             );
 
             -- update x_series_meta
@@ -89,9 +103,18 @@ BEGIN
          * DELETE
          ***************************************************************************/
 
-        INSERT INTO ce_warehouse.a_xvalue(fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, realised, audit_type)
+        INSERT INTO ce_warehouse.a_xvalue(
+           fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, realised, audit_type, audit_user
+        )
         VALUES (
-            OLD.fk_pk_series, OLD.lk_pk_pdi, OLD.itype, OLD.lk_pk_source, OLD.value, FALSE, 'D'
+            OLD.fk_pk_series,
+            OLD.lk_pk_pdi,
+            OLD.itype,
+            OLD.lk_pk_source,
+            OLD.value,
+            FALSE,
+            'D',
+            ce_warehouse.fx_ut__current_uid()
         );
 
         -- recompute bounds

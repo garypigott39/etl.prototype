@@ -62,8 +62,16 @@ BEGIN
     END IF;
 
     IF _diff IS NOT NULL THEN
-        INSERT INTO ce_warehouse.a__xgen_audit (t_name, t_pkey, data, audit_type)
-            VALUES (TG_TABLE_SCHEMA || '.' || TG_TABLE_NAME, _pk, _diff, _audit_type);
+        INSERT INTO ce_warehouse.a__xgen_audit (
+            t_name, t_pkey, data, audit_type, audit_user
+        )
+        VALUES (
+            TG_TABLE_SCHEMA || '.' || TG_TABLE_NAME,
+            _pk,
+            _diff,
+            _audit_type,
+            ce_warehouse.fx_ut__get_current_uid()
+        );
     END IF;
 
     RETURN NULL;

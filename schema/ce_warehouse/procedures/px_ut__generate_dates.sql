@@ -32,11 +32,11 @@ BEGIN
         FROM generate_series(_dt1, _dt2, INTERVAL '1 DAY') AS gs(date)
         WHERE NOT EXISTS (
             SELECT 1
-            FROM ce_warehouse.l__date d
+            FROM ce_warehouse.l__dti d
             WHERE d.dt_date = gs.date
         )
     LOOP
-        INSERT INTO ce_warehouse.l__date (dt_date)
+        INSERT INTO ce_warehouse.l__dti (dt_date)
             VALUES (_dt)
         ON CONFLICT (dt_date) DO NOTHING;
     END LOOP;
@@ -83,13 +83,13 @@ BEGIN
         FROM _with_lag l
         WHERE NOT EXISTS  (
             SELECT 1
-            FROM ce_warehouse.l__period p
+            FROM ce_warehouse.l__pdi p
             WHERE p.ifreq = l.ifreq
             AND p.start_of_period = l.start_of_period
         );
 
     IF (SELECT COUNT(*) FROM t__periods) > 0 THEN
-        INSERT INTO ce_warehouse.l__period (ifreq, start_of_period, end_of_period, period, lag)
+        INSERT INTO ce_warehouse.l__pdi (ifreq, start_of_period, end_of_period, period, lag)
             SELECT ifreq, start_of_period, end_of_period, period, lag
             FROM t__periods;
 

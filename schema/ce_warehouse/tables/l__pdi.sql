@@ -7,9 +7,9 @@
  ***********************************************************************************************************
  */
 
--- DROP TABLE IF EXISTS ce_warehouse.l__period;
+-- DROP TABLE IF EXISTS ce_warehouse.l__pdi;
 
-CREATE TABLE IF NOT EXISTS ce_warehouse.l__period
+CREATE TABLE IF NOT EXISTS ce_warehouse.l__pdi
 (
     pk_pdi INT NOT NULL GENERATED ALWAYS
         AS (ce_warehouse.fx_ut__date_to_pdi_or_dti(dt_start_of_period, ifreq)) STORED,
@@ -38,5 +38,5 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l__period
     UNIQUE (ifreq, dt_start_of_period)
 );
 
-COMMENT ON TABLE ce_warehouse.l__period
+COMMENT ON TABLE ce_warehouse.l__pdi
     IS 'Lookup table - period lookup. System generated';

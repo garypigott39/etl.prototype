@@ -4,7 +4,7 @@
 #
 # ---- Config ----
 PYTHON ?= python3
-MANAGE := $(PYTHON) manage.py
+MANAGE := $(PYTHON) app/manage.py
 
 # Directories
 DJANGO := app
@@ -20,6 +20,7 @@ help:
 	@clear
 	@echo
 	@echo "Available targets:"
+	@echo
 	@echo "  make run               - Run Django dev server"
 	@echo "  make migrate           - Apply migrations"
 	@echo "  make makemigrations    - Make migrations"

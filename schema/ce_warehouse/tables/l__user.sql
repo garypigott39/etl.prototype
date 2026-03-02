@@ -42,7 +42,7 @@ COMMENT ON TABLE ce_warehouse.l__user
  */
 INSERT INTO ce_warehouse.l__user (pk_user, name, source_uid, internal_notes)
 VALUES
-    (-1, 'app', -2, 'System user for automated processes'),
+    (-1, 'system', -2, 'System user for automated processes'),
     (-2, 'migration', -1, 'System user for data migration & backfilling');
 
 /*
@@ -61,3 +61,20 @@ CREATE TRIGGER tg__luser__b01
 
 COMMENT ON TRIGGER tg__luser__b01 ON ce_warehouse.l__user
     IS 'Trigger to block changes to system records on l__user table';
+
+/*
+ ***********************************************************************************************************
+ * Block any DELETEs
+ ***********************************************************************************************************
+ */
+
+-- DROP TRIGGER IF EXISTS tg__luser__b02 ON ce_warehouse.l__user;
+
+CREATE TRIGGER tg__luser__b02
+    BEFORE DELETE
+        ON ce_warehouse.l__user
+    FOR EACH ROW
+        EXECUTE FUNCTION ce_warehouse.fx_tg__utils__block('pk_user');
+
+COMMENT ON TRIGGER tg__luser__b02 ON ce_warehouse.l__user
+    IS 'Trigger to block deletes on l__user table';

@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a__xgen
     audit_type TEXT NOT NULL
         CHECK (audit_type IN ('I', 'U', 'D')),
 
-    audit_user TEXT NOT NULL,  -- annotate with username/ID
+    audit_user TEXT NOT NULL
+        CHECK (ce_warehouse.fx_val__is_audit_user(audit_user) IS NOT NULL),
 
     ts_audit_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 

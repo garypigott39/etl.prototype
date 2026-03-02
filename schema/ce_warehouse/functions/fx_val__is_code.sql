@@ -15,12 +15,10 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_val__is_code(
     _nulls_allowed BOOL DEFAULT TRUE
 )
     RETURNS TEXT
-    LANGUAGE plpgsql
+    LANGUAGE sql
 AS
 $$
-BEGIN
-    RETURN ce_warehouse.fx_val__is_text(_val, _col_name, _nulls_allowed, 'C');
-END
+    SELECT ce_warehouse.fx_val__is_text(_val, _col_name, _nulls_allowed, 'C');
 $$;
 
 COMMENT ON FUNCTION ce_warehouse.fx_val__is_code

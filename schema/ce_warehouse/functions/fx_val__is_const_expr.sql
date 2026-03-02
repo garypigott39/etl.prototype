@@ -53,7 +53,7 @@ BEGIN
         -- Token & Period_must exist
         IF NOT EXISTS (SELECT 1 FROM ce_warehouse.c__series s WHERE s.series_id = _tok) THEN
             RETURN FORMAT('Token "%s" does not exist', _tok);
-        ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l__pdi p WHERE p.pk_pdi = _pdi1::INT) THEN
+        ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l__period p WHERE p.pk_pdi = _pdi1::INT) THEN
             RETURN FORMAT('Period "%s" does not exist', _pdi1);
         END IF;
         RETURN NULL;
@@ -83,9 +83,9 @@ BEGIN
             RETURN 'Period 1 and Period 2_must be in the same frequency group';
         ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.c__series s WHERE s.series_id = _tok) THEN
             RETURN FORMAT('Token "%s" does not exist', _tok);
-        ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l__pdi p WHERE p.pk_pdi = _pdi1::INT) THEN
+        ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l__period p WHERE p.pk_pdi = _pdi1::INT) THEN
             RETURN FORMAT('Period "%s" does not exist', _pdi1);
-        ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l__pdi p WHERE p.pk_pd2 = _pdi2::INT) THEN
+        ELSEIF NOT EXISTS (SELECT 1 FROM ce_warehouse.l__period p WHERE p.pk_pd2 = _pdi2::INT) THEN
             RETURN FORMAT('Period "%s" does not exist', _pdi2);
         END IF;
 

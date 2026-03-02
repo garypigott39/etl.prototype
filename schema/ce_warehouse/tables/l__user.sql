@@ -42,8 +42,8 @@ COMMENT ON TABLE ce_warehouse.l__user
  */
 INSERT INTO ce_warehouse.l__user (pk_user, name, source_uid, internal_notes)
 VALUES
-    (-1, 'migration', -1, 'System user for data migration and backfilling'),
-    (-2, 'app', -2, 'System user for automated processes');
+    (-1, 'app', -2, 'System user for automated processes'),
+    (-2, 'migration', -1, 'System user for data migration & backfilling');
 
 /*
  ***********************************************************************************************************

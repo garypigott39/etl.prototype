@@ -39,7 +39,7 @@ SELECT
     END                     AS status,
     p.lag                   AS lag
 
-FROM ce_warehouse.l__pdi p
+FROM ce_warehouse.l__period p
     LEFT JOIN ce_warehouse.l__freq f
         ON p.ifreq = f.pk_freq;
 

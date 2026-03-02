@@ -28,54 +28,74 @@ BEGIN
     END IF;
 
     FOR _dt IN
-        SELECT gs.dt_date
-        FROM generate_series(_dt1, _dt2, INTERVAL '1 DAY') AS gs(date)
+        SELECT gs.dt
+        FROM generate_series(_dt1, _dt2, INTERVAL '1 DAY') AS gs(dt)
         WHERE NOT EXISTS (
             SELECT 1
-            FROM ce_warehouse.l__dti d
+            FROM ce_warehouse.l__date d
             WHERE d.dt_date = gs.date
         )
     LOOP
-        INSERT INTO ce_warehouse.l__dti (dt_date)
+        INSERT INTO ce_warehouse.l__date (dt_date)
             VALUES (_dt)
         ON CONFLICT (dt_date) DO NOTHING;
     END LOOP;
 
     -- 2. PERIODS
-    CREATE TEMP TABLE t__periods ON COMMIT DROP AS
+    CREATE TEMP TABLE t__period ON COMMIT DROP AS
         WITH _periods AS (
-            SELECT 1 AS ifreq, d.dt_date AS start_of_period, d.dt_date AS end_of_period
+            SELECT
+                1           AS ifreq,
+                d.dt_date   AS dt_start_of_period,
+                d.dt_date   AS dt_end_of_period
             FROM ce_warehouse.v_date d
             UNION ALL
-            SELECT 2, d.start_of_week, d.end_of_week
+            SELECT
+                2,
+                d.dt_start_of_week,
+                d.dt_end_of_week
             FROM ce_warehouse.v_date d
             GROUP BY 2, 3
             UNION ALL
-            SELECT 3, d.start_of_month, d.end_of_month
+            SELECT
+                3,
+                d.dt_start_of_month,
+                d.dt_end_of_month
             FROM ce_warehouse.v_date d
             GROUP BY 2, 3
             UNION ALL
-            SELECT 4, d.start_of_quarter, d.end_of_quarter
+            SELECT
+                4,
+                d.dt_start_of_quarter,
+                d.dt_end_of_quarter
             FROM ce_warehouse.v_date d
             GROUP BY 2, 3
             UNION  ALL
-            SELECT 5, d.start_of_year, d.end_of_year
+            SELECT
+                5,
+                d.dt_start_of_year,
+                d.dt_end_of_year
             FROM ce_warehouse.v_date d
             GROUP BY 2, 3
         ),
         _with_lag AS (
             SELECT
                 ifreq,
-                start_of_period,
-                end_of_period,
+                dt_start_of_period,
+                dt_end_of_period,
                 CASE ifreq
-                    WHEN 1 THEN TO_CHAR(start_of_period, 'YYYY-MM-DD')
-                    WHEN 2 THEN TO_CHAR(start_of_period, 'IYYY-"W"IW')
-                    WHEN 3 THEN TO_CHAR(start_of_period, 'YYYY-MM')
-                    WHEN 4 THEN TO_CHAR(start_of_period, 'YYYY-"Q"Q')
-                    ELSE TO_CHAR(start_of_period, 'YYYY')
+                    WHEN 1 THEN
+                        TO_CHAR(dt_start_of_period, 'YYYY-MM-DD')
+                    WHEN 2 THEN
+                        TO_CHAR(dt_start_of_period, 'IYYY-"W"IW')
+                    WHEN 3 THEN
+                        TO_CHAR(dt_start_of_period, 'YYYY-MM')
+                    WHEN 4 THEN
+                        TO_CHAR(dt_start_of_period, 'YYYY-"Q"Q')
+                    ELSE
+                        TO_CHAR(dt_start_of_period, 'YYYY')
                 END::TEXT  AS period,
-                ROW_NUMBER() OVER (PARTITION BY ifreq ORDER BY start_of_period)  AS lag
+                ROW_NUMBER() OVER (PARTITION BY ifreq ORDER BY dt_start_of_period)  AS lag
             FROM _periods
         )
         SELECT
@@ -83,15 +103,16 @@ BEGIN
         FROM _with_lag l
         WHERE NOT EXISTS  (
             SELECT 1
-            FROM ce_warehouse.l__pdi p
+            FROM ce_warehouse.l__period p
             WHERE p.ifreq = l.ifreq
-            AND p.start_of_period = l.start_of_period
+            AND p.dt_start_of_period = l.dt_start_of_period
         );
 
-    IF (SELECT COUNT(*) FROM t__periods) > 0 THEN
-        INSERT INTO ce_warehouse.l__pdi (ifreq, start_of_period, end_of_period, period, lag)
-            SELECT ifreq, start_of_period, end_of_period, period, lag
-            FROM t__periods;
+    IF (SELECT COUNT(*) FROM t__period) > 0 THEN
+        INSERT INTO ce_warehouse.l__period (ifreq, dt_start_of_period, dt_end_of_period, period, lag)
+            SELECT
+                ifreq, dt_start_of_period, dt_end_of_period, period, lag
+            FROM t__period;
 
         -- 3. Refresh materialized views
         REFRESH MATERIALIZED VIEW ce_warehouse.mv_period;

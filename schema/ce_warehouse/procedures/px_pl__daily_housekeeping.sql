@@ -15,30 +15,55 @@ CREATE OR REPLACE PROCEDURE ce_warehouse.px_pl__daily_housekeeping(
 AS
 $$
 BEGIN
-    CALL ce_warehouse.px_ut__info('Pipeline - Daily Housekeeping starting', TRUE);
 
-    -- Lock pipeline to prevent concurrent runs
+    CALL ce_warehouse.px_ut__info('Pipeline - Daily Housekeeping starts', TRUE);
+
+    ----------------------------------------------------------------
+    -- Acquire lock (persists via COMMIT inside lock proc)
+    ----------------------------------------------------------------
     CALL ce_warehouse.px_ut__lock_pipeline('ETL', 'lock');
 
-    -- Fix any SEQUENCEs that may be out of sync (e.g. after manual data loads)
-    CALL ce_warehouse.px_ut__info('Running sequence fix', TRUE);
-    CALL ce_warehouse.px_ut__fix_seq();
+    BEGIN
+        ----------------------------------------------------------------
+        -- Main housekeeping block (fully rollbackable)
+        ----------------------------------------------------------------
 
-    -- Generate any missing dates & periods
-    CALL ce_warehouse.px_ut__info('Generating dates & periods', TRUE);
-    CALL ce_warehouse.px_ut__generate_dates();
+        -- Fix sequences
+        CALL ce_warehouse.px_ut__info('Running sequence fix', TRUE);
+        CALL ce_warehouse.px_ut__fix_seq();
 
-    -- Pull over any Django users, &/or mark deletions
-    CALL ce_warehouse.px_ut__info('Syncing users', TRUE);
-    CALL ce_warehouse.px_ut__sync_users();
+        -- Generate dates & periods
+        CALL ce_warehouse.px_ut__info('Generating dates & periods', TRUE);
+        CALL ce_warehouse.px_ut__generate_dates();
 
-    -- Any other housekeeping tasks could go her, @TBA
+        -- Sync Django users
+        CALL ce_warehouse.px_ut__info('Syncing users', TRUE);
+        CALL ce_warehouse.px_ut__sync_users();
 
-    -- Unlock pipeline
-    CALL ce_warehouse.px_ut__lock_pipeline('ETL', 'unlock');
+    EXCEPTION WHEN OTHERS THEN
+        ----------------------------------------------------------------
+        -- If anything fails:
+        --  • housekeeping changes rollback automatically
+        --  • rethrow error
+        -- Pipeline remains locked to prevent further runs until issue is resolved and pipeline manually unlocked
+        ----------------------------------------------------------------
+
+        CALL ce_warehouse.px_ut__info(
+            'Pipeline - Daily Housekeeping failed: ' || SQLERRM,
+            TRUE
+        );
+
+        RAISE;
+    END;
 
     CALL ce_warehouse.px_ut__info('Pipeline - Daily Housekeeping ends OK', TRUE);
-END
+
+    ----------------------------------------------------------------
+    -- Success path: unlock pipeline
+    ----------------------------------------------------------------
+    CALL ce_warehouse.px_ut__lock_pipeline('ETL', 'unlock');
+
+END;
 $$;
 
 COMMENT ON PROCEDURE ce_warehouse.px_pl__daily_housekeeping

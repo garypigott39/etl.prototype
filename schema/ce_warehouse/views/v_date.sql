@@ -13,7 +13,7 @@ CREATE OR REPLACE VIEW ce_warehouse.v_date
 AS
 SELECT
     d.pk_dti                                                                             AS pk_dti,
-    d.dt_date                                                                            AS date,
+    d.dt_date                                                                            AS dt_date,
 
     -- Status (Past, Current, Future)
     CASE
@@ -87,7 +87,7 @@ SELECT
         ELSE EXTRACT(YEAR FROM d.dt_date)::INT
     END                                                                                  AS yyyy_fy
 
-FROM ce_warehouse.l__dti d
+FROM ce_warehouse.l__date d
     JOIN ce_warehouse.s__sys_flag s
         ON s.code = 'DATE.MIN';
 

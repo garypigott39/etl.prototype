@@ -35,10 +35,10 @@ BEGIN
                 FILTER (WHERE g.name IS NOT NULL),
                 '{}'
             )                                   AS groups
-        FROM public.auth_user ug
+        FROM public.auth_user u
             LEFT JOIN public.auth_user_groups ug
                 ON ug.user_id = u.id
-            LEFT JOIN public.auth_user_groups g
+            LEFT JOIN public.auth_group g
                 ON ug.user_id = u.id
         GROUP BY 1, 2, 3, 4
         ORDER BY 1;
@@ -49,15 +49,13 @@ BEGIN
      ****************************************************************************************
      */
     INSERT INTO ce_warehouse.l__user (
-        name, status, source_uid, is_admin, is_data_team, is_value_uploader
+        name, status, source_uid, is_admin
     )
         SELECT
             t.name,
             t.status,
             t.source_uid,
-            t.is_admin,
-            t.is_data_team,
-            t.is_value_uploader
+            t.is_admin
         FROM t__django_users t
             LEFT JOIN ce_warehouse.l__user u
                 ON u.source_uid = t.source_uid

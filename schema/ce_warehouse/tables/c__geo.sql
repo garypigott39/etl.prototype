@@ -195,7 +195,7 @@ CREATE TRIGGER tg__cgeo__b01
     BEFORE UPDATE OR DELETE
         ON ce_warehouse.c__geo
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg__generic__block_internal('pk_geo');
+        EXECUTE FUNCTION ce_warehouse.fx_tg__utils__block_internal('pk_geo');
 
 COMMENT ON TRIGGER tg__cgeo__b01 ON ce_warehouse.c__geo
     IS 'Trigger to block changes to system records on c_geo table';

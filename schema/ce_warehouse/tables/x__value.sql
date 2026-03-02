@@ -71,3 +71,20 @@ CREATE INDEX IF NOT EXISTS x_value__fk_pk_tip__idx
 
 COMMENT ON TABLE ce_warehouse.x__value
     IS 'Internal table - datapoint values';
+
+/*
+ ***********************************************************************************************************
+ * Truncate value to 12 decimal places.
+ ***********************************************************************************************************
+ */
+
+-- DROP TRIGGER IF EXISTS tg__x__b01 ON ce_warehouse.c__series;
+
+CREATE TRIGGER tg__xvalue__b01
+    BEFORE INSERT OR UPDATE
+        ON ce_warehouse.x__value
+    FOR EACH ROW
+        EXECUTE FUNCTION ce_warehouse.fx_tg__utils__trunc_dps('value', 12);
+
+COMMENT ON TRIGGER tg__xvalue__b01 ON ce_warehouse.x__value
+    IS 'Trigger to truncate value to 12 dps on x_value table';

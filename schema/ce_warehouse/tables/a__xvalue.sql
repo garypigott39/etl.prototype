@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a__xvalue
     ifreq SMALLINT GENERATED ALWAYS
         AS (
             CASE
-                WHEN pdi > 0 THEN (pdi / 100000000)
+                WHEN lk_pk_pdi > 0 THEN (lk_pk_pdi / 100000000)
                 ELSE NULL
             END
         ) STORED,

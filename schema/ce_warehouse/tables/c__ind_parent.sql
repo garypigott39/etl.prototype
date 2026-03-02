@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__ind_parent
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
             fk_pk_ind > 0
-            AND fk_pk_ind__parent > 0
-            AND fk_pk_ind__parent <> fk_pk_ind  -- prevent self-reference
+            AND fk_pk_ind_parent > 0
+            AND fk_pk_ind_parent <> fk_pk_ind  -- prevent self-reference
         ),
 
     error TEXT,  -- system generated
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__ind_parent
 -- It's recommended to have INDICES on foreign keys for performance!!
 -- unless we already have them on the referenced table
 CREATE INDEX IF NOT EXISTS c_ind__parent__idx
-    ON ce_warehouse.c__ind_parent (fk_pk_ind__parent);
+    ON ce_warehouse.c__ind_parent (fk_pk_ind_parent);
 
 COMMENT ON TABLE ce_warehouse.c__ind_parent
     IS 'Control table - IND parents';

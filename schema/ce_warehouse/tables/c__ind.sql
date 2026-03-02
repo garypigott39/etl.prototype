@@ -96,7 +96,7 @@ CREATE TRIGGER tg__cind__b01
     BEFORE UPDATE OR DELETE
         ON ce_warehouse.c__ind
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg__generic__block_internal('pk_ind');
+        EXECUTE FUNCTION ce_warehouse.fx_tg__utils__block_internal('pk_ind');
 
 COMMENT ON TRIGGER tg__cind__b01 ON ce_warehouse.c__ind
     IS 'Trigger to block changes to system records on c_ind table';

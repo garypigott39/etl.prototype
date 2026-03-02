@@ -106,7 +106,7 @@ CREATE TRIGGER tg__cseries__b01
     BEFORE UPDATE OR DELETE
         ON ce_warehouse.c__series
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg__generic__block_internal('pk_ind');
+        EXECUTE FUNCTION ce_warehouse.fx_tg__utils__block_internal('pk_ind');
 
 COMMENT ON TRIGGER tg__cseries__b01 ON ce_warehouse.c__series
     IS 'Trigger to block changes to system records on c_series table';
@@ -135,14 +135,14 @@ COMMENT ON TRIGGER tg__cseries__b02 ON ce_warehouse.c__series
  ***********************************************************************************************************
  */
 
--- DROP TRIGGER IF EXISTS tg__cseries__a03 ON ce_warehouse.c__series;
+-- DROP TRIGGER IF EXISTS tg__cseries__a01 ON ce_warehouse.c__series;
 
-CREATE CONSTRAINT TRIGGER tg__cseries__a03
+CREATE CONSTRAINT TRIGGER tg__cseries__a01
     AFTER INSERT OR UPDATE OF icode, gcode
         ON ce_warehouse.c__series
     DEFERRABLE INITIALLY DEFERRED
     FOR EACH ROW
         EXECUTE FUNCTION ce_warehouse.fx_tg__cseries__check_icode();
 
-COMMENT ON TRIGGER tg__cseries__a03 ON ce_warehouse.c__series
+COMMENT ON TRIGGER tg__cseries__a01 ON ce_warehouse.c__series
     IS 'Trigger to instigate IND check on c_series table';

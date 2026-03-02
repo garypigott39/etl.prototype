@@ -1,16 +1,16 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_tg__generic__block_internal.sql
+ * fx_tg__utils__block_internal.sql
  *
  * Trigger function - block updates (BEFORE update).
  * CONSTRAINT TRIGGER.
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg__generic__block_internal;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg__utils__block_internal;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg__generic__block_internal(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg__utils__block_internal(
 )
     RETURNS TRIGGER
     LANGUAGE plpgsql
@@ -43,5 +43,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_tg__generic__block_internal
+COMMENT ON FUNCTION ce_warehouse.fx_tg__utils__block_internal
     IS 'Trigger function - block updates (BEFORE update)';

@@ -3,7 +3,7 @@
  * @file
  * l_data_transformation.sql
  *
- * Lookup table - data transFORMATion lookup.
+ * Lookup table - data transformation lookup.
  ***********************************************************************************************************
  */
 

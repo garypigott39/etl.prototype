@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l__user
     ts_created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_user),
-    UNIQUE (name, source_uid)
+    UNIQUE (source_uid)
 );
 
 COMMENT ON TABLE ce_warehouse.l__user

@@ -35,7 +35,7 @@ BEGIN
     -- Unlock pipeline
     CALL ce_warehouse.px_ut__lock_or_unlock('ETL', 'unlock');
 
-    CALL ce_warehouse.px_ut__info('Pipeline - Daily Housekeeping ends OK', TRUE);
+    CALL ce_warehouse.px_ut__info('Pipeline - Daily Housekeeping ends', TRUE);
 
 END;
 $$;

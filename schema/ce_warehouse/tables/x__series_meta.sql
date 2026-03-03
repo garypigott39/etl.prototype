@@ -60,6 +60,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__series_meta
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of series with metadata, see app logic!!
 
+    ts_updated TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
     PRIMARY KEY (idx),
     UNIQUE (fk_pk_series, ifreq, itype),  -- enforce only one record per series/frequency/type
     UNIQUE (sid3)  -- enforce unique SID3

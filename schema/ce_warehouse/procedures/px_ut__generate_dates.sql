@@ -40,7 +40,8 @@ BEGIN
             dt_date
         )
         VALUES (_dt)
-        ON CONFLICT (dt_date) DO NOTHING;
+        ON CONFLICT (dt_date)
+            DO NOTHING;
     END LOOP;
 
     -- 2. PERIODS

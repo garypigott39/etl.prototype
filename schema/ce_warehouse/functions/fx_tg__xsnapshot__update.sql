@@ -20,7 +20,7 @@ DECLARE
 
 BEGIN
    -- Trigger disabled?
-    IF NOT ce_warehouse.fx_ut_trigger_is_enabled(TG_NAME) THEN
+    IF NOT ce_warehouse.fx_ut__trigger_is_enabled(TG_NAME) THEN
         IF TG_OP = 'DELETE' THEN
             RETURN OLD;
         ELSE

@@ -25,7 +25,7 @@ DECLARE
 
 BEGIN
    -- Trigger disabled?
-    IF NOT ce_warehouse.fx_ut_trigger_is_enabled(TG_NAME) THEN
+    IF NOT ce_warehouse.fx_ut__trigger_is_enabled(TG_NAME) THEN
         IF TG_OP = 'DELETE' THEN
             RETURN OLD;
         ELSE
@@ -62,10 +62,17 @@ BEGIN
         )
         ON CONFLICT (fk_pk_series, ifreq, itype)
             DO UPDATE
-                SET first_pdi = LEAST(COALESCE(x_series_meta.first_pdi, EXCLUDED.first_pdi), EXCLUDED.first_pdi),
+                SET sid1 = EXCLUDED.sid1,
+                    first_pdi = LEAST(COALESCE(x_series_meta.first_pdi, EXCLUDED.first_pdi), EXCLUDED.first_pdi),
                     last_pdi  = GREATEST(COALESCE(x_series_meta.last_pdi, EXCLUDED.last_pdi), EXCLUDED.last_pdi),
                     is_has_values = EXCLUDED.is_has_values,
-                    ts_new_values = EXCLUDED.ts_new_values;
+                    ts_new_values = EXCLUDED.ts_new_values,
+                    ts_updated = _now
+            WHERE x_series_meta.sid1 IS DISTINCT FROM EXCLUDED.sid1
+            OR x_series_meta.first_pdi IS DISTINCT FROM EXCLUDED.first_pdi
+            OR x_series_meta.last_pdi IS DISTINCT FROM EXCLUDED.last_pdi
+            OR x_series_meta.is_has_values IS DISTINCT FROM EXCLUDED.is_has_values
+            OR x_series_meta.ts_new_values IS DISTINCT FROM EXCLUDED.ts_new_values;
 
     ELSEIF TG_OP = 'UPDATE' THEN
 
@@ -103,7 +110,11 @@ BEGIN
                 DO UPDATE
                     SET sid1 = EXCLUDED.sid1,
                         is_has_values = EXCLUDED.has_values,
-                        ts_updated_values = EXCLUDED.ts_updated_values;
+                        ts_updated_values = EXCLUDED.ts_updated_values,
+                        ts_updated = _now
+                WHERE x_series_meta.sid1 IS DISTINCT FROM EXCLUDED.sid1
+                OR x_series_meta.is_has_values IS DISTINCT FROM EXCLUDED.is_has_values
+                OR x_series_meta.ts_new_values IS DISTINCT FROM EXCLUDED.ts_new_values;
         END IF;
 
     ELSEIF TG_OP = 'DELETE' THEN
@@ -134,17 +145,24 @@ BEGIN
         AND itype = OLD.itype;
 
         INSERT INTO ce_warehouse.x__series_meta(
-            fk_pk_series, ifreq, itype, first_pdi, last_pdi, is_has_values, ts_updated_values
+            fk_pk_series, ifreq, itype, sid1, first_pdi, last_pdi, is_has_values, ts_updated_values
         )
         VALUES (
-            OLD.fk_pk_series, OLD.ifreq, OLD.itype, _first_pdi, _last_pdi, (_first_pdi IS NOT NULL), _now
+            OLD.fk_pk_series, OLD.ifreq, OLD.itype, OLD.sid1, _first_pdi, _last_pdi, (_first_pdi IS NOT NULL), _now
         )
         ON CONFLICT (fk_pk_series, ifreq, itype)
             DO UPDATE
-                SET first_pdi = EXCLUDED.first_pdi,
+                SET sid1 = EXCLUDED.sid1,
+                    first_pdi = EXCLUDED.first_pdi,
                     last_pdi  = EXCLUDED.last_pdi,
                     is_has_values = EXCLUDED.has_values,
-                    ts_updated_values = EXCLUDED.ts_updated_values;
+                    ts_updated_values = EXCLUDED.ts_updated_values,
+                    ts_updated = _now
+            WHERE x_series_meta.sid1 IS DISTINCT FROM EXCLUDED.sid1
+            OR x_series_meta.first_pdi IS DISTINCT FROM EXCLUDED.first_pdi
+            OR x_series_meta.last_pdi IS DISTINCT FROM EXCLUDED.last_pdi
+            OR x_series_meta.is_has_values IS DISTINCT FROM EXCLUDED.is_has_values
+            OR x_series_meta.ts_new_values IS DISTINCT FROM EXCLUDED.ts_new_values;
 
     END IF;
 

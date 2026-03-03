@@ -85,7 +85,11 @@ BEGIN
                 eop_value = EXCLUDED.eop_value,
                 sum_value = EXCLUDED.sum_value,
                 num_periods = EXCLUDED.num_periods,
-                ts_updated = NOW();
+                ts_updated = NOW()
+            WHERE ce_warehouse.x__snapshot.eop_pdi IS DISTINCT FROM EXCLUDED.eop_pdi
+            OR ce_warehouse.x__snapshot.eop_value IS DISTINCT FROM EXCLUDED.eop_value
+            OR ce_warehouse.x__snapshot.sum_value IS DISTINCT FROM EXCLUDED.sum_value
+            OR ce_warehouse.x__snapshot.num_periods IS DISTINCT FROM EXCLUDED.num_periods;
 
 END
 $$;

@@ -41,7 +41,8 @@ BEGIN
         )
         VALUES (_name)
             ON CONFLICT (name)
-            DO UPDATE SET ts_locked_at = NOW();
+                DO UPDATE
+                    SET ts_locked_at = NOW();
 
     ELSIF _type = 'unlock' THEN
         DELETE FROM ce_warehouse.s__lock

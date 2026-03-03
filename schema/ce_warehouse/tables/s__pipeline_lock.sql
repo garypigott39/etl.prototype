@@ -3,7 +3,7 @@
  * @file
  * s__lock.sql
  *
- * System table - generic "locks", enabling us to lock/unlock a pipeline (or whatever) for processing.
+ * System table - general "locks", enabling us to lock/unlock a pipeline (or whatever) for processing.
   *
  * NOTE, we don't use the text validation functions in any of the "s_" system tables because they are
  * potentially used by the validation functions, so we need to have more basic validation rules in place
@@ -23,4 +23,4 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.s__lock
 );
 
 COMMENT ON TABLE ce_warehouse.s__lock
-    IS 'System table - generic "locks", enabling us to lock/unlock a pipeline (or whatever) for processing';
+    IS 'System table - general "locks", enabling us to lock/unlock a pipeline (or whatever) for processing';

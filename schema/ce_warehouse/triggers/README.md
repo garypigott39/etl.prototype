@@ -1,6 +1,6 @@
 # Table Triggers for CE ETL
 
-Note, these are generic auditing triggers, other triggers for deletion prevention etc would be added to the table definition.
+Note, these are general auditing triggers, other triggers for deletion prevention etc would be added to the table definition.
 
 
 ## Other notes

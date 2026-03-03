@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a__xvalue
         CHECK (audit_type IN ('I', 'U', 'D', 'init', 'pipeline')),
 
     audit_user TEXT NOT NULL
-        CHECK (ce_warehouse.fx_val__is_audit_user(audit_user) IS NOT NULL),
+        CHECK (ce_warehouse.fx_val__is_audit_user(audit_user) IS NULL),
 
     ts_audit_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 

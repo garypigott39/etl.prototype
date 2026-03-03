@@ -353,7 +353,7 @@ def migrate_axvalue(src_cur, tgt_cur, is_restart):
         )
         SELECT 
             x.fk_pk_xs::INT, x.pdi::INT, x.type::INT, l.pk_source, x.value::NUMERIC, 
-            x.new_value::NUMERIC, x.realised::BOOL, x.aud_type, 'migration', x.aud_utc::TIMESTAMPTZ
+            x.new_value::NUMERIC, x.realised::BOOL, x.aud_type, 'migrate', x.aud_utc::TIMESTAMPTZ
         FROM {tmp} x
             JOIN ce_warehouse.l__source l
                 ON l.code = x.source

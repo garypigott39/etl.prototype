@@ -13,7 +13,7 @@ CREATE TRIGGER tg__cind_parent__a99
     AFTER INSERT OR UPDATE OR DELETE
         ON ce_warehouse.c__ind_parent
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg__xgen__audit('idx');
+        EXECUTE FUNCTION ce_warehouse.fx_tg__xgeneral_audit('idx');
 
 COMMENT ON TRIGGER tg__cind_parent__a99 ON ce_warehouse.c__ind_parent
     IS 'Trigger to audit changes to the c_ind_parent table';

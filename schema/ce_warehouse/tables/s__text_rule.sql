@@ -1,7 +1,7 @@
 /*
  ***********************************************************************************************************
  * @file
- * s_text_rule.sql
+ * s__text_rule.sql
  *
  * System table - text field validation rules, see fx_val_is_text, fx_val_is_code & fx_val_is_name.
   *

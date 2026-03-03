@@ -28,7 +28,9 @@ COMMENT ON TABLE ce_warehouse.l__currency_unit
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l__currency_unit (code, name)
+INSERT INTO ce_warehouse.l__currency_unit (
+    code, name
+)
 VALUES
     ('AED', 'Dirham'),
     ('AFN', 'Afghani'),

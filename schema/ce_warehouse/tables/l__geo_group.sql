@@ -29,7 +29,9 @@ COMMENT ON TABLE ce_warehouse.l__geo_group
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l__geo_group (code, name)
+INSERT INTO ce_warehouse.l__geo_group (
+    code, name
+)
 VALUES
     ('Africa_Middle_East_CE','Africa Middle East CE'),
     ('Africa_UN','Africa UN'),

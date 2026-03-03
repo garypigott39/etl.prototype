@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__value
     is_dx BOOL NOT NULL DEFAULT FALSE,  -- flag to indicate if the value is a DX value, i.e generated via DX calculation
     is_calculated BOOL NOT NULL DEFAULT FALSE,  -- flag to indicate if the value was calculated (not DX)
 
-    error TEXT,  -- system generated
+    error TEXT,  -- system generated/housekeeping
     ts_updated TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (idx),
@@ -57,7 +57,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__value
 
 -- Optimal index for Trigger
 CREATE INDEX IF NOT EXISTS x__value__series_meta__idx
-    ON ce_warehouse.x__value (fk_pk_series, ifreq, itype, lk_pk_pdi);
+    ON ce_warehouse.x__value (fk_pk_series, ifreq, itype, lk_pk_pdi)
+    INCLUDE (value);  -- include value in index for faster access in trigger calculations
 
 -- It's recommended to have INDICES on foreign keys for performance!! (particularly important for large tables)
 CREATE INDEX IF NOT EXISTS x__value__pdi__idx
@@ -78,13 +79,33 @@ COMMENT ON TABLE ce_warehouse.x__value
  ***********************************************************************************************************
  */
 
--- DROP TRIGGER IF EXISTS tg__x__b01 ON ce_warehouse.c__series;
+-- DROP TRIGGER IF EXISTS tg__x__b01 ON ce_warehouse.x__value;
 
 CREATE TRIGGER tg__xvalue__b01
     BEFORE INSERT OR UPDATE
         ON ce_warehouse.x__value
     FOR EACH ROW
         EXECUTE FUNCTION ce_warehouse.fx_tg__utils__trunc_dps('value', 12);
+
+COMMENT ON TRIGGER tg__xvalue__b01 ON ce_warehouse.x__value
+    IS 'Trigger to truncate value to 12 dps on x_value table';
+
+/*
+ ***********************************************************************************************************
+ * Update snapshot.
+ ***********************************************************************************************************
+ */
+
+-- DROP TRIGGER IF EXISTS tg__xvalue__a01 ON ce_warehouse.x__value;
+
+CREATE TRIGGER tg__xvalue__a01
+    AFTER INSERT OR UPDATE OR DELETE
+        ON ce_warehouse.x__value
+    REFERENCING
+        NEW TABLE AS new_table
+        OLD TABLE AS old_table
+    FOR EACH STATEMENT
+        EXECUTE FUNCTION ce_warehouse.fx_tg__xsnapshot__update();
 
 COMMENT ON TRIGGER tg__xvalue__b01 ON ce_warehouse.x__value
     IS 'Trigger to truncate value to 12 dps on x_value table';

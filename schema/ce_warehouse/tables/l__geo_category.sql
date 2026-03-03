@@ -26,7 +26,9 @@ COMMENT ON TABLE ce_warehouse.l__geo_category
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l__geo_category (name)
+INSERT INTO ce_warehouse.l__geo_category (
+    name
+)
 VALUES
     ('Country'),
     ('Region'),

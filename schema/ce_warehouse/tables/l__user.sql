@@ -40,7 +40,9 @@ COMMENT ON TABLE ce_warehouse.l__user
 /**
  * Pre-populate with System Use values.
  */
-INSERT INTO ce_warehouse.l__user (pk_user, name, source_uid, internal_notes)
+INSERT INTO ce_warehouse.l__user (
+    pk_user, name, source_uid, internal_notes
+)
 VALUES
     (-1, 'system', -2, 'System user for automated processes'),
     (-2, 'migrate', -1, 'System user for data migration & backfilling');

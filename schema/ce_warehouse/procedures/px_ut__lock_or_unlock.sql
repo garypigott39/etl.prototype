@@ -36,7 +36,10 @@ BEGIN
         END IF;
 
         -- Insert or refresh lock
-        INSERT INTO ce_warehouse.s__lock(name) VALUES (_name)
+        INSERT INTO ce_warehouse.s__lock(
+            name
+        )
+        VALUES (_name)
             ON CONFLICT (name)
             DO UPDATE SET ts_locked_at = NOW();
 

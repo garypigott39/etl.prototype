@@ -17,6 +17,11 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg__cseries__check_icode(
 AS
 $$
 BEGIN
+    -- Trigger disabled?
+    IF NOT ce_warehouse.fx_ut_trigger_is_enabled(TG_NAME) THEN
+        RETURN NEW;
+    END IF;
+
     IF NEW.gcode = 'INTERNAL' OR EXISTS (SELECT 1 FROM ce_warehouse.c__ind WHERE code = NEW.icode) THEN
         RETURN NEW;
     END IF;

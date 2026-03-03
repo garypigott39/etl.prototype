@@ -20,6 +20,15 @@ DECLARE
     _colname TEXT;
     _dps INT;
 BEGIN
+   -- Trigger disabled?
+    IF NOT ce_warehouse.fx_ut_trigger_is_enabled(TG_NAME) THEN
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE
+            RETURN NEW;
+        END IF;
+    END IF;
+
     -- Check that a VALUE column & DPD was passed
     IF TG_NARGS < 2 THEN
         RAISE EXCEPTION 'Trigger requires the value column name & decimal places as arguments';

@@ -31,7 +31,9 @@ COMMENT ON TABLE ce_warehouse.l__com_type
  *       GROUP BY 1 ORDER BY 1`
  * and then some tidying up!!!!
  */
-INSERT INTO ce_warehouse.l__data_source (name)
+INSERT INTO ce_warehouse.l__data_source (
+    name
+)
 VALUES
     ('Accounting and Statistics'),
     ('Algeria'),

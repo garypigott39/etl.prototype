@@ -26,7 +26,9 @@ COMMENT ON TABLE ce_warehouse.l__ind_category_broad
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l__ind_category_broad (name)
+INSERT INTO ce_warehouse.l__ind_category_broad (
+    name
+)
 VALUES
     ('Climate'),
     ('Commodities'),

@@ -32,7 +32,9 @@ COMMENT ON TABLE ce_warehouse.l__units
  *     "TROJAN SOURCE WARNING, The pasted text contains bidirectional Unicode characters which could be interpreted
  *      differently than what is displayed..."
  */
-INSERT INTO ce_warehouse.l__units (name)
+INSERT INTO ce_warehouse.l__units (
+    name
+)
 VALUES
     ('%'),
     ('$'),

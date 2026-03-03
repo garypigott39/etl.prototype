@@ -36,8 +36,10 @@ BEGIN
             WHERE d.dt_date = gs.date
         )
     LOOP
-        INSERT INTO ce_warehouse.l__date (dt_date)
-            VALUES (_dt)
+        INSERT INTO ce_warehouse.l__date (
+            dt_date
+        )
+        VALUES (_dt)
         ON CONFLICT (dt_date) DO NOTHING;
     END LOOP;
 
@@ -109,7 +111,9 @@ BEGIN
         );
 
     IF (SELECT COUNT(*) FROM t__period) > 0 THEN
-        INSERT INTO ce_warehouse.l__period (ifreq, dt_start_of_period, dt_end_of_period, period, lag)
+        INSERT INTO ce_warehouse.l__period (
+            ifreq, dt_start_of_period, dt_end_of_period, period, lag
+        )
             SELECT
                 ifreq, dt_start_of_period, dt_end_of_period, period, lag
             FROM t__period;

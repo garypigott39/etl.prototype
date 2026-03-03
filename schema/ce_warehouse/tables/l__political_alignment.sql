@@ -26,7 +26,9 @@ COMMENT ON TABLE ce_warehouse.l__political_alignment
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l__political_alignment (name)
+INSERT INTO ce_warehouse.l__political_alignment (
+    name
+)
 VALUES
     ('Strong US'),
     ('Leans US'),

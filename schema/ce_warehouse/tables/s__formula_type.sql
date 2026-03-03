@@ -31,11 +31,15 @@ COMMENT ON TABLE ce_warehouse.s__formula_type
 /**
  * Pre-populate with known values. As we add new formula types, add them here.
  */
-INSERT INTO ce_warehouse.s__formula_type (code, class, description, ordering)
+INSERT INTO ce_warehouse.s__formula_type (
+    code, class, description, ordering
+)
 VALUES
     ('DX', 'DX', 'Formula type for DX formulas, replaces old API calc functionality', -1);
 
-INSERT INTO ce_warehouse.s__formula_type (code, class, description)
+INSERT INTO ce_warehouse.s__formula_type (
+    code, class, description
+)
 VALUES
     ('basic', 'basic', 'Basic expression, e.g. #SERIES1# + #SERIES2#'),
     ('ann', 'ann', 'Annualisation expression'),

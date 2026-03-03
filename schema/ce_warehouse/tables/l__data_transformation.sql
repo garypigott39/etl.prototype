@@ -26,7 +26,9 @@ COMMENT ON TABLE ce_warehouse.l__data_transformation
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l__data_transformation (code)
+INSERT INTO ce_warehouse.l__data_transformation (
+    code
+)
 VALUES
     ('%'),
     ('%GDP'),

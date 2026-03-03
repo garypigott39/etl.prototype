@@ -46,7 +46,9 @@ COMMENT ON TABLE ce_warehouse.l__freq
 /**
  * Pre-populate with known values. THIS WILL NEVER CHANGE!!!
  */
-INSERT INTO ce_warehouse.l__freq (code, forecast_only_lifespan)
+INSERT INTO ce_warehouse.l__freq (
+    code, forecast_only_lifespan
+)
 VALUES
     ('D', 1),
     ('W', 7),

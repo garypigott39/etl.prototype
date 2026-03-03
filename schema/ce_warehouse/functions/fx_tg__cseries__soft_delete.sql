@@ -16,7 +16,16 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg__cseries__soft_delete(
 AS
 $$
 BEGIN
-    -- Prevent execution if tiggered by another trigger
+   -- Trigger disabled?
+    IF NOT ce_warehouse.fx_ut_trigger_is_enabled(TG_NAME) THEN
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE
+            RETURN NEW;
+        END IF;
+    END IF;
+
+    -- Prevent execution if tiggered by another trigger,
     IF pg_trigger_depth() > 1 THEN
         IF TG_OP = 'DELETE' THEN
             RETURN OLD;

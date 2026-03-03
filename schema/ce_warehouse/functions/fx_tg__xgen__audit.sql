@@ -27,6 +27,15 @@ DECLARE
     _pk TEXT;
 
 BEGIN
+   -- Trigger disabled?
+    IF NOT ce_warehouse.fx_ut_trigger_is_enabled(TG_NAME) THEN
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE
+            RETURN NEW;
+        END IF;
+    END IF;
+
     -- Check that a PK column was passed
     IF TG_NARGS < 1 THEN
         RAISE EXCEPTION 'Trigger requires the primary key column name as argument';

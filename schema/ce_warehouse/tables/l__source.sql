@@ -35,7 +35,9 @@ COMMENT ON TABLE ce_warehouse.l__source
 /**
  * Pre-populate with known values. We will NEVER delete these values, but we might deactivate them if required!!
  */
-INSERT INTO ce_warehouse.l__source (code, name, allowed_source, is_api_available)
+INSERT INTO ce_warehouse.l__source (
+    code, name, allowed_source, is_api_available
+)
 VALUES
     ('BLS','U.S. Bureau of Labour Statistics', 'A', TRUE),
     ('DS','LSEG Data & Analytics', 'A', FALSE),
@@ -48,7 +50,9 @@ VALUES
  * @todo - discuss with Rhydian needed to change "'BHIGA', 'eGovernment Authority, Bahrain'"
  *   to amend name to 'E-Government Authority, Bahrain' to fit the simple names rules.
  */
-INSERT INTO ce_warehouse.l__source (code, name)
+INSERT INTO ce_warehouse.l__source (
+    code, name
+)
 VALUES
     ('ABS', 'Australian Bureau of Statistics'),
     ('AENBS', 'National Bureau of Statistics, United Arab Emirates'),

@@ -28,7 +28,9 @@ COMMENT ON TABLE ce_warehouse.l__stock_market
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l__stock_market (name, short_code)
+INSERT INTO ce_warehouse.l__stock_market (
+    name, short_code
+)
 VALUES
     ('Abu Dhabi Securities Exchange', 'ADX'),
     ('Afghanistan Stock Exchange', 'AFSE'),

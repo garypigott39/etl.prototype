@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__snapshot
             DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of periods with values, see app logic!!
 
     src_ifreq SMALLINT NOT NULL
-        CHECK IN (1, 2, 3 , 4),  -- D->W, D->M, .., W->M, W->Q, etc
+        CHECK (src_ifreq IN (1, 2, 3 , 4)),  -- D->W, D->M, .., W->M, W->Q, etc
     ifreq SMALLINT NOT NULL GENERATED ALWAYS
         AS (lk_pk_pdi / 100000000) STORED
         CHECK (ifreq IN (2, 3 , 4, 5)),  -- extract frequency from period code
@@ -46,12 +46,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__snapshot
     UNIQUE (fk_pk_series, lk_pk_pdi, src_ifreq, itype)
 );
 
--- Optimal index for Trigger
-CREATE INDEX IF NOT EXISTS x__snapshot__series_meta__idx
+-- Optimal index for Trigger(s)
+CREATE INDEX IF NOT EXISTS x__snapshot__tgt_pdi__idx
     ON ce_warehouse.x__snapshot (fk_pk_series, lk_pk_pdi, itype);
 
+CREATE INDEX IF NOT EXISTS x__snapshot__src_ifreq__idx
+    ON ce_warehouse.x__snapshot (fk_pk_series, src_ifreq, itype);
+
 -- It's recommended to have INDICES on foreign keys for performance!! (particularly important for large tables)
-CREATE INDEX IF NOT EXISTS x__value__pdi__idx
+CREATE INDEX IF NOT EXISTS x__snapshot__pdi__idx
     ON ce_warehouse.x__snapshot (lk_pk_pdi);
 
 COMMENT ON TABLE ce_warehouse.x__snapshot

@@ -179,7 +179,9 @@ COMMENT ON TABLE ce_warehouse.c__geo
 /**
  * Pre-populate with System Use values.
  */
-INSERT INTO ce_warehouse.c__geo (pk_geo, code, name, short_name, tla, internal_notes)
+INSERT INTO ce_warehouse.c__geo (
+    pk_geo, code, name, short_name, tla, internal_notes
+)
 VALUES
     (-1, 'INTERNAL', 'For internal use series etc', 'n/a', 'n/a', 'Allows declaration of internal use series');
 

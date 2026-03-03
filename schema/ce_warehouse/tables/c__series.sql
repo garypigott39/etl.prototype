@@ -138,7 +138,8 @@ COMMENT ON TRIGGER tg__cseries__b02 ON ce_warehouse.c__series
 -- DROP TRIGGER IF EXISTS tg__cseries__a01 ON ce_warehouse.c__series;
 
 CREATE CONSTRAINT TRIGGER tg__cseries__a01
-    AFTER INSERT OR UPDATE OF icode, gcode
+    AFTER INSERT OR UPDATE
+        OF icode, gcode
         ON ce_warehouse.c__series
     DEFERRABLE INITIALLY DEFERRED
     FOR EACH ROW

@@ -24,6 +24,15 @@ DECLARE
     _now TIMESTAMPTZ := NOW();
 
 BEGIN
+   -- Trigger disabled?
+    IF NOT ce_warehouse.fx_ut_trigger_is_enabled(TG_NAME) THEN
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE
+            RETURN NEW;
+        END IF;
+    END IF;
+
     IF TG_OP = 'INSERT' THEN
 
         /***************************************************************************
@@ -124,7 +133,9 @@ BEGIN
         AND ifreq = OLD.ifreq
         AND itype = OLD.itype;
 
-        INSERT INTO ce_warehouse.x__series_meta(fk_pk_series, ifreq, itype, first_pdi, last_pdi, is_has_values, ts_updated_values)
+        INSERT INTO ce_warehouse.x__series_meta(
+            fk_pk_series, ifreq, itype, first_pdi, last_pdi, is_has_values, ts_updated_values
+        )
         VALUES (
             OLD.fk_pk_series, OLD.ifreq, OLD.itype, _first_pdi, _last_pdi, (_first_pdi IS NOT NULL), _now
         )

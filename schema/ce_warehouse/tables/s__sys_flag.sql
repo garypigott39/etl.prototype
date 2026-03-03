@@ -1,7 +1,7 @@
 /*
  ***********************************************************************************************************
  * @file
- * s_sys_flag.sql
+ * s__sys_flag.sql
  *
  * System table - assorted system flags.
  *
@@ -29,7 +29,9 @@ COMMENT ON TABLE ce_warehouse.s__sys_flag
 /**
  * Pre-populate with known values.
  */
-INSERT INTO ce_warehouse.s__sys_flag (code, value, description)
+INSERT INTO ce_warehouse.s__sys_flag (
+    code, value, description
+)
 VALUES
     ('ASCII-ONLY','FALSE','If set to "TRUE" then only allow ASCII text values. Default is value is "FALSE".'),
     ('DATE.MAX','+30 YEAR','Max date for date lookup table. This should be an INTERVAL value. Default is "+30 YEAR".'),

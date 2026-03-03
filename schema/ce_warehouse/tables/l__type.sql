@@ -38,7 +38,9 @@ COMMENT ON TABLE ce_warehouse.l__type
 /**
  * Pre-populate with known values. THIS WILL NEVER CHANGE!!!
  */
-INSERT INTO ce_warehouse.l__type (code)
+INSERT INTO ce_warehouse.l__type (
+    code
+)
 VALUES
     ('AC'),
     ('F');

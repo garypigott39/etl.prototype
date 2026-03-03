@@ -76,7 +76,8 @@ BEGIN
     LOOP
         EXECUTE FORMAT('SELECT MAX(%I) FROM %I.%I', _rec.col_name, _rec.schema_name, _rec.table_name)
             INTO _max_count;
-        INSERT INTO t__seq_check VALUES (
+        INSERT INTO t__seq_check
+        VALUES (
             _rec.schema_name,
             _rec.table_name,
             _rec.col_name,

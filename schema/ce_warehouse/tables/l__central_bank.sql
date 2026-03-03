@@ -28,7 +28,9 @@ COMMENT ON TABLE ce_warehouse.l__central_bank
 /**
  * Pre-populate with known values. Update as required.
  */
-INSERT INTO ce_warehouse.l__central_bank (name, short_code)
+INSERT INTO ce_warehouse.l__central_bank (
+    name, short_code
+)
 VALUES
     ('Austrian National Bank', 'OeNB'),
     ('Autoriti Monetari Brunei Darussalam', 'AMBD'),

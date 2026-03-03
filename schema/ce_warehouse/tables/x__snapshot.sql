@@ -27,16 +27,18 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__snapshot
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of periods with values, see app logic!!
 
-    src_ifreq SMALLINT NOT NULL
-        CHECK (src_ifreq IN (1, 2, 3 , 4)),  -- D->W, D->M, .., W->M, W->Q, etc
-    ifreq SMALLINT NOT NULL GENERATED ALWAYS
-        AS (lk_pk_pdi / 100000000) STORED
-        CHECK (ifreq IN (2, 3 , 4, 5)),  -- extract frequency from period code
     itype SMALLINT NOT NULL
         CHECK (itype IN (1, 2)),  -- enforce valid types: 1=actual, 2=forecast
 
-    eop_pdi INT NOT NULL,  -- period code for end of period value (source periods)
-    eop_value NUMERIC NOT NULL,  -- end of period value (i.e. "stock" value)
+    tgt_ifreq SMALLINT NOT NULL GENERATED ALWAYS
+        AS (lk_pk_pdi / 100000000) STORED
+        CHECK (tgt_ifreq IN (2, 3 , 4, 5)),  -- extract frequency from period code
+
+    src_ifreq SMALLINT NOT NULL
+        CHECK (src_ifreq IN (1, 2, 3 , 4)),  -- D->W, D->M, .., W->M, W->Q, etc
+
+    src_last_pdi INT NOT NULL,  -- last source pdi
+    src_last_value NUMERIC NOT NULL,  -- last source value (e.g. closing prices...)
     sum_value NUMERIC NOT NULL,
     num_periods INT NOT NULL,  -- number of periods included in sum_value (for averaging etc)
 

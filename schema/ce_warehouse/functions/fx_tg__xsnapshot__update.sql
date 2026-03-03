@@ -53,18 +53,16 @@ BEGIN
     FOR _rec IN
         SELECT DISTINCT
             fk_pk_series,
-            ifreq,
-            itype
+            ifreq
         FROM (
-            SELECT fk_pk_series, ifreq, itype FROM new_table
+            SELECT fk_pk_series, ifreq FROM new_table
             UNION
-            SELECT fk_pk_series, ifreq, itype FROM old_table
+            SELECT fk_pk_series, ifreq FROM old_table
         ) t
     LOOP
         CALL ce_warehouse.px_ut__xsnapshot(
             _rec.fk_pk_series,
-            _rec.ifreq,
-            _rec.itype
+            _rec.ifreq
         );
     END LOOP;
 

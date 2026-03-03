@@ -50,7 +50,7 @@ CREATE UNIQUE INDEX mv__period__period__idx
     ON ce_warehouse.mv__period(period);
 
 -- GIST "Generalized Search Tree" index -> performant for range queries
-CREATE INDEX IF NOT EXISTS mv__period__date_range__idx
+CREATE INDEX IF NOT EXISTS mv__period__daterange__idx
     ON ce_warehouse.mv__period USING GIST (date_range);
 
 COMMENT ON MATERIALIZED VIEW ce_warehouse.mv__period

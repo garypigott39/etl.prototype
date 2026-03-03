@@ -22,7 +22,7 @@ BEGIN
     CALL ce_warehouse.px_ut__info('Pipeline - Rebuild snapshot starts', TRUE);
 
     FOR _rec IN
-        SELECT DISTINCT fk_pk_series, ifreq, itype,
+        SELECT DISTINCT fk_pk_series, ifreq, itype
         FROM ce_warehouse.x__value
     LOOP
         CALL ce_warehouse.px_ut__xsnapshot(

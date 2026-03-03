@@ -1,7 +1,7 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_ut__current_uid.sql
+ * fx_ut_session_uid.sql
  *
  * Utility function - get current UID for auditing purposes.
  *
@@ -13,9 +13,9 @@
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_ut__current_uid;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_ut_session_uid;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_ut__current_uid(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_ut_session_uid(
 )
     RETURNS TEXT
     LANGUAGE sql
@@ -30,5 +30,5 @@ $$
         );
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_ut__current_uid
+COMMENT ON FUNCTION ce_warehouse.fx_ut_session_uid
     IS 'Utility function - get current UID for auditing purposes';

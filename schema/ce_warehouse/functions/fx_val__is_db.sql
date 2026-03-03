@@ -9,9 +9,9 @@
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_val__is_db_utc;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_val__is_db;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_val__is_db_utc(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_val__is_db(
     _name TEXT
 )
     RETURNS BOOL

@@ -99,7 +99,33 @@ COMMENT ON TRIGGER tg__xvalue__b01 ON ce_warehouse.x__value
 -- DROP TRIGGER IF EXISTS tg__xvalue__a01 ON ce_warehouse.x__value;
 
 CREATE TRIGGER tg__xvalue__a01
-    AFTER INSERT OR UPDATE OR DELETE
+    AFTER INSERT
+        ON ce_warehouse.x__value
+    REFERENCING
+        NEW TABLE AS new_table
+    FOR EACH STATEMENT
+        EXECUTE FUNCTION ce_warehouse.fx_tg__xsnapshot__update();
+
+COMMENT ON TRIGGER tg__xvalue__a01 ON ce_warehouse.x__value
+    IS 'Trigger to snapshot (NEW) values on x_value table';
+
+-- DROP TRIGGER IF EXISTS tg__xvalue__a02 ON ce_warehouse.x__value;
+
+CREATE TRIGGER tg__xvalue__a02
+    AFTER DELETE
+        ON ce_warehouse.x__value
+    REFERENCING
+        OLD TABLE AS old_table
+    FOR EACH STATEMENT
+        EXECUTE FUNCTION ce_warehouse.fx_tg__xsnapshot__update();
+
+COMMENT ON TRIGGER tg__xvalue__a02 ON ce_warehouse.x__value
+    IS 'Trigger to snapshot (DELETE) values on x_value table';
+
+-- DROP TRIGGER IF EXISTS tg__xvalue__a03 ON ce_warehouse.x__value;
+
+CREATE TRIGGER tg__xvalue__a03
+    AFTER UPDATE
         ON ce_warehouse.x__value
     REFERENCING
         NEW TABLE AS new_table
@@ -107,5 +133,5 @@ CREATE TRIGGER tg__xvalue__a01
     FOR EACH STATEMENT
         EXECUTE FUNCTION ce_warehouse.fx_tg__xsnapshot__update();
 
-COMMENT ON TRIGGER tg__xvalue__b01 ON ce_warehouse.x__value
-    IS 'Trigger to truncate value to 12 dps on x_value table';
+COMMENT ON TRIGGER tg__xvalue__a03 ON ce_warehouse.x__value
+    IS 'Trigger to snapshot (UPDATE) values on x_value table';

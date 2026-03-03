@@ -50,7 +50,7 @@ BEGIN
             NEW.value,
             FALSE,
             'I',
-            ce_warehouse.fx_ut__current_uid()
+            ce_warehouse.fx_ut__session_uid()
         );
 
         -- upsert x_series_meta
@@ -89,7 +89,7 @@ BEGIN
                 NEW.value,
                 (OLD.itype = 2 AND NEW.itype = 1),
                 'U',
-                ce_warehouse.fx_ut__current_uid()
+                ce_warehouse.fx_ut__session_uid()
             );
 
             -- update x_series_meta
@@ -123,7 +123,7 @@ BEGIN
             OLD.value,
             FALSE,
             'D',
-            ce_warehouse.fx_ut__current_uid()
+            ce_warehouse.fx_ut__session_uid()
         );
 
         -- recompute bounds

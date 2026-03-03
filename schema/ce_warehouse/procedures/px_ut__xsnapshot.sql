@@ -50,7 +50,7 @@ BEGIN
                 b.itype         AS itype
             FROM _base b
                 JOIN ce_warehouse.mv__xperiod p
-                    ON xp.s_ifreq = b.ifreq
+                    ON p.s_ifreq = b.ifreq
         ),
         _aggregated AS (
             SELECT

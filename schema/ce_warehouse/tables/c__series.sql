@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series
     ts_updated TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_series),
-    UNIQUE(pk_series, sid1),  -- enforce unique SID1 per series, for the FK in x_series_meta
+    UNIQUE(pk_series, sid1),  -- enforce unique SID1 per series, for the FK in x__series_meta
     UNIQUE (series_id),
     UNIQUE (sid1)
 );

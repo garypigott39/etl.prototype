@@ -53,7 +53,7 @@ BEGIN
             ce_warehouse.fx_ut__current_uid()
         );
 
-        -- upsert x_series_meta
+        -- upsert x__series_meta
         INSERT INTO ce_warehouse.x__series_meta (
             fk_pk_series, ifreq, itype, sid1, first_pdi, last_pdi, is_has_values, ts_new_values
         )
@@ -63,16 +63,16 @@ BEGIN
         ON CONFLICT (fk_pk_series, ifreq, itype)
             DO UPDATE
                 SET sid1 = EXCLUDED.sid1,
-                    first_pdi = LEAST(COALESCE(x_series_meta.first_pdi, EXCLUDED.first_pdi), EXCLUDED.first_pdi),
-                    last_pdi  = GREATEST(COALESCE(x_series_meta.last_pdi, EXCLUDED.last_pdi), EXCLUDED.last_pdi),
+                    first_pdi = LEAST(COALESCE(x__series_meta.first_pdi, EXCLUDED.first_pdi), EXCLUDED.first_pdi),
+                    last_pdi  = GREATEST(COALESCE(x__series_meta.last_pdi, EXCLUDED.last_pdi), EXCLUDED.last_pdi),
                     is_has_values = EXCLUDED.is_has_values,
                     ts_new_values = EXCLUDED.ts_new_values,
                     ts_updated = _now
-            WHERE x_series_meta.sid1 IS DISTINCT FROM EXCLUDED.sid1
-            OR x_series_meta.first_pdi IS DISTINCT FROM EXCLUDED.first_pdi
-            OR x_series_meta.last_pdi IS DISTINCT FROM EXCLUDED.last_pdi
-            OR x_series_meta.is_has_values IS DISTINCT FROM EXCLUDED.is_has_values
-            OR x_series_meta.ts_new_values IS DISTINCT FROM EXCLUDED.ts_new_values;
+            WHERE x__series_meta.sid1 IS DISTINCT FROM EXCLUDED.sid1
+            OR x__series_meta.first_pdi IS DISTINCT FROM EXCLUDED.first_pdi
+            OR x__series_meta.last_pdi IS DISTINCT FROM EXCLUDED.last_pdi
+            OR x__series_meta.is_has_values IS DISTINCT FROM EXCLUDED.is_has_values
+            OR x__series_meta.ts_new_values IS DISTINCT FROM EXCLUDED.ts_new_values;
 
     ELSEIF TG_OP = 'UPDATE' THEN
 
@@ -99,7 +99,7 @@ BEGIN
                 ce_warehouse.fx_ut__current_uid()
             );
 
-            -- update x_series_meta
+            -- update x__series_meta
             INSERT INTO ce_warehouse.x__series_meta (
                 fk_pk_series, ifreq, itype, sid1, is_has_values, ts_updated_values
             )
@@ -109,12 +109,12 @@ BEGIN
             ON CONFLICT (fk_pk_series, ifreq, itype)
                 DO UPDATE
                     SET sid1 = EXCLUDED.sid1,
-                        is_has_values = EXCLUDED.has_values,
+                        is_has_values = EXCLUDED.is_has_values,
                         ts_updated_values = EXCLUDED.ts_updated_values,
                         ts_updated = _now
-                WHERE x_series_meta.sid1 IS DISTINCT FROM EXCLUDED.sid1
-                OR x_series_meta.is_has_values IS DISTINCT FROM EXCLUDED.is_has_values
-                OR x_series_meta.ts_new_values IS DISTINCT FROM EXCLUDED.ts_new_values;
+                WHERE x__series_meta.sid1 IS DISTINCT FROM EXCLUDED.sid1
+                OR x__series_meta.is_has_values IS DISTINCT FROM EXCLUDED.is_has_values
+                OR x__series_meta.ts_new_values IS DISTINCT FROM EXCLUDED.ts_new_values;
         END IF;
 
     ELSEIF TG_OP = 'DELETE' THEN
@@ -155,14 +155,14 @@ BEGIN
                 SET sid1 = EXCLUDED.sid1,
                     first_pdi = EXCLUDED.first_pdi,
                     last_pdi  = EXCLUDED.last_pdi,
-                    is_has_values = EXCLUDED.has_values,
+                    is_has_values = EXCLUDED.is_has_values,
                     ts_updated_values = EXCLUDED.ts_updated_values,
                     ts_updated = _now
-            WHERE x_series_meta.sid1 IS DISTINCT FROM EXCLUDED.sid1
-            OR x_series_meta.first_pdi IS DISTINCT FROM EXCLUDED.first_pdi
-            OR x_series_meta.last_pdi IS DISTINCT FROM EXCLUDED.last_pdi
-            OR x_series_meta.is_has_values IS DISTINCT FROM EXCLUDED.is_has_values
-            OR x_series_meta.ts_new_values IS DISTINCT FROM EXCLUDED.ts_new_values;
+            WHERE x__series_meta.sid1 IS DISTINCT FROM EXCLUDED.sid1
+            OR x__series_meta.first_pdi IS DISTINCT FROM EXCLUDED.first_pdi
+            OR x__series_meta.last_pdi IS DISTINCT FROM EXCLUDED.last_pdi
+            OR x__series_meta.is_has_values IS DISTINCT FROM EXCLUDED.is_has_values
+            OR x__series_meta.ts_new_values IS DISTINCT FROM EXCLUDED.ts_new_values;
 
     END IF;
 

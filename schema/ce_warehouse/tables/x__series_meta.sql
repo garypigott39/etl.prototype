@@ -1,7 +1,7 @@
 /*
  ***********************************************************************************************************
  * @file
- * x_series_meta.sql
+ * x__series_meta.sql
  *
  * Internal table - series metadata, updated by triggers on x_value and maintained by users/apps.
  ***********************************************************************************************************
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__series_meta
 );
 
 -- It's recommended to have INDICES on foreign keys for performance!!
-CREATE INDEX IF NOT EXISTS x_series_meta__fk_pk_series__idx
+CREATE INDEX IF NOT EXISTS x__series_meta__fk_pk_series__idx
     ON ce_warehouse.x__series_meta (fk_pk_series);
 
 COMMENT ON TABLE ce_warehouse.x__series_meta

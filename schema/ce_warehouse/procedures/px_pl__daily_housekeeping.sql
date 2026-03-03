@@ -18,7 +18,7 @@ BEGIN
 
     CALL ce_warehouse.px_ut__info('Pipeline - Daily Housekeeping starts', TRUE);
 
-    CALL ce_warehouse.px_ut__lock_pipeline('ETL', 'lock');
+    CALL ce_warehouse.px_ut__lock_or_unlock('ETL', 'lock');
 
     -- Fix sequences
     CALL ce_warehouse.px_ut__info('Running sequence fix', TRUE);
@@ -33,7 +33,7 @@ BEGIN
     CALL ce_warehouse.px_ut__sync_users();
 
     -- Unlock pipeline
-    CALL ce_warehouse.px_ut__lock_pipeline('ETL', 'unlock');
+    CALL ce_warehouse.px_ut__lock_or_unlock('ETL', 'unlock');
 
     CALL ce_warehouse.px_ut__info('Pipeline - Daily Housekeeping ends OK', TRUE);
 

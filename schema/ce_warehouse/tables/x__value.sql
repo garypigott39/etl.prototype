@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__value
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of periods with values, see app logic!!
 
-    -- These exist in l_freq & l_type, but aren't really worth the join
+    -- These exist in l__freq & l__type, but aren't really worth the join
     ifreq SMALLINT NOT NULL GENERATED ALWAYS
         AS (lk_pk_pdi / 100000000) STORED
         CHECK (ifreq IN (1, 2, 3 , 4, 5)),  -- extract frequency from period code
@@ -56,17 +56,17 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__value
 );
 
 -- Optimal index for Trigger
-CREATE INDEX IF NOT EXISTS x_value__series_meta__idx
+CREATE INDEX IF NOT EXISTS x__value__series_meta__idx
     ON ce_warehouse.x__value (fk_pk_series, ifreq, itype, lk_pk_pdi);
 
 -- It's recommended to have INDICES on foreign keys for performance!! (particularly important for large tables)
-CREATE INDEX IF NOT EXISTS x_value__pdi__idx
+CREATE INDEX IF NOT EXISTS x__value__pdi__idx
     ON ce_warehouse.x__value (lk_pk_pdi);
 
-CREATE INDEX IF NOT EXISTS x_value__source__idx
+CREATE INDEX IF NOT EXISTS x__value__source__idx
     ON ce_warehouse.x__value (lk_pk_source);
 
-CREATE INDEX IF NOT EXISTS x_value__fk_pk_tip__idx
+CREATE INDEX IF NOT EXISTS x__value__fk_pk_tip__idx
     ON ce_warehouse.x__value (fk_pk_tip);
 
 COMMENT ON TABLE ce_warehouse.x__value

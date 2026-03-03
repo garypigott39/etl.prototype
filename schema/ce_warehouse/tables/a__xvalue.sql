@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a__xvalue
     PRIMARY KEY (idx)
 );
 
-CREATE INDEX IF NOT EXISTS a_xvalue__datapoint__idx
+CREATE INDEX IF NOT EXISTS a__xvalue__datapoint__idx
     ON ce_warehouse.a__xvalue (fk_pk_series, lk_pk_pdi, idx DESC);
 
 COMMENT ON TABLE ce_warehouse.a__xvalue

@@ -1,7 +1,7 @@
 /*
  ***********************************************************************************************************
  * @file
- * c_calc.sql
+ * c__calc.sql
  *
  * Control table - "rules" for calculated values (vers 2).
  * Handles both API calc & the more custom calculations, with the aim of simplifying logic & maintenance.
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__calc
 
 -- It's recommended to have INDICES on foreign keys for performance!!
 -- unless we already have them on the referenced table
-CREATE INDEX IF NOT EXISTS c_calc__formula_type__idx
+CREATE INDEX IF NOT EXISTS c__calc__formula_type__idx
     ON ce_warehouse.c__calc (formula_type);
 
 COMMENT ON TABLE ce_warehouse.c__calc

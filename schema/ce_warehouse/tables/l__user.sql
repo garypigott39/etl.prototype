@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l__user
     internal_notes TEXT
         CHECK (ce_warehouse.fx_val__is_text(internal_notes, 'internal_notes') IS NULL),
 
-    ts_created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    ts_created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_user),
     UNIQUE (source_uid)

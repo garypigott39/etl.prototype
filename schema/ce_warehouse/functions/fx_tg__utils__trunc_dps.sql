@@ -36,19 +36,13 @@ BEGIN
     _colname := TG_ARGV[0];  -- first argument passed to the trigger
     _dps := TG_ARGV[1]::INT;  -- second argument passed to the trigger
 
-    EXECUTE FORMAT(
-        'SELECT ($1).%I := trunc(($1).%I, %s)',
-        _colname,
-        _dps
-    )
-    INTO _value
-    USING NEW;
-
-    IF _value IS NOT NULL THEN
-        _value := TRUNC(_value, _dps);
-        EXECUTE FORMAT('SELECT ($1).%I := $2', _colname)
-            USING NEW, _value;
-    END IF;
+    NEW := JSONB_POPULATE_RECORD(
+        NEW,
+        JSONB_BUILD_OBJECT(
+            _colname,
+            TRUNC((TO_JSONB(NEW)->>_colname)::NUMERIC, _dps)
+        )
+    );
 
     RETURN NEW;
 END

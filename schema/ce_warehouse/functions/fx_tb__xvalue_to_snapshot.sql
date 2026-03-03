@@ -18,7 +18,7 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__xvalue_to_snapshot(
        tgt_ifreq SMALLINT,
        fk_pk_series INT,
        lk_pk_pdi INT,
-       ifreq SMALLINT,
+       itype SMALLINT,
        last_pdi INT,
        last_value NUMERIC,
        sum_value NUMERIC,

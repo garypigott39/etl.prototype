@@ -878,6 +878,9 @@ def migrate_xtooltip(src_cur, tgt_cur, is_restart):
 def migrate_xvalue(src_cur, tgt_cur, is_restart):
     tgt = "ce_warehouse.x__value"
 
+    if is_restart and not is_table_empty(tgt, tgt_cur):
+        return
+
     print(f"\n### MIGRATE: {tgt}")
 
     print("Disabling triggers...")

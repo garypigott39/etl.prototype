@@ -39,8 +39,8 @@ BEGIN
          * INSERT
          ***************************************************************************/
 
-        INSERT INTO ce_warehouse.a_xvalue (
-            fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, realised, audit_type, audit_user
+        INSERT INTO ce_warehouse.a__xvalue (
+            fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, is_realised, audit_type, audit_user
         )
         VALUES (
             NEW.fk_pk_series,
@@ -84,8 +84,8 @@ BEGIN
             OR (OLD.itype IS DISTINCT FROM NEW.itype)
             OR (OLD.lk_pk_source IS DISTINCT FROM NEW.lk_pk_source) THEN
 
-            INSERT INTO ce_warehouse.a_xvalue (
-                fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, new_value, realised, audit_type, audit_user
+            INSERT INTO ce_warehouse.a__xvalue (
+                fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, new_value, is_realised, audit_type, audit_user
             )
             VALUES (
                 OLD.fk_pk_series,
@@ -123,8 +123,8 @@ BEGIN
          * DELETE
          ***************************************************************************/
 
-        INSERT INTO ce_warehouse.a_xvalue(
-           fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, realised, audit_type, audit_user
+        INSERT INTO ce_warehouse.a__xvalue(
+           fk_pk_series, lk_pk_pdi, itype, lk_pk_source, value, is_realised, audit_type, audit_user
         )
         VALUES (
             OLD.fk_pk_series,

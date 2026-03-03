@@ -1063,7 +1063,7 @@ def main(commit_on_fail: bool = False, is_restart: bool = False):
         post_migration_steps_1(src_cur, tgt_cur, is_restart)
         tgt_conn.commit() if commit_on_fail else None  # commit after each major step
 
-        # post_migration_steps_2(src_cur, tgt_cur, is_restart)
+        post_migration_steps_2(src_cur, tgt_cur, is_restart)
 
         tgt_conn.commit()  # FINAL commit if we got here without exception, regardless of commit_on_fail setting
 

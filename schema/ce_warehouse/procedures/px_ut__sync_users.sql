@@ -94,7 +94,8 @@ BEGIN
     UPDATE ce_warehouse.l__user u
         SET is_admin = t.is_admin,
             is_data_team = 'DATA TEAM' = ANY(t.groups),
-            is_value_uploader = 'VALUE UPLOADER' = ANY(t.groups)
+            is_value_uploader = 'VALUE UPLOADER' = ANY(t.groups),
+            is_check_uploads = 'CHECK UPLOADS' = ANY(t.groups)
     FROM t__django_users t
     WHERE u.source_uid = t.source_uid
     AND u.status <> 'deleted'

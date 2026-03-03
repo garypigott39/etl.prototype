@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l__user
     is_admin BOOL NOT NULL DEFAULT FALSE,  -- Admin user
     is_data_team BOOL NOT NULL DEFAULT FALSE,  -- Member of the data team
     is_value_uploader BOOL NOT NULL DEFAULT FALSE,  -- User with financial upload permissions
-    is_checking_required BOOL NOT NULL DEFAULT FALSE,  -- User value uploads require "checking"
+    is_check_uploads BOOL NOT NULL DEFAULT FALSE,  -- User value uploads require "checking"
 
     internal_notes TEXT
         CHECK (ce_warehouse.fx_val__is_text(internal_notes, 'internal_notes') IS NULL),

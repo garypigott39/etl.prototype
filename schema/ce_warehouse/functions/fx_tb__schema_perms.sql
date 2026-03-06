@@ -7,9 +7,9 @@
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_core.fx_tb_schema_perms;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb_schema_perms;
 
-CREATE OR REPLACE FUNCTION ce_core.fx_tb_schema_perms(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb_schema_perms(
 )
     RETURNS TABLE (
         role        NAME,
@@ -33,5 +33,5 @@ $$
     ORDER BY role, schema;
 $$;
 
-COMMENT ON FUNCTION ce_core.fx_tb_schema_perms
+COMMENT ON FUNCTION ce_warehouse.fx_tb_schema_perms
     IS 'Pseudo table function - provide a list of users & their schema permissions';

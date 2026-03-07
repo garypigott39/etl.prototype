@@ -21,13 +21,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__snapshot
 
     fk_pk_series INT NOT NULL
         REFERENCES ce_warehouse.c__series (pk_series)
-            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
 
     lk_pk_pdi INT NOT NULL
         REFERENCES ce_warehouse.l__period (pk_pdi)
-            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of periods with values, see app logic!!
 

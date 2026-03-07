@@ -16,13 +16,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__ind_parent
 
     fk_pk_ind INT NOT NULL
         REFERENCES ce_warehouse.c__ind (pk_ind)
-            ON UPDATE RESTRICT
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 
     fk_pk_ind_parent INT NOT NULL
         REFERENCES ce_warehouse.c__ind (pk_ind)
-            ON UPDATE RESTRICT
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED
         CHECK (

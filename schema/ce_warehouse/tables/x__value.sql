@@ -17,12 +17,10 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__value
 
     fk_pk_series INT NOT NULL
         REFERENCES ce_warehouse.c__series (pk_series)
-            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of series with values, see app logic!!
     lk_pk_pdi INT NOT NULL
         REFERENCES ce_warehouse.l__period (pk_pdi)
-            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of periods with values, see app logic!!
 
@@ -35,13 +33,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__value
 
     lk_pk_source SMALLINT NOT NULL
         REFERENCES ce_warehouse.l__source (pk_source)
-            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
     value NUMERIC NOT NULL,
     fk_pk_tip INT
         REFERENCES ce_warehouse.x__tooltip (pk_tip)
-            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,  -- optional tooltip reference
 

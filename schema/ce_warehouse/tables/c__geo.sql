@@ -85,7 +85,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
         ),
     lk_pk_central_bank SMALLINT
         REFERENCES ce_warehouse.l__central_bank(pk_central_bank)
-            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
@@ -94,7 +93,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
         ),
     lk_pk_stock_market SMALLINT
         REFERENCES ce_warehouse.l__stock_market(pk_stock_market)
-            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
@@ -103,7 +101,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
         ),
     lk_pk_political_alignment SMALLINT
         REFERENCES ce_warehouse.l__political_alignment(pk_political_alignment)
-            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
@@ -112,7 +109,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
         ),
     lk_pk_currency_unit SMALLINT
         REFERENCES ce_warehouse.l__currency_unit(pk_currency_unit)
-            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
         CHECK (
@@ -121,7 +117,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
         ),
     lk_pk_geo_category SMALLINT
         REFERENCES ce_warehouse.l__geo_category(pk_geo_category)
-            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED
         CHECK (

@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo_group
 
     fk_pk_geo INT NOT NULL
         REFERENCES ce_warehouse.c__geo (pk_geo)
-            ON UPDATE RESTRICT
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED
         CHECK(
@@ -27,7 +26,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo_group
     -- GEO Group ID
     lk_pk_geo_group SMALLINT NOT NULL
         REFERENCES ce_warehouse.l__geo_group (pk_geo_group)
-            ON UPDATE RESTRICT
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 

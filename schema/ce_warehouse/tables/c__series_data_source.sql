@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_data_source
 
     fk_pk_series INT NOT NULL
         REFERENCES ce_warehouse.c__series (pk_series)
-            ON UPDATE CASCADE
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED
         CHECK (fk_pk_series > 0),
@@ -23,7 +22,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_data_source
     -- Data source ID
     lk_pk_data_source SMALLINT NOT NULL
         REFERENCES ce_warehouse.l__data_source (pk_data_source)
-            ON UPDATE RESTRICT
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
 

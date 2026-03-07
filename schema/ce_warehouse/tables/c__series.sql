@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series
 
     gcode TEXT NOT NULL
         REFERENCES ce_warehouse.c__geo (code)
-            ON UPDATE CASCADE
+            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
 
@@ -48,7 +48,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series
         CHECK (ce_warehouse.fx_val__is_text(description, 'c_series.description') IS NULL),
     lk_pk_units SMALLINT
         REFERENCES ce_warehouse.l__units (pk_units)
-            ON UPDATE RESTRICT
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
     precision INT NOT NULL DEFAULT 0
@@ -79,7 +78,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series
     ts_updated TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (pk_series),
-    UNIQUE(pk_series, sid1),  -- enforce unique SID1 per series, for the FK in x__series_meta
     UNIQUE (series_id),
     UNIQUE (sid1)
 );
@@ -127,6 +125,23 @@ CREATE TRIGGER tg__cseries__b02
 
 COMMENT ON TRIGGER tg__cseries__b02 ON ce_warehouse.c__series
     IS 'Trigger to instigate soft delete on c_series table';
+
+/*
+ ***********************************************************************************************************
+ * Add series-metadata record on insert
+ ***********************************************************************************************************
+ */
+
+-- DROP TRIGGER IF EXISTS tg__cseries__a01 ON ce_warehouse.c__series;
+
+CREATE TRIGGER tg__cseries__a01
+    BEFORE INSERT
+        ON ce_warehouse.c__series
+    FOR EACH ROW
+        EXECUTE FUNCTION ce_warehouse.fx_tg__cseries_meta__create();
+
+COMMENT ON TRIGGER tg__cseries__a01 ON ce_warehouse.c__series
+    IS 'Trigger to create metadata records on c_series table INSERTs';
 
 /*
  ***********************************************************************************************************

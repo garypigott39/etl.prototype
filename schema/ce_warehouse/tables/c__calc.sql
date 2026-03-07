@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__calc
 
     tgt_series_id TEXT NOT NULL
         REFERENCES ce_warehouse.c__series(series_id)
-            ON UPDATE CASCADE
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,
     tgt_cfreq TEXT NOT NULL
@@ -26,7 +25,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__calc
 
     formula_type TEXT NOT NULL
         REFERENCES ce_warehouse.s__formula_type(code)
-            ON UPDATE RESTRICT
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,
     expr TEXT NOT NULL,  -- Validated via APP

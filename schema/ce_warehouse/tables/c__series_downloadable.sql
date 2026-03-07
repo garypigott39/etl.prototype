@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_downloadable
 
     fk_pk_series INT NOT NULL
         REFERENCES ce_warehouse.c__series (pk_series)
-            ON UPDATE RESTRICT
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED
         CHECK (fk_pk_series > 0),

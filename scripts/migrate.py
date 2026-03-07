@@ -91,8 +91,8 @@ def create_temp_from_source(src_cur, tgt_cur, source_query, temp_name):
 # Other helper functions
 # -------------------------------------------------------
 
-def is_table_empty(table_name, tgt_cur):
-    tgt_cur.execute(f"SELECT COUNT(*) FROM {table_name}")
+def is_table_empty(table_name, tgt_cur, filter = None):
+    tgt_cur.execute(f"SELECT COUNT(*) FROM {table_name} WHERE {filter if filter else '1=1'}")
     return tgt_cur.fetchone()[0] <= 0
 
 
@@ -103,7 +103,7 @@ def is_table_empty(table_name, tgt_cur):
 def setup_and_check(src_cur, tgt_cur, is_restart):
     # Check its UTC
     print("Checking database timezone...")
-    tgt_cur.execute('SELECT ce_warehouse.fx_val__is_db_utc()')
+    tgt_cur.execute("SELECT ce_warehouse.fx_val__pg__is_db_utc()")
     is_utc = bool(tgt_cur.fetchone()[0] is None)
     if not is_utc:
         raise RuntimeError("Target database is not set to UTC! Aborting.")
@@ -331,12 +331,12 @@ def data_clean_data_source(tgt_cur, tmp):
 # Individual table copy functions
 # -------------------------------------------------------
 
-def migrate_axvalue(src_cur, tgt_cur, is_restart):
+def migrate_axvalue(src_cur, tgt_cur):
     src = "SELECT * FROM ce_powerbi.x_values_audit"
     tgt = "ce_warehouse.a__xvalue"
     tmp = "t__a_x_values_audit"
 
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -368,13 +368,13 @@ def migrate_axvalue(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_calc(src_cur, tgt_cur, is_restart):
+def migrate_calc(src_cur, tgt_cur):
     """Various jiggery pokery needed."""
     src = "SELECT * FROM ce_data.c_api_calc"
     tgt = "ce_warehouse.c__calc"
     tmp = "t__c_api_calc"
 
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -417,7 +417,7 @@ def migrate_calc(src_cur, tgt_cur, is_restart):
     create_temp_from_source(src_cur, tgt_cur, src, tmp)
     copy_table(src_cur, tgt_cur, src, tmp)
 
-    formulas_regex = r'^(ann|calc|delta|growth|offset|peop|pmean|pmedian|psum|quantile|zscore)\('
+    formulas_regex = r"^(ann|calc|delta|growth|offset|peop|pmean|pmedian|psum|quantile|zscore)\("
 
     tgt_cur.execute(f"""
         INSERT INTO {tgt} (
@@ -448,12 +448,12 @@ def migrate_calc(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_const(src_cur, tgt_cur, is_restart):
+def migrate_const(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_const"
     tgt = "ce_warehouse.c__const"
     tmp = "t__c_const"
 
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -483,10 +483,10 @@ def migrate_const(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_geo(src_cur, tgt_cur, is_restart):
+def migrate_geo(src_cur, tgt_cur):
     tgt = "ce_warehouse.c__geo"
 
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur, "pk_geo > 0"):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -551,7 +551,7 @@ def migrate_geo(src_cur, tgt_cur, is_restart):
     copy_table(src_cur, tgt_cur, src, tmp)
 
     tgt_cur.execute(f"""
-        CALL ce_warehouse.px_ut__fix_seq();
+        CALL ce_warehouse.px_ut__pg__fix_seq();
 
         INSERT INTO {tgt} (
             code, name, short_name, tla, ordering, lk_pk_commodity_type, internal_notes, ts_updated
@@ -570,12 +570,12 @@ def migrate_geo(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_geo_group(src_cur, tgt_cur, is_restart):
+def migrate_geo_group(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_geo"
     tgt = "ce_warehouse.c__geo_group"
     tmp = "t__c_geo_group"
 
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -613,12 +613,12 @@ def migrate_geo_group(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_ind(src_cur, tgt_cur, is_restart):
+def migrate_ind(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_ind"
     tgt = "ce_warehouse.c__ind"
     tmp = "t__c_ind"
 
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -664,12 +664,12 @@ def migrate_ind(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_ind_parent(src_cur, tgt_cur, is_restart):
+def migrate_ind_parent(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_ind"
     tgt = "ce_warehouse.c__ind_parent"
     tmp = "t__c_ind_parent"
 
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -707,12 +707,12 @@ def migrate_ind_parent(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_series(src_cur, tgt_cur, is_restart):
+def migrate_series(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_series"
     tgt = "ce_warehouse.c__series"
     tmp = "t__c_series"
 
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -755,12 +755,12 @@ def migrate_series(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_series_data_source(src_cur, tgt_cur, is_restart):
+def migrate_series_data_source(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_series"
     tgt = "ce_warehouse.c__series_data_source"
     tmp = "t__c_series_data_source"
 
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -804,12 +804,12 @@ def migrate_series_data_source(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_series_downloadable(src_cur, tgt_cur, is_restart):
+def migrate_series_downloadable(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_series_metadata"
     tgt = "ce_warehouse.c__series_downloadable"
     tmp = "t__c_series_metadata"
 
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -847,12 +847,12 @@ def migrate_series_downloadable(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_xtooltip(src_cur, tgt_cur, is_restart):
+def migrate_xtooltip(src_cur, tgt_cur):
     src = "SELECT * FROM ce_pipeline.x_tooltip"
     tgt = "ce_warehouse.x__tooltip"
     tmp = "t__c_xtooltip"
     
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -879,10 +879,10 @@ def migrate_xtooltip(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_xvalue(src_cur, tgt_cur, is_restart):
+def migrate_xvalue(src_cur, tgt_cur):
     tgt = "ce_warehouse.x__value"
 
-    if is_restart and not is_table_empty(tgt, tgt_cur):
+    if not is_table_empty(tgt, tgt_cur):
         return
 
     print(f"\n### MIGRATE: {tgt}")
@@ -963,16 +963,16 @@ def migrate_xvalue(src_cur, tgt_cur, is_restart):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def post_migration_steps_1(src_cur, tgt_cur, is_restart):
+def post_migration_steps_1(src_cur, tgt_cur):
     """
     Post-migration updates to x-series metadata based on new values.
     """
-    if is_restart and not is_table_empty('ce_warehouse.c__series_meta', tgt_cur):
+    if not is_table_empty("ce_warehouse.c__series_meta", tgt_cur):
         return
 
     print("\n### POST-MIGRATION: Updating c-series-meta, & fixing any SEQuences")
     
-    tgt_cur.execute("CALL ce_warehouse.px_ut__fix_seq()")
+    tgt_cur.execute("CALL ce_warehouse.px_ut__pg__fix_seq()")
 
     tgt_cur.execute("""
         ALTER TABLE ce_warehouse.c__series_meta DISABLE TRIGGER ALL;
@@ -981,14 +981,14 @@ def post_migration_steps_1(src_cur, tgt_cur, is_restart):
     """)
 
 
-def post_migration_steps_2(src_cur, tgt_cur, is_restart):
+def post_migration_steps_2(src_cur, tgt_cur):
     """
     Post-migration - rebuild snapshot
     """
-    if is_restart and not is_table_empty("ce_warehouse.x__snapshot", tgt_cur):
+    if not is_table_empty("ce_warehouse.x__snapshot", tgt_cur):
         return
 
-    print("\n### POST-MIGRATION: Building snapshot tables")
+    print("\n### POST-MIGRATION: Building values snapshot table")
 
     tgt_cur.execute("CALL ce_warehouse.px_pl__rebuild_xsnapshot();")
 
@@ -998,7 +998,7 @@ def post_migration_steps_2(src_cur, tgt_cur, is_restart):
 # -------------------------------------------------------
 
 
-def main(commit_on_fail: bool = False, is_restart: bool = False):
+def main(is_restart: bool = False):
     src_conn = psycopg2.connect(**SOURCE_CONN)
     tgt_conn = psycopg2.connect(**TARGET_CONN)
 
@@ -1009,50 +1009,49 @@ def main(commit_on_fail: bool = False, is_restart: bool = False):
 
     try:
         setup_and_check(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        tgt_conn.commit()  # commit after each major step
 
-        migrate_geo(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_geo(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        migrate_geo_group(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_geo_group(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        migrate_ind(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_ind(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        migrate_ind_parent(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_ind_parent(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        migrate_series(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_series(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        migrate_series_data_source(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_series_data_source(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        migrate_series_downloadable(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_series_downloadable(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        migrate_const(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_const(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        migrate_calc(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_calc(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        migrate_xtooltip(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_xtooltip(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        migrate_xvalue(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_xvalue(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        migrate_axvalue(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        migrate_axvalue(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        post_migration_steps_1(src_cur, tgt_cur, is_restart)
-        tgt_conn.commit() if commit_on_fail else None  # commit after each major step
+        post_migration_steps_1(src_cur, tgt_cur)
+        tgt_conn.commit()
 
-        post_migration_steps_2(src_cur, tgt_cur, is_restart)
-
-        tgt_conn.commit()  # FINAL commit if we got here without exception!!
+        post_migration_steps_2(src_cur, tgt_cur)
+        tgt_conn.commit()
 
         print("\n### Migration complete ✔")
 
@@ -1069,11 +1068,10 @@ def main(commit_on_fail: bool = False, is_restart: bool = False):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 2 or (len(sys.argv) == 2 and sys.argv[1] not in ["--commit", "--restart"]):
-        print("Usage: py migrate.py [--commit or --restart]")
+    if len(sys.argv) > 2 or (len(sys.argv) == 2 and sys.argv[1] not in ["--restart"]):
+        print("Usage: py migrate.py [--restart]")
         sys.exit(1)
 
     main(
-        commit_on_fail=len(sys.argv) == 2,
         is_restart=len(sys.argv) == 2 and "--restart" in sys.argv
     )

@@ -14,11 +14,11 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__xvalue_to_snapshot(
     _src_ifreq INT DEFAULT NULL
 )
     RETURNS TABLE (
-       src_ifreq INT,
-       tgt_ifreq INT,
+       src_ifreq SMALLINT,
+       tgt_ifreq SMALLINT,
        fk_pk_series INT,
        lk_pk_pdi INT,
-       itype INT,
+       itype SMALLINT,
        last_pdi INT,
        last_value NUMERIC,
        sum_value NUMERIC,

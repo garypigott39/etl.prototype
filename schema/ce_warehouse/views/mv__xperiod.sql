@@ -32,7 +32,7 @@ CREATE INDEX IF NOT EXISTS mv__xperiod__tgt_datapoint__idx
 
 -- GIST "Generalized Search Tree" index -> performant for range queries
 CREATE INDEX IF NOT EXISTS mv__xperiod__src_pdirange__idx
-    ON ce_warehouse.mv__xperiod USING GIST (src_ifreq, src_pdi_range);
+    ON ce_warehouse.mv__xperiod USING GIST (src_pdi_range);
 
 COMMENT ON MATERIALIZED VIEW ce_warehouse.mv__xperiod
     IS 'Materialized View - creates a source to target period table, for use in API calculations etc';

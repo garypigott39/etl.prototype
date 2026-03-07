@@ -40,7 +40,7 @@ BEGIN
         NEW,
         JSONB_BUILD_OBJECT(
             _colname,
-            TRUNC((TO_JSONB(NEW)->>_colname)::NUMERIC, _dps)
+            TRIM_SCALE(TRUNC((TO_JSONB(NEW)->>_colname)::NUMERIC, _dps))
         )
     );
 

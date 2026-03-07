@@ -41,4 +41,6 @@ VALUES
     ('DEFAULT.VALUERANGE', 'ANY', 'Default value range name from l__value_range table, if unspecified.'),
     ('DEFAULT.OUTOFRANGE.ACTION', 'onhold', 'Default action if value is out of range, if unspecified.'),
     ('DEFAULT.DOWNLOADABLE', 'ess_plugin', 'Default downloadable setting for series metadata, if unspecified.'),
-    ('DEFAULT.VARIANCE', '-1', 'Default period variance series metadata, if unspecified (-1 = no check).');
+    ('DEFAULT.VARIANCE', '-1', 'Default period variance series metadata, if unspecified (-1 = no check).'),
+    ('UD.ERRORS.RETENTION_DAYS', '30', 'Number of days to keep UD value errors. Default is 30 days.'),
+    ('UD.REJECTION.RETENTION_DAYS', '90', 'Number of days to keep UD value rejections. Default is 90 days.');

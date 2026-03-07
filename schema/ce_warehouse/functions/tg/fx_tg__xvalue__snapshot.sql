@@ -38,7 +38,7 @@ BEGIN
             WHERE (o.fk_pk_series IS DISTINCT FROM n.fk_pk_series)
             OR (o.lk_pk_pdi IS DISTINCT FROM n.lk_pk_pdi)
             OR (o.itype IS DISTINCT FROM n.itype)
-            OR (o.value IS NULL AND n.value)
+            OR (o.value IS DISTINCT FROM n.value)
         ) THEN
             RETURN NULL;
         END IF;

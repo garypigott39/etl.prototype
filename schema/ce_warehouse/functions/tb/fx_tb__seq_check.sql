@@ -34,7 +34,7 @@ DECLARE
     _max_count BIGINT;
 
 BEGIN
-    CREATE TEMP TABLE t__seq_check (
+    CREATE TEMP TABLE IF NOT EXISTS t__seq_check (
         t_schema_name TEXT,
         t_table_name TEXT,
         t_col_name TEXT,
@@ -42,6 +42,8 @@ BEGIN
         t_seq_last_value BIGINT,
         t_col_last_value BIGINT
     ) ON COMMIT DROP;
+
+    TRUNCATE TABLE t__seq_check;
 
     FOR _rec IN
         SELECT

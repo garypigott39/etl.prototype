@@ -110,7 +110,7 @@ def setup_and_check(src_cur, tgt_cur, is_restart):
 
     # Build dates & periods
     print("Initialize by running first ever daily housekeeping...")
-    tgt_cur.execute("CALL ce_warehouse.px_pl__daily_housekeeping()")
+    tgt_cur.execute("CALL ce_warehouse.px_pl__daily_housekeeping(FALSE)")
 
     # Check we're not overwriting existing data if this is not a restart
     if not is_restart:
@@ -263,6 +263,10 @@ def data_clean_series(tgt_cur, tmp):
     fields = ["s_name", "s_name1", "s_name2", "s_name3", "s_name4", "s_description", "s_source"]
     names = {
         "average": "Average",
+        "Germany OIS-implied year-end policy rate (%, as of 05-03-2026":
+            "Germany OIS-implied year-end policy rate (%, as of 05-03-2026)",
+        "Germany OIS-implied year-end policy rate (%":
+            "Germany OIS-implied year-end policy rate (%)",
         "Germany OIS-implied year-end policy rate (%, as of 19-02-2026":
             "Germany OIS-implied year-end policy rate (%, as of 19-02-2026)",
         "Germany OIS-implied year-end policy rate (%, as of 30-01-2026":
@@ -963,14 +967,17 @@ def post_migration_steps_1(src_cur, tgt_cur, is_restart):
     """
     Post-migration updates to x-series metadata based on new values.
     """
-    if is_restart and not is_table_empty('ce_warehouse.x__series_meta', tgt_cur):
+    if is_restart and not is_table_empty('ce_warehouse.c__series_meta', tgt_cur):
         return
 
     print("\n### POST-MIGRATION: Updating c-series-meta, & fixing any SEQuences")
     
+    tgt_cur.execute("CALL ce_warehouse.px_ut__fix_seq()")
+
     tgt_cur.execute("""
-        CALL ce_warehouse.px_ut__fix_seq();
+        ALTER TABLE ce_warehouse.c__series_meta DISABLE TRIGGER ALL;
         CALL ce_warehouse.px_ut__fix_series_meta();
+        ALTER TABLE ce_warehouse.c__series_meta ENABLE TRIGGER ALL; 
     """)
 
 
@@ -978,12 +985,12 @@ def post_migration_steps_2(src_cur, tgt_cur, is_restart):
     """
     Post-migration - rebuild snapshot
     """
-    if is_restart and not is_table_empty('ce_warehouse.x__snapshot', tgt_cur):
+    if is_restart and not is_table_empty("ce_warehouse.x__snapshot", tgt_cur):
         return
 
     print("\n### POST-MIGRATION: Building snapshot tables")
 
-    tgt_cur.execute('CALL ce_warehouse.px_pl__rebuild_xsnapshot();')
+    tgt_cur.execute("CALL ce_warehouse.px_pl__rebuild_xsnapshot();")
 
 
 # -------------------------------------------------------
@@ -998,7 +1005,7 @@ def main(commit_on_fail: bool = False, is_restart: bool = False):
     src_cur = src_conn.cursor()
     tgt_cur = tgt_conn.cursor()
 
-    os.system('cls' if platform.system() == 'Windows' else 'clear')
+    os.system("cls" if platform.system() == "Windows" else "clear")
 
     try:
         setup_and_check(src_cur, tgt_cur, is_restart)

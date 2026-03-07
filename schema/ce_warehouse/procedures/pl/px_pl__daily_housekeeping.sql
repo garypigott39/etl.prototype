@@ -10,6 +10,7 @@
 -- DROP PROCEDURE IF EXISTS ce_warehouse.px_pl__daily_housekeeping;
 
 CREATE OR REPLACE PROCEDURE ce_warehouse.px_pl__daily_housekeeping(
+    _fix_metadata BOOL DEFAULT TRUE
 )
     LANGUAGE plpgsql
 AS
@@ -25,8 +26,10 @@ BEGIN
     CALL ce_warehouse.px_ut__fix_seq();
 
     -- Generate any missing series metadata records, BELT & BRACES!
-    CALL ce_warehouse.px_ut__info('Adding missing series metadata', TRUE);
-    CALL ce_warehouse.px_ut__fix_series_meta();
+    IF _fix_metadata THEN
+        CALL ce_warehouse.px_ut__info('Adding missing series metadata', TRUE);
+        CALL ce_warehouse.px_ut__fix_series_meta();
+    END IF;
 
     -- Generate dates & periods
     CALL ce_warehouse.px_ut__info('Generating dates & periods', TRUE);

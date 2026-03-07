@@ -1,7 +1,7 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_tg__xgeneral_audit.sql
+ * fx_tg__general_audit.sql
  *
  * Trigger function - general audit trigger (AFTER update).
  *
@@ -10,9 +10,9 @@
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg__xgeneral_audit;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg__general_audit;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg__xgeneral_audit(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg__general_audit(
 )
     RETURNS TRIGGER
     LANGUAGE plpgsql
@@ -71,7 +71,7 @@ BEGIN
     END IF;
 
     IF _diff IS NOT NULL THEN
-        INSERT INTO ce_warehouse.a__xgeneral_audit (
+        INSERT INTO ce_warehouse.a__general (
             t_name, t_pkey, data, audit_type, audit_user
         )
         VALUES (
@@ -79,7 +79,7 @@ BEGIN
             _pk,
             _diff,
             _audit_type,
-            ce_warehouse.fx_ut__get_current_uid()
+            ce_warehouse.fx_ut__current_uid()
         );
     END IF;
 
@@ -87,5 +87,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_tg__xgeneral_audit
+COMMENT ON FUNCTION ce_warehouse.fx_tg__general_audit
     IS 'Trigger function - general audit trigger (AFTER update)';

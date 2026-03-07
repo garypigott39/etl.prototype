@@ -13,7 +13,7 @@ CREATE TRIGGER tg__cconst__a99
     AFTER INSERT OR UPDATE OR DELETE
         ON ce_warehouse.c__const
     FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg__xgeneral_audit('pk_const');
+        EXECUTE FUNCTION ce_warehouse.fx_tg__general_audit('pk_const');
 
 COMMENT ON TRIGGER tg__cconst__a99 ON ce_warehouse.c__const
     IS 'Trigger to audit changes to the c_const table';

@@ -26,7 +26,7 @@ BEGIN
 
     -- Generate any missing series metadata records, BELT & BRACES!
     CALL ce_warehouse.px_ut__info('Adding missing series metadata', TRUE);
-    CALL ce_warehouse.px_ut__generate_series_meta();
+    CALL ce_warehouse.px_ut__fix_series_meta();
 
     -- Generate dates & periods
     CALL ce_warehouse.px_ut__info('Generating dates & periods', TRUE);

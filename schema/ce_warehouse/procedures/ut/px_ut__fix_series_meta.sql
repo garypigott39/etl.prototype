@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * px_ut__generate_series_meta.sql
+ * px_ut__fix_series_meta.sql
  *
- * Utility procedure - generate missing (& remove dangling) series metadata records, BELT & BRACES!!
+ * Utility procedure - fix missing (& remove dangling) series metadata records, BELT & BRACES!!
  ***********************************************************************************************************
  */
 
--- DROP PROCEDURE IF EXISTS ce_warehouse.px_ut__generate_series_meta;
+-- DROP PROCEDURE IF EXISTS ce_warehouse.px_ut__fix_series_meta;
 
-CREATE OR REPLACE PROCEDURE ce_warehouse.px_ut__generate_series_meta(
+CREATE OR REPLACE PROCEDURE ce_warehouse.px_ut__fix_series_meta(
 )
     LANGUAGE plpgsql
 AS
@@ -39,5 +39,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON PROCEDURE ce_warehouse.px_ut__generate_series_meta
-    IS 'Utility procedure - generate missing (& remove dangling) series metadata records, BELT & BRACES!!';
+COMMENT ON PROCEDURE ce_warehouse.px_ut__fix_series_meta
+    IS 'Utility procedure - fix missing (& remove dangling) series metadata records, BELT & BRACES!!';

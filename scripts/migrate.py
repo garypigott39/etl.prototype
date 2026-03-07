@@ -119,7 +119,7 @@ def setup_and_check(src_cur, tgt_cur, is_restart):
         tgt_cur.execute("SELECT COUNT(*) FROM ce_warehouse.x__value")
         count = tgt_cur.fetchone()[0]
         if count > 0:
-            raise RuntimeError(f"Target values table is not empty! Found {count} records. Aborting.")
+            raise RuntimeError(f"Target values table not empty! Found {count} records. Aborting.")
 
 
 # -------------------------------------------------------
@@ -966,34 +966,11 @@ def post_migration_steps_1(src_cur, tgt_cur, is_restart):
     if is_restart and not is_table_empty('ce_warehouse.x__series_meta', tgt_cur):
         return
 
-    print("\n### POST-MIGRATION: Updating x-series-meta, & fixing any SEQuences")
+    print("\n### POST-MIGRATION: Updating c-series-meta, & fixing any SEQuences")
     
-    tgt_cur.execute("""CALL ce_warehouse.px_ut__fix_seq();""")
-
     tgt_cur.execute("""
-        INSERT INTO ce_warehouse.x__series_meta (
-            fk_pk_series, ifreq, itype, sid1, first_pdi, last_pdi, is_has_values, ts_updated_values
-        )
-        SELECT
-            x.fk_pk_series, x.ifreq, x.itype, s.sid1, MIN(x.lk_pk_pdi), MAX(x.lk_pk_pdi), TRUE, 
-            MAX(x.ts_updated) 
-        FROM ce_warehouse.x__value x
-            JOIN ce_warehouse.c__series s 
-                ON s.pk_series = x.fk_pk_series
-        GROUP BY x.fk_pk_series, x.ifreq, x.itype, s.sid1
-        ON CONFLICT (fk_pk_series, ifreq, itype) DO NOTHING;
-
-        UPDATE ce_warehouse.x__series_meta xm
-        SET ts_new_values = a.ts_audit_time
-        FROM (
-            SELECT fk_pk_series, ifreq, itype, MAX(ts_audit_time) AS ts_audit_time
-            FROM ce_warehouse.a__xvalue
-            WHERE audit_type = 'I'
-            GROUP BY fk_pk_series, ifreq, itype 
-        ) a
-        WHERE xm.fk_pk_series = a.fk_pk_series
-        AND xm.ifreq = a.ifreq
-        AND xm.itype = a.itype;
+        CALL ce_warehouse.px_ut__fix_seq();
+        CALL ce_warehouse.px_ut__fix_series_meta();
     """)
 
 
@@ -1006,7 +983,7 @@ def post_migration_steps_2(src_cur, tgt_cur, is_restart):
 
     print("\n### POST-MIGRATION: Building snapshot tables")
 
-    tgt_cur.execute("""CALL ce_warehouse.px_pl__rebuild_xsnapshot();""")
+    tgt_cur.execute('CALL ce_warehouse.px_pl__rebuild_xsnapshot();')
 
 
 # -------------------------------------------------------
@@ -1068,7 +1045,7 @@ def main(commit_on_fail: bool = False, is_restart: bool = False):
 
         post_migration_steps_2(src_cur, tgt_cur, is_restart)
 
-        tgt_conn.commit()  # FINAL commit if we got here without exception, regardless of commit_on_fail setting
+        tgt_conn.commit()  # FINAL commit if we got here without exception!!
 
         print("\n### Migration complete ✔")
 

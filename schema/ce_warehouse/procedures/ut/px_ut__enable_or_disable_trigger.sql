@@ -29,8 +29,8 @@ BEGIN
            name, status
         )
         VALUES (_name, 'disabled')
-            ON CONFLICT (name)
-                DO NOTHING;
+        ON CONFLICT (name)
+            DO NOTHING;
     ELSIF _type = 'enable' THEN
         DELETE FROM ce_warehouse.s__trigger_status
         WHERE name = _name;

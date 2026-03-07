@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u__value
     -- Calculated
     pk_series INT,
     pdi INT,
-    ifreq INT,
-    itype INT,
+    ifreq SMALLINT,
+    itype SMALLINT,
     isource INT,
     -- End
 

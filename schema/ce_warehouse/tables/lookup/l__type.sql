@@ -4,6 +4,7 @@
  * l__type.sql
  *
  * Lookup table - account type lookup.
+ * Note, as very small table (and for size & performance reasons) we make the primary key SMALLINT.
  ***********************************************************************************************************
  */
 

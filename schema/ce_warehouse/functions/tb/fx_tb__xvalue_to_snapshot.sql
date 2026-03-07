@@ -88,7 +88,7 @@ BEGIN
             l.last_pdi,
             l.last_value,
             a.sum_value,
-            a.num_periods
+            a.num_periods::INT
         FROM _aggregated a
             LEFT JOIN _latest l
                 USING (src_ifreq, tgt_ifreq, fk_pk_series, lk_pk_pdi, itype)

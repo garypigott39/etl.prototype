@@ -4,6 +4,7 @@
  * l__freq.sql
  *
  * Lookup table - frequency lookup.
+ * Note, as very small table (and for size & performance reasons) we make the primary key SMALLINT.
  ***********************************************************************************************************
  */
 
@@ -11,7 +12,7 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.l__freq
 (
-    pk_freq INT NOT NULL GENERATED ALWAYS AS (
+    pk_freq SMALLINT NOT NULL GENERATED ALWAYS AS (
         CASE code
             WHEN 'D' THEN 1
             WHEN 'W' THEN 2

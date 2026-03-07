@@ -18,9 +18,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_downloadable
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED
         CHECK (fk_pk_series > 0),
-    ifreq INT NOT NULL
+    ifreq SMALLINT NOT NULL
         CHECK (ifreq IN (1, 2, 3, 4, 5)),
-    itype INT NOT NULL,
+    itype SMALLINT NOT NULL,
         CHECK (itype IN (1, 2)),
 
     -- User maintained fields

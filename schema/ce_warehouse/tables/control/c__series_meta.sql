@@ -15,9 +15,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_meta
 
     fk_pk_series INT NOT NULL,  -- see Foreign key constraint below
 
-    ifreq INT NOT NULL
+    ifreq SMALLINT NOT NULL
         CHECK (ifreq IN (1, 2, 3 , 4, 5)),
-    itype INT NOT NULL
+    itype SMALLINT NOT NULL
         CHECK (itype IN (1, 2)),
 
     -- SID1 is on the "series" level, SID2 and SID3 are on the "series+frequency+type" level

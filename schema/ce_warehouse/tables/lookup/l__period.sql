@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.l__period
     pk_pdi INT NOT NULL GENERATED ALWAYS
         AS (ce_warehouse.fx_ut__date_to_pdi_or_dti(dt_start_of_period, ifreq)) STORED,
 
-    ifreq INT NOT NULL
+    ifreq SMALLINT NOT NULL
         CHECK (ifreq IN (1, 2, 3, 4, 5)), -- 1=DAILY, 2=WEEKLY, 3=MONTHLY, 4=QUARTERLY, 5=YEARLY
     dt_start_of_period DATE NOT NULL
         CHECK (ce_warehouse.fx_val__is_start_date(dt_start_of_period, ifreq) IS NULL),

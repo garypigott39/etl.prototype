@@ -804,9 +804,9 @@ def migrate_series_data_source(src_cur, tgt_cur):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def migrate_series_downloadable(src_cur, tgt_cur):
+def migrate_series_meta(src_cur, tgt_cur):
     src = "SELECT * FROM ce_data.c_series_metadata"
-    tgt = "ce_warehouse.c__series_downloadable"
+    tgt = "ce_warehouse.c__series_meta"
     tmp = "t__c_series_metadata"
 
     if not is_table_empty(tgt, tgt_cur):
@@ -823,24 +823,27 @@ def migrate_series_downloadable(src_cur, tgt_cur):
     create_temp_from_source(src_cur, tgt_cur, src, tmp)
     copy_table(src_cur, tgt_cur, src, tmp)
 
+    # Pre-populate meta data
+    tgt_cur.execute("CALL ce_warehouse.px_ut__fix_series_meta()")
+
+    # Add in source values if any
     tgt_cur.execute(f"""
-        INSERT INTO {tgt} (
-            fk_pk_series, ifreq, itype, downloadable, forecast_only_lifespan, 
-            internal_notes, ts_updated
-        )
-        SELECT 
-            s.pk_series, lf.pk_freq, lt.pk_type, sm.sm_downloadable, sm.forecast_only_lifespan::INT,
-            sm.internal_notes, sm.updated_utc::TIMESTAMPTZ
-        FROM {tmp} sm
-            JOIN ce_warehouse.c__series s 
-                ON s.gcode = sm.sm_gcode 
-                AND s.icode = sm.sm_icode
-            JOIN ce_warehouse.l__freq lf
-                ON lf.code = sm.sm_freq
-            JOIN ce_warehouse.l__type lt
-                ON lt.code = sm.sm_type
-        WHERE sm.error IS NULL
-        ORDER BY 1    
+        UPDATE {tgt} meta
+        SET 
+            downloadable = raw.sm_downloadable,
+            forecast_only_lifespan = raw.forecast_only_lifespan::INT,
+            internal_notes = raw.internal_notes
+        FROM {tmp} raw
+            JOIN ce_warehouse.c__series s
+                ON s.gcode = raw.sm_gcode
+                AND s.icode = raw.sm_icode
+            JOIN ce_warehouse.l__freq f
+                ON f.code = raw.sm_freq
+            JOIN ce_warehouse.l__type t
+                ON t.code = raw.sm_type    
+        WHERE s.pk_series = meta.fk_pk_series
+        AND f.pk_freq = meta.ifreq
+        AND t.pk_type = meta.itype
     """)
 
     print("Re-enabling triggers...")
@@ -963,34 +966,20 @@ def migrate_xvalue(src_cur, tgt_cur):
     tgt_cur.execute(f"ALTER TABLE {tgt} ENABLE TRIGGER ALL")
 
 
-def post_migration_steps_1(src_cur, tgt_cur):
+def post_migration_steps(src_cur, tgt_cur):
     """
-    Post-migration updates to x-series metadata based on new values.
-    """
-    if not is_table_empty("ce_warehouse.c__series_meta", tgt_cur):
-        return
-
-    print("\n### POST-MIGRATION: Updating c-series-meta, & fixing any SEQuences")
-    
-    tgt_cur.execute("CALL ce_warehouse.px_ut__pg__fix_seq()")
-
-    tgt_cur.execute("""
-        ALTER TABLE ce_warehouse.c__series_meta DISABLE TRIGGER ALL;
-        CALL ce_warehouse.px_ut__fix_series_meta();
-        ALTER TABLE ce_warehouse.c__series_meta ENABLE TRIGGER ALL; 
-    """)
-
-
-def post_migration_steps_2(src_cur, tgt_cur):
-    """
-    Post-migration - rebuild snapshot
+    Post-migration steps.
     """
     if not is_table_empty("ce_warehouse.x__snapshot", tgt_cur):
         return
 
-    print("\n### POST-MIGRATION: Building values snapshot table")
+    print("\n### POST-MIGRATION: Building values snapshot table etc")
 
-    tgt_cur.execute("CALL ce_warehouse.px_pl__rebuild_xsnapshot();")
+    tgt_cur.execute("""
+        CALL ce_warehouse.px_ut__pg__fix_seq();
+        
+        CALL ce_warehouse.px_pl__rebuild_xsnapshot();
+    """)
 
 
 # -------------------------------------------------------
@@ -1029,7 +1018,7 @@ def main(is_restart: bool = False):
         migrate_series_data_source(src_cur, tgt_cur)
         tgt_conn.commit()
 
-        migrate_series_downloadable(src_cur, tgt_cur)
+        migrate_series_meta(src_cur, tgt_cur)
         tgt_conn.commit()
 
         migrate_const(src_cur, tgt_cur)
@@ -1047,10 +1036,7 @@ def main(is_restart: bool = False):
         migrate_axvalue(src_cur, tgt_cur)
         tgt_conn.commit()
 
-        post_migration_steps_1(src_cur, tgt_cur)
-        tgt_conn.commit()
-
-        post_migration_steps_2(src_cur, tgt_cur)
+        post_migration_steps(src_cur, tgt_cur)
         tgt_conn.commit()
 
         print("\n### Migration complete ✔")

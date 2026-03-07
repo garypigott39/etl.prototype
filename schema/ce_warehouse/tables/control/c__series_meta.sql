@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_meta
         ) STORED,
 
     -- User maintained fields
-    downloadable TEXT NOT NULL DEFAULT 'ess_plugin'
+    downloadable TEXT
         CHECK (
             downloadable IN (
                 'all',
@@ -42,8 +42,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_meta
                 'internal',
                 'none',
                 'powerbi')
-        ),
-    forecast_only_lifespan INT,  -- If NULL then will take the system default
+        ),  -- If Null then use the system default
+    forecast_only_lifespan INT,  -- If NULL then use the system default
     internal_notes TEXT,  -- Unvalidated!
 
     ts_updated TIMESTAMPTZ NOT NULL DEFAULT NOW(),

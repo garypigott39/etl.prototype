@@ -18,7 +18,7 @@ DECLARE
     _sql TEXT;
 
 BEGIN
-    FOR _sql IN SELECT fix FROM ce_warehouse.fx_tb__seq_check() WHERE fix IS NOT NULL
+    FOR _sql IN SELECT fix FROM ce_warehouse.fx_tb__pg__seq_check() WHERE fix IS NOT NULL
     LOOP
         CALL ce_warehouse.px_ut__info('Running - ' || _sql);
         EXECUTE _sql;

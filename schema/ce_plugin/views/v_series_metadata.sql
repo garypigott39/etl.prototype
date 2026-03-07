@@ -9,7 +9,6 @@
 
 -- DROP VIEW IF EXISTS ce_plugin.v_series_metadata;
 
-
 CREATE OR REPLACE VIEW ce_plugin.v_series_metadata
 AS
     SELECT
@@ -27,22 +26,22 @@ AS
         t.name                          AS t_name,
         s.description                   AS s_description,
         src.data_sources                AS s_source,
-        s.units                         AS s_units,
+        u.name                          AS s_units,
         s.precision                     AS s_precision,
         s.date_point                    AS s_date_point,
         CASE s.date_point
-            WHEN 'start' THEN first.start_of_period
-            WHEN 'end' THEN first.end_of_period
-            ELSE first.mid_of_period
+            WHEN 'start' THEN first.dt_start_of_period
+            WHEN 'end' THEN first.dt_end_of_period
+            ELSE first.dt_mid_of_period
         END                             AS s_first_date,
         CASE s.date_point
-            WHEN 'start' THEN last.start_of_period
-            WHEN 'end' THEN last.end_of_period
-            ELSE last.mid_of_period
+            WHEN 'start' THEN last.dt_start_of_period
+            WHEN 'end' THEN last.dt_end_of_period
+            ELSE last.dt_mid_of_period
         END                             AS s_last_date,
         first.period                    AS s_first_period,
         last.period                     AS s_last_period,
-        COALESCE(sd.downloadable, 'ess_plugin')
+        COALESCE(sm.downloadable, 'ess_plugin')
 										AS s_downloadable,
         sd.ts_last_insert::DATE         AS s_new_values_utc,
         sd.ts_last_update::DATE         AS s_updated_values_utc,
@@ -59,13 +58,14 @@ AS
             ON f.pk_freq = sm.ifreq
         JOIN ce_warehouse.l__type t
             ON t.pk_type = sm.itype
+		-- JOIN on series dates guarantees we have values
         JOIN ce_warehouse.mv__series_dates sd
             ON sd.fk_pk_series = sm.fk_pk_series
             AND sd.ifreq = sm.ifreq
             AND sd.itype = sm.itype
-        LEFT JOIN ce_warehouse.mv_period first
+        LEFT JOIN ce_warehouse.mv__period first
             ON first.pk_pdi = sd.first_pdi
-        LEFT JOIN ce_warehouse.mv_period last
+        LEFT JOIN ce_warehouse.mv__period last
             ON last.pk_pdi = sd.last_pdi
         -- Concatenate sources
         LEFT JOIN (
@@ -74,13 +74,15 @@ AS
                 STRING_AGG(l.name, ', ' ORDER BY sd.idx) AS data_sources
             FROM ce_warehouse.c__series_data_source sd
                 JOIN ce_warehouse.l__data_source l
-                    ON l.pk_data_source = sd.data_source
+                    ON l.pk_data_source = sd.lk_pk_data_source
             GROUP BY 1
         ) AS src
             ON src.fk_pk_series = sm.fk_pk_series
+        -- Units
+        LEFT JOIN ce_warehouse.l__units u
+            ON u.pk_units = s.lk_pk_units
 
-    WHERE sd.downloadable NOT IN ('none', 'internal')  -- CEP-313: Exclude "none" & "internal" from  PowerBI datasets
-    AND xsm.has_values = TRUE;
+    WHERE sm.downloadable NOT IN ('none', 'internal');  -- CEP-313: Exclude "none" & "internal" from  PowerBI datasets
 
 COMMENT ON VIEW ce_plugin.v_series_metadata
     IS 'Materialized view - for Excel plugin series metadata';

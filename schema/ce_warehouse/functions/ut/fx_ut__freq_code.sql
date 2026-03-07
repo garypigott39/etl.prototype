@@ -19,11 +19,11 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_ut__freq_code(
 AS
 $$
     SELECT CASE _freq
-        WHEN 1 THEN 'A'
-        WHEN 2 THEN 'Q'
+        WHEN 1 THEN 'D'
+        WHEN 2 THEN 'W'
         WHEN 3 THEN 'M'
-        WHEN 4 THEN 'W'
-        WHEN 5 THEN 'D'
+        WHEN 4 THEN 'Q'
+        WHEN 5 THEN 'Y'
         ELSE NULL
     END
 $$;

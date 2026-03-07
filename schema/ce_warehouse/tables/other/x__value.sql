@@ -90,7 +90,7 @@ COMMENT ON TRIGGER tg__xvalue__b01 ON ce_warehouse.x__value
 
 /*
  ***********************************************************************************************************
- * Update snapshot.
+ * Update snapshot, on INSERT
  ***********************************************************************************************************
  */
 
@@ -107,6 +107,12 @@ CREATE TRIGGER tg__xvalue__a01
 COMMENT ON TRIGGER tg__xvalue__a01 ON ce_warehouse.x__value
     IS 'Trigger to snapshot (NEW) values on x_value table';
 
+/*
+ ***********************************************************************************************************
+ * Update snapshot, on DELETE
+ ***********************************************************************************************************
+ */
+
 -- DROP TRIGGER IF EXISTS tg__xvalue__a02 ON ce_warehouse.x__value;
 
 CREATE TRIGGER tg__xvalue__a02
@@ -119,6 +125,12 @@ CREATE TRIGGER tg__xvalue__a02
 
 COMMENT ON TRIGGER tg__xvalue__a02 ON ce_warehouse.x__value
     IS 'Trigger to snapshot (DELETE) values on x_value table';
+
+/*
+ ***********************************************************************************************************
+ * Update snapshot, on UPDATE
+ ***********************************************************************************************************
+ */
 
 -- DROP TRIGGER IF EXISTS tg__xvalue__a03 ON ce_warehouse.x__value;
 

@@ -24,10 +24,12 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_meta
     sid1 TEXT NOT NULL,
     sid2 TEXT NOT NULL GENERATED ALWAYS
         AS (sid1 || '_' || ce_warehouse.fx_ut__freq_code(ifreq)) STORED,
-    -- Can base on SID2 as: a generated column can reference another generated column,
-    -- as long as the dependency chain is valid and not cyclic
     sid3 TEXT NOT NULL GENERATED ALWAYS
-        AS (sid2 || '_' || ce_warehouse.fx_ut__type_code(itype)) STORED,
+        AS (
+            sid1 || '_' ||
+            ce_warehouse.fx_ut__freq_code(ifreq) || '_' ||
+            ce_warehouse.fx_ut__type_code(itype)
+        ) STORED,
 
     -- User maintained fields
     downloadable TEXT NOT NULL DEFAULT 'ess_plugin'
@@ -51,7 +53,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_meta
 
     -- Composite foreign key
     FOREIGN KEY (fk_pk_series, sid1)
-        REFERENCES c__series (pk_series, sid1)
+        REFERENCES ce_warehouse.c__series (pk_series, sid1)
         ON DELETE CASCADE
         DEFERRABLE INITIALLY DEFERRED
 );

@@ -130,23 +130,6 @@ COMMENT ON TRIGGER tg__cseries__b02 ON ce_warehouse.c__series
 
 /*
  ***********************************************************************************************************
- * Add series-metadata record on insert
- ***********************************************************************************************************
- */
-
--- DROP TRIGGER IF EXISTS tg__cseries__a01 ON ce_warehouse.c__series;
-
-CREATE TRIGGER tg__cseries__a01
-    BEFORE INSERT
-        ON ce_warehouse.c__series
-    FOR EACH ROW
-        EXECUTE FUNCTION ce_warehouse.fx_tg__cseries_meta__create();
-
-COMMENT ON TRIGGER tg__cseries__a01 ON ce_warehouse.c__series
-    IS 'Trigger to create metadata records on c_series table INSERTs';
-
-/*
- ***********************************************************************************************************
  * Allow INTERNAL series to link to non-existent indicators.
  * Must be AFTER trigger for "DEFERRABLE" gubbins.
  ***********************************************************************************************************
@@ -164,3 +147,20 @@ CREATE CONSTRAINT TRIGGER tg__cseries__a01
 
 COMMENT ON TRIGGER tg__cseries__a01 ON ce_warehouse.c__series
     IS 'Trigger to instigate IND check on c_series table';
+
+/*
+ ***********************************************************************************************************
+ * Add series-metadata record on insert
+ ***********************************************************************************************************
+ */
+
+-- DROP TRIGGER IF EXISTS tg__cseries__a02 ON ce_warehouse.c__series;
+
+CREATE TRIGGER tg__cseries__a02
+    AFTER INSERT
+        ON ce_warehouse.c__series
+    FOR EACH ROW
+        EXECUTE FUNCTION ce_warehouse.fx_tg__cseries__create_meta();
+
+COMMENT ON TRIGGER tg__cseries__a02 ON ce_warehouse.c__series
+    IS 'Trigger to create metadata records on c_series table INSERTs';

@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_tg__cseries_meta__create.sql
+ * fx_tg__cseries__create_meta.sql
  *
  * Trigger function - create metadata records on c_series table INSERTs.
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg__cseries_meta__create;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg__cseries__create_meta;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg__cseries_meta__create(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg__cseries__create_meta(
 )
     RETURNS TRIGGER
     LANGUAGE plpgsql
@@ -39,5 +39,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_tg__cseries_meta__create
+COMMENT ON FUNCTION ce_warehouse.fx_tg__cseries__create_meta
     IS 'Trigger function - create metadata records on c_series table INSERTs';

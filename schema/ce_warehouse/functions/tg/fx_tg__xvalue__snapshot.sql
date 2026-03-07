@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_tg__xsnapshot__update.sql
+ * fx_tg__xvalue__snapshot.sql
  *
- * Trigger function - update values snapshot (AFTER STATEMENT update).
+ * Trigger function - update values snapshot (AFTER STATEMENT update of x_value).
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg__xsnapshot__update;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tg__xvalue__snapshot;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg__xsnapshot__update(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tg__xvalue__snapshot(
 )
     RETURNS TRIGGER
     LANGUAGE plpgsql
@@ -70,5 +70,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_tg__xsnapshot__update
-    IS 'Trigger function - update values snapshot (AFTER STATEMEMNT update)';
+COMMENT ON FUNCTION ce_warehouse.fx_tg__xvalue__snapshot
+    IS 'Trigger function - update values snapshot (AFTER STATEMEMNT update of x_value)';

@@ -102,7 +102,7 @@ CREATE TRIGGER tg__xvalue__a01
     REFERENCING
         NEW TABLE AS new_table
     FOR EACH STATEMENT
-        EXECUTE FUNCTION ce_warehouse.fx_tg__xsnapshot__update();
+        EXECUTE FUNCTION ce_warehouse.fx_tg__xvalue__snapshot();
 
 COMMENT ON TRIGGER tg__xvalue__a01 ON ce_warehouse.x__value
     IS 'Trigger to snapshot (NEW) values on x_value table';
@@ -121,7 +121,7 @@ CREATE TRIGGER tg__xvalue__a02
     REFERENCING
         OLD TABLE AS old_table
     FOR EACH STATEMENT
-        EXECUTE FUNCTION ce_warehouse.fx_tg__xsnapshot__update();
+        EXECUTE FUNCTION ce_warehouse.fx_tg__xvalue__snapshot();
 
 COMMENT ON TRIGGER tg__xvalue__a02 ON ce_warehouse.x__value
     IS 'Trigger to snapshot (DELETE) values on x_value table';
@@ -141,7 +141,7 @@ CREATE TRIGGER tg__xvalue__a03
         NEW TABLE AS new_table
         OLD TABLE AS old_table
     FOR EACH STATEMENT
-        EXECUTE FUNCTION ce_warehouse.fx_tg__xsnapshot__update();
+        EXECUTE FUNCTION ce_warehouse.fx_tg__xvalue__snapshot();
 
 COMMENT ON TRIGGER tg__xvalue__a03 ON ce_warehouse.x__value
     IS 'Trigger to snapshot (UPDATE) values on x_value table';

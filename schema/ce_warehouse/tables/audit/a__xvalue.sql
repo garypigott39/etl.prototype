@@ -40,7 +40,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a__xvalue
 );
 
 CREATE INDEX IF NOT EXISTS a__xvalue__datapoint__idx
-    ON ce_warehouse.a__xvalue (fk_pk_series, lk_pk_pdi, idx DESC);
+    ON ce_warehouse.a__xvalue (fk_pk_series, lk_pk_pdi, idx DESC)
+    INCLUDE (value, ts_audit_time);
 
 COMMENT ON TABLE ce_warehouse.a__xvalue
     IS 'Audit table - datapoint values';

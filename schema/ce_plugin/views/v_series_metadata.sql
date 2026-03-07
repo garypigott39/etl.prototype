@@ -13,8 +13,8 @@
 CREATE OR REPLACE VIEW ce_plugin.v_series_metadata
 AS
     SELECT
-        xsm.sid3                        AS skey,  -- <GEO/COMMODITY>_<IND>
-        xsm.sid1                        AS series_id,
+        sm.sid3                         AS skey,  -- <GEO/COMMODITY>_<IND>
+        sm.sid1                         AS series_id,
         s.name                          AS s_name,
         g.short_code                    AS geo_short_code,
         g.short_name                    AS geo_short_name,
@@ -44,39 +44,40 @@ AS
         last.period                     AS s_last_period,
         COALESCE(sd.downloadable, 'ess_plugin')
 										AS s_downloadable,
-        xsm.new_values_utc::DATE        AS s_new_values_utc,
-        xsm.updated_values_utc::DATE    AS s_updated_values_utc,
-        s.updated_utc::DATE             AS s_updated_utc
+        sd.ts_last_insert::DATE         AS s_new_values_utc,
+        sd.ts_last_update::DATE         AS s_updated_values_utc,
+        s.ts_updated::DATE              AS s_updated_utc
 
-    FROM ce_warehouse.x_series_meta xsm
-        JOIN ce_warehouse.c_series s
-            ON s.pk_series = xsm.fk_pk_series
-        JOIN ce_warehouse.c_geo g
+    FROM ce_warehouse.c__series_meta sm
+        JOIN ce_warehouse.c__series s
+            ON s.pk_series = sm.fk_pk_series
+        JOIN ce_warehouse.c__geo g
             ON g.code = s.gcode
-        JOIN ce_warehouse.c_ind i
+        JOIN ce_warehouse.c__ind i
             ON i.code = s.icode
-        JOIN ce_warehouse.l_freq f
-            ON f.pk_freq = xsm.ifreq
-        JOIN ce_warehouse.l_type t
-            ON t.pk_type = xsm.itype
+        JOIN ce_warehouse.l__freq f
+            ON f.pk_freq = sm.ifreq
+        JOIN ce_warehouse.l__type t
+            ON t.pk_type = sm.itype
+        JOIN ce_warehouse.mv__series_dates sd
+            ON sd.fk_pk_series = sm.fk_pk_series
+            AND sd.ifreq = sm.ifreq
+            AND sd.itype = sm.itype
         LEFT JOIN ce_warehouse.mv_period first
-            ON first.pk_pdi = xsm.first_pdi
+            ON first.pk_pdi = sd.first_pdi
         LEFT JOIN ce_warehouse.mv_period last
-            ON last.pk_pdi = xsm.last_pdi
-		LEFT JOIN ce_warehouse.c_series_downloadable sd
-			ON sd.fk_pk_series = xsm.fk_pk_series
-			AND sd.ifreq = xsm.ifreq
-			AND sd.itype = xsm.itype
+            ON last.pk_pdi = sd.last_pdi
+        -- Concatenate sources
         LEFT JOIN (
             SELECT
                 sd.fk_pk_series,
                 STRING_AGG(l.name, ', ' ORDER BY sd.idx) AS data_sources
-            FROM ce_warehouse.c_series_data_source sd
-                JOIN ce_warehouse.l_data_source l
+            FROM ce_warehouse.c__series_data_source sd
+                JOIN ce_warehouse.l__data_source l
                     ON l.pk_data_source = sd.data_source
             GROUP BY 1
         ) AS src
-            ON src.fk_pk_series = xsm.fk_pk_series
+            ON src.fk_pk_series = sm.fk_pk_series
 
     WHERE sd.downloadable NOT IN ('none', 'internal')  -- CEP-313: Exclude "none" & "internal" from  PowerBI datasets
     AND xsm.has_values = TRUE;

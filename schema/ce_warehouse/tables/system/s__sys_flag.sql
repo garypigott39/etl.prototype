@@ -33,8 +33,12 @@ INSERT INTO ce_warehouse.s__sys_flag (
     code, value, description
 )
 VALUES
-    ('ASCII-ONLY','FALSE','If set to "TRUE" then only allow ASCII text values. Default is value is "FALSE".'),
+    ('ASCII.ONLY','FALSE','If set to "TRUE" then only allow ASCII text values. Default is value is "FALSE".'),
     ('DATE.MAX','+30 YEAR','Max date for date lookup table. This should be an INTERVAL value. Default is "+30 YEAR".'),
     ('DATE.MIN','1890-01-01','Minimum date for date lookup table, should be the beginning of a year'),
     ('GEO.FLAG.BASEURL','https://www.capitaleconomics.com/sites/default/files/','Base URL for GEO flags. Note the trailing slash.'),
-    ('PIPELINE.ERRCTL', 'SKIP', 'Pipeline errors, what to do with control table errors. Options are SKIP (default), or ABORT.');
+    ('PIPELINE.ERRCTL', 'SKIP', 'Pipeline errors, what to do with control table errors. Options are SKIP (default), or ABORT.'),
+    ('DEFAULT.VALUERANGE', 'ANY', 'Default value range name from l__value_range table, if unspecified.'),
+    ('DEFAULT.OUTOFRANGE.ACTION', 'onhold', 'Default action if value is out of range, if unspecified.'),
+    ('DEFAULT.DOWNLOADABLE', 'ess_plugin', 'Default downloadable setting for series metadata, if unspecified.'),
+    ('DEFAULT.VARIANCE', '-1', 'Default period variance series metadata, if unspecified (-1 = no check).');

@@ -19,15 +19,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__snapshot
     src_ifreq SMALLINT NOT NULL
         CHECK (src_ifreq IN (1, 2, 3 , 4)),  -- D->W, D->M, .., W->M, W->Q, etc
 
-    fk_pk_series INT NOT NULL
-        REFERENCES ce_warehouse.c__series (pk_series)
-            ON DELETE RESTRICT
-            DEFERRABLE INITIALLY DEFERRED,
-
-    lk_pk_pdi INT NOT NULL
-        REFERENCES ce_warehouse.l__period (pk_pdi)
-            ON DELETE RESTRICT
-            DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of periods with values, see app logic!!
+    fk_pk_series INT NOT NULL,  -- checked via APP logic
+    lk_pk_pdi INT NOT NULL,  -- ditto
 
     itype SMALLINT NOT NULL
         CHECK (itype IN (1, 2)),  -- enforce valid types: 1=actual, 2=forecast

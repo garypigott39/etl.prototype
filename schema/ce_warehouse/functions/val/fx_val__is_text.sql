@@ -39,7 +39,7 @@ BEGIN
         RETURN 'Value contains unprintable characters';
     ELSEIF _val !~ '^[[:ascii:]]+$' THEN
         -- Contains non-ASCII characters
-        IF EXISTS (SELECT 1 FROM ce_warehouse.s__sys_flag WHERE code = 'ASCII-ONLY' AND value = 'TRUE') THEN
+        IF EXISTS (SELECT 1 FROM ce_warehouse.s__sys_flag WHERE code = 'ASCII.ONLY' AND value = 'TRUE') THEN
             RETURN 'Value contains non-ASCII characters';
         END IF;
     END IF;

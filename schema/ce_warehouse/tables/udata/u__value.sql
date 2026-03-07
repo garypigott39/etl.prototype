@@ -16,15 +16,21 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u__value
 (
     idx INT GENERATED ALWAYS AS IDENTITY,
 
-    uv_gcode TEXT,
-    uv_icode TEXT,
-    uv_period TEXT,
-    uv_cfreq TEXT,    -- CHAR version of frequency
-    uv_ctype TEXT,    -- CHAR version of type
-    uv_source TEXT,  -- CHAR version of source
-    uv_value TEXT,
-    uv_tooltip TEXT,
+    gcode TEXT,
+    icode TEXT,
+    period TEXT,
+    cfreq TEXT,    -- CHAR version of frequency
+    ctype TEXT,    -- CHAR version of type
+    csource TEXT,  -- CHAR version of source
+    cvalue TEXT,   -- CHAR version of value
+    tooltip TEXT,
     update_type TEXT,  -- NEW, UPDATE, DELETE or UNCHANGED
+
+    -- Track who uploaded the file (annotation only)
+    uploaded_by TEXT NOT NULL,
+
+    is_api BOOL NOT NULL,  -- flag to indicate if the value is from an API (set via manual loader)
+
     -- Calculated
     pk_series INT,
     pdi INT,
@@ -32,8 +38,6 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u__value
     itype SMALLINT,
     isource INT,
     -- End
-
-    is_api BOOL NOT NULL,  -- flag to indicate if the value is from an API (set via manual loader)
 
     file_name TEXT,
     error TEXT,  -- system generated
@@ -43,7 +47,11 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u__value
 
 -- Add index on gcode/icode/period for duplicates checking speed
 CREATE INDEX IF NOT EXISTS u_value__datapoint__idx
-    ON ce_warehouse.u__value (uv_gcode, uv_icode, uv_period);
+    ON ce_warehouse.u__value (gcode, icode, period);
+
+-- It's recommended to have INDICES on foreign keys for performance!! (particularly important for large tables)
+CREATE INDEX IF NOT EXISTS u__value__uploaded_by__idx
+    ON ce_warehouse.u__value (uploaded_by);
 
 COMMENT ON TABLE ce_warehouse.u__value
     IS 'Userdata table - datapoint values from API (or CSV)';

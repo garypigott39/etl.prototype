@@ -32,6 +32,17 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_meta
         ) STORED,
 
     -- User maintained fields
+    lk_pk_value_range INT
+        REFERENCES ce_warehouse.l__value_range (pk_value_range)
+            ON DELETE SET NULL
+            DEFERRABLE INITIALLY DEFERRED,  -- optional reference for valid value range, maintained by users/apps
+    period_variance_percentage INT
+        CHECK (period_variance_percentage BETWEEN -1 AND 9999),  -- If NULL then use the system default (-1 = no variance checks)
+    out_of_range_action TEXT
+        CHECK (
+            out_of_range_action IN ('allow', 'onhold', 'reject')
+        ),  -- If NULL then use the system default
+
     downloadable TEXT
         CHECK (
             downloadable IN (
@@ -42,7 +53,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_meta
                 'internal',
                 'none',
                 'powerbi')
-        ),  -- If Null then use the system default
+        ),  -- If NULL then use the system default
+
     forecast_only_lifespan INT,  -- If NULL then use the system default
     internal_notes TEXT,  -- Unvalidated!
 

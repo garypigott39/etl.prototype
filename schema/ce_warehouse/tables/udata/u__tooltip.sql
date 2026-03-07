@@ -18,11 +18,14 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u__tooltip
 (
     idx INT GENERATED ALWAYS AS IDENTITY,
 
-    ut_gcode TEXT,
-    ut_icode TEXT,
-    ut_period TEXT,
-    ut_freq TEXT,  -- CHAR version of frequency
-    ut_tooltip TEXT,
+    gcode TEXT,
+    icode TEXT,
+    period TEXT,
+    cfreq TEXT,  -- CHAR version of frequency
+    tooltip TEXT,
+
+    -- Track who uploaded the file (annotation only)
+    uploaded_by TEXT NOT NULL,
 
     file_name TEXT, -- File it came from, if applicable
     error TEXT,  -- system generated

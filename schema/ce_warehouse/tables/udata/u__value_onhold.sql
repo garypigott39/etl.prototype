@@ -36,10 +36,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u__value_onhold
 
     update_type TEXT,  -- NEW, UPDATE, DELETE or UNCHANGED
 
-    uploaded_by INT NOT NULL
-        REFERENCES ce_warehouse.l__user (pk_user)
-            ON DELETE CASCADE
-            DEFERRABLE INITIALLY DEFERRED,
+    -- Track who uploaded the file (annotation only)
+    uploaded_by TEXT NOT NULL,
 
     is_api BOOL NOT NULL,  -- flag to indicate if the value is from an API (set via manual loader)
 

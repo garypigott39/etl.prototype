@@ -79,7 +79,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series
 
     PRIMARY KEY (pk_series),
     UNIQUE (series_id),
-    UNIQUE (sid1)
+    UNIQUE (sid1),
+    -- Composite foreign key to enforce unique SID1 within the same series
+    UNIQUE (pk_series, sid1)
 );
 
 -- It's recommended to have INDICES on foreign keys for performance!!

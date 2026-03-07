@@ -23,7 +23,7 @@ BEGIN
 
     -- Fix sequences
     CALL ce_warehouse.px_ut__info('Running sequence fix', TRUE);
-    CALL ce_warehouse.px_ut__fix_seq();
+    CALL ce_warehouse.px_ut__pg__fix_seq();
 
     -- Generate any missing series metadata records, BELT & BRACES!
     IF _fix_metadata THEN

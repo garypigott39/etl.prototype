@@ -1,7 +1,7 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_tb__seq_check.sql
+ * fx_tb__pg__seq_check.sql
  *
  * Pseudo table function - compare known sequences (serial keys) with actual values.
  *
@@ -13,9 +13,9 @@
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__seq_check;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__pg__seq_check;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__seq_check(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__pg__seq_check(
 )
     RETURNS TABLE (
         table_name     TEXT,
@@ -114,5 +114,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_tb__seq_check
+COMMENT ON FUNCTION ce_warehouse.fx_tb__pg__seq_check
     IS 'Pseudo table function - compare known sequences (serial keys) with actual values';

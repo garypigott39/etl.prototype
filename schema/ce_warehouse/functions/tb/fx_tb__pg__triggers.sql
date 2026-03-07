@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_tb__triggers.sql
+ * fx_tb__pg__triggers.sql
  *
  * Pseudo table function - provide a list of triggers & the functions they call.
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__triggers;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__pg__triggers;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__triggers(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__pg__triggers(
     _schema TEXT = '^ce_'
 )
     RETURNS TABLE (
@@ -35,5 +35,5 @@ $$
         1, 2;
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_tb__triggers
+COMMENT ON FUNCTION ce_warehouse.fx_tb__pg__triggers
     IS 'Pseudo table function - provide a list of triggers & the functions they call';

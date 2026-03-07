@@ -1,9 +1,9 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_tb__help.sql
+ * fx_tb__pg__help.sql
  *
- * Pseudo table function - list/document database structure (named schemas).
+ * Pseudo/Postgres table function - list/document database structure (named schemas).
  *
  * Thanks to:
  * - https://www.commandprompt.com/education/how-to-list-user-defined-functions-in-postgresql/
@@ -13,9 +13,9 @@
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__help;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__pg__help;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__help(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__pg__help(
     _regex TEXT DEFAULT '^ce_'
 )
     RETURNS TABLE (
@@ -88,5 +88,5 @@ $$
     ORDER BY 1, 2, 3, 4;
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_tb__help
-    IS 'Pseudo table function - list/document database structure (named schemas)';
+COMMENT ON FUNCTION ce_warehouse.fx_tb__pg__help
+    IS 'Pseudo/Postgres table function - list/document database structure (named schemas)';

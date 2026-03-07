@@ -1,9 +1,9 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_tb__postgres_pids.sql
+ * fx_tb__pg__pids.sql
  *
- * Pseudo table function - get list of PostgreSQL processes.
+ * Pseudo/Postgres table function - get list of PostgreSQL processes.
 
  * Note, to clear them you can run:
  *
@@ -16,9 +16,9 @@
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__postgres_pids;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__pg__pids;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__postgres_pids(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__pg__pids(
 )
     RETURNS TABLE (
         pid INT,
@@ -42,5 +42,5 @@ $$
     ORDER BY 1;
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_tb__postgres_pids
-    IS 'Pseudo table function - get list of PostgreSQL processes';
+COMMENT ON FUNCTION ce_warehouse.fx_tb__pg__pids
+    IS 'Pseudo/Postgres table function - get list of PostgreSQL processes';

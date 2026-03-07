@@ -1,16 +1,16 @@
 /*
  ***********************************************************************************************************
  * @file
- * px_ut__is_db.sql
+ * px_ut__pg__is_db.sql
  *
  * Utility procedure - check current database name, to ensure running on specific database only.
  * Raise EXCEPTION if not running on expected database.
  ***********************************************************************************************************
  */
 
--- DROP PROCEDURE IF EXISTS ce_warehouse.px_ut__is_db;
+-- DROP PROCEDURE IF EXISTS ce_warehouse.px_ut__pg__is_db;
 
-CREATE OR REPLACE PROCEDURE ce_warehouse.px_ut__is_db(
+CREATE OR REPLACE PROCEDURE ce_warehouse.px_ut__pg__is_db(
     _db TEXT
 )
     LANGUAGE plpgsql
@@ -23,5 +23,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON PROCEDURE ce_warehouse.px_ut__is_db
+COMMENT ON PROCEDURE ce_warehouse.px_ut__pg__is_db
     IS 'Utility procedure - check current database name, to ensure running on specific database only';

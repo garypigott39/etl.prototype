@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * fx_tb__table_cols.sql
+ * fx_tb__pg__table_cols.sql
  *
  * Pseudo table function - provide a list of column names in named table.
  ***********************************************************************************************************
  */
 
--- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__table_cols;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__pg__table_cols;
 
-CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__table_cols(
+CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__pg__table_cols(
     _tablename TEXT,
     _schema TEXT,
     _ignore TEXT[] DEFAULT NULL
@@ -31,5 +31,5 @@ $$
     ORDER BY s.ordinal_position;
 $$;
 
-COMMENT ON FUNCTION ce_warehouse.fx_tb__table_cols
+COMMENT ON FUNCTION ce_warehouse.fx_tb__pg__table_cols
     IS 'Pseudo table function - provide a list of columns in named table';

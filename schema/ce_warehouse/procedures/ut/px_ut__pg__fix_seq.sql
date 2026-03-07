@@ -1,15 +1,15 @@
 /*
  ***********************************************************************************************************
  * @file
- * px_ut__fix_seq.sql
+ * px_ut__pg__fix_seq.sql
  *
  * Utility procedure - fix table sequence(s).
  ***********************************************************************************************************
  */
 
--- DROP PROCEDURE IF EXISTS ce_warehouse.px_ut__fix_seq;
+-- DROP PROCEDURE IF EXISTS ce_warehouse.px_ut__pg__fix_seq;
 
-CREATE OR REPLACE PROCEDURE ce_warehouse.px_ut__fix_seq(
+CREATE OR REPLACE PROCEDURE ce_warehouse.px_ut__pg__fix_seq(
 )
     LANGUAGE plpgsql
 AS
@@ -26,5 +26,5 @@ BEGIN
 END
 $$;
 
-COMMENT ON PROCEDURE ce_warehouse.px_ut__fix_seq
+COMMENT ON PROCEDURE ce_warehouse.px_ut__pg__fix_seq
     IS 'Utility procedure - fix table sequence(s)';

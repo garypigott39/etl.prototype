@@ -24,6 +24,7 @@ BEGIN
         FROM ce_warehouse.c__series s
 			CROSS JOIN ce_warehouse.l__freq f
             CROSS JOIN ce_warehouse.l__type t
+        ORDER BY 1, 3, 4
     ON CONFLICT (sid3)
         DO NOTHING;
 

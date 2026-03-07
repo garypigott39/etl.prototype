@@ -30,6 +30,7 @@ BEGIN
                 t.pk_type
             FROM ce_warehouse.l__freq f
                 CROSS JOIN ce_warehouse.l__type t
+            ORDER BY 1, 3, 4
         ON CONFLICT (sid3)
             DO NOTHING;
     END IF;

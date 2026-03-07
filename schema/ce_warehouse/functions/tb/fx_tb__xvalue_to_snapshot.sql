@@ -7,7 +7,7 @@
  ***********************************************************************************************************
  */
 
-DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__xvalue_to_snapshot;
+-- DROP FUNCTION IF EXISTS ce_warehouse.fx_tb__xvalue_to_snapshot;
 
 CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__xvalue_to_snapshot(
     _pks        INT DEFAULT NULL,
@@ -16,10 +16,10 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__xvalue_to_snapshot(
     _debug      BOOL DEFAULT FALSE
 )
     RETURNS TABLE (
-       src_ifreq        SMALLINT,
-       tgt_ifreq        SMALLINT,
        fk_pk_series     INT,
        lk_pk_pdi        INT,
+       src_ifreq        SMALLINT,
+       tgt_ifreq        SMALLINT,
        itype            SMALLINT,
        last_pdi         INT,
        last_value       NUMERIC,
@@ -58,10 +58,10 @@ BEGIN
                 AND xp.src_pdi_range @> %2$s
             )
             SELECT
-                %1$s::SMALLINT              AS src_ifreq,
-                p.tgt_ifreq::SMALLINT       AS tgt_ifreq,
                 %3$s::INT                   AS fk_pk_series,
                 p.tgt_pdi                   AS lk_pk_pdi,
+                %1$s::SMALLINT              AS src_ifreq,
+                p.tgt_ifreq::SMALLINT       AS tgt_ifreq,
                 ag.itype                    AS itype,
                 ag.last_pdi                 AS last_pdi,
                 ag.last_value               AS last_value,
@@ -136,10 +136,10 @@ BEGIN
                     1, 2, 3, 4, 5
             )
             SELECT
-                ag.src_ifreq,
-                ag.tgt_ifreq,  -- redundant but useful
                 ag.fk_pk_series,
                 ag.lk_pk_pdi,
+                ag.src_ifreq,
+                ag.tgt_ifreq,
                 ag.itype,
                 l.last_pdi,
                 l.last_value,

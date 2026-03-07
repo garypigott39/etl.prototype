@@ -18,9 +18,9 @@ AS
 $$
 BEGIN
     INSERT INTO ce_warehouse.x__snapshot (
-        src_ifreq,
         fk_pk_series,
         lk_pk_pdi,
+        src_ifreq,
         itype,
         last_pdi,
         last_value,
@@ -28,9 +28,9 @@ BEGIN
         num_periods
     )
         SELECT
-            src_ifreq,
             fk_pk_series,
             lk_pk_pdi,
+            src_ifreq,
             itype,
             last_pdi,
             last_value,

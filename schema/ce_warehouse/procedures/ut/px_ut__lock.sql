@@ -40,9 +40,9 @@ BEGIN
             name
         )
         VALUES (_name)
-            ON CONFLICT (name)
-                DO UPDATE
-                    SET ts_locked_at = NOW();
+        ON CONFLICT (name)
+            DO UPDATE SET
+                ts_locked_at = NOW();
 
     ELSIF _type = 'remove' THEN
         DELETE FROM ce_warehouse.s__lock

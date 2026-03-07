@@ -822,6 +822,10 @@ def migrate_series_meta(src_cur, tgt_cur):
 
     create_temp_from_source(src_cur, tgt_cur, src, tmp)
     copy_table(src_cur, tgt_cur, src, tmp)
+    tgt_cur.execute("""
+        CREATE INDEX t__c_series_metadata
+            ON t__c_series_metadata (sm_gcode, sm_icode, sm_freq, sm_type)
+    """)
 
     # Pre-populate meta data
     tgt_cur.execute("CALL ce_warehouse.px_ut__fix_series_meta()")

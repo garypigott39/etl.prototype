@@ -11,7 +11,8 @@
 
 CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__xvalue_to_snapshot(
     _pks INT DEFAULT NULL,
-    _src_ifreq INT DEFAULT NULL
+    _src_ifreq INT DEFAULT NULL,
+    _debug BOOL DEFAULT FALSE
 )
     RETURNS TABLE (
        src_ifreq SMALLINT,
@@ -30,6 +31,7 @@ $$
 DECLARE
     _sql TEXT;
     _where TEXT;
+
 BEGIN
     IF _pks IS NOT NULL THEN
         _where := FORMAT('WHERE v.fk_pk_series = %s', _pks);
@@ -94,8 +96,12 @@ BEGIN
                 USING (src_ifreq, tgt_ifreq, fk_pk_series, lk_pk_pdi, itype)
     $sql$, _where, _where);
 
-    RETURN QUERY EXECUTE _sql;
+    -- Debug option to raise the generated SQL as an exception, for copy-pasting and testing in isolation
+    IF _debug THEN
+        RAISE EXCEPTION 'SQL: %', _sql;
+    END IF;
 
+    RETURN QUERY EXECUTE _sql;
 END
 $$;
 

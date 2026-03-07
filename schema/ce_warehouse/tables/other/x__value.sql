@@ -53,8 +53,8 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__value
 
 -- Optimal index for Snapshot Trigger
 CREATE INDEX IF NOT EXISTS x__value__snapshot__idx
-    ON ce_warehouse.x__value (fk_pk_series, ifreq)
-    INCLUDE (lk_pk_pdi, itype, value);  -- include value in index for faster access in trigger calculations
+    ON ce_warehouse.x__value(fk_pk_series, ifreq, itype, lk_pk_pdi DESC)
+    INCLUDE (value);  -- include value in index for faster access in trigger calculations
 
 -- @todo - look at other indexes for performance
 

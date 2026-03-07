@@ -3,7 +3,7 @@
  * @file
  * s__text_rule.sql
  *
- * System table - text field validation rules, see fx_val_is_text, fx_val_is_code & fx_val_is_name.
+ * System table - text field validation rules.
   *
  * NOTE, we don't use the text validation functions in any of the "s_" system tables because they are
  * potentially used by the validation functions, so we need to have more basic validation rules in place
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.s__text_rule
 );
 
 COMMENT ON TABLE ce_warehouse.s__text_rule
-    IS 'System table - text field validation rules, see fx_val_is_text & fx_val_is_name';
+    IS 'System table - text field validation rules';
 
 /**
  * Pre-populate with known values.

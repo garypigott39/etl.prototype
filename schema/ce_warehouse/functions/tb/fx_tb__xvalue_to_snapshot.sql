@@ -87,7 +87,7 @@ BEGIN
 
     ELSE
         -- This is the more general query which is optimal in other cases
-        IF _src_ifreq IS NULL THEN
+        IF _src_ifreq IS NOT NULL THEN
             _w1 := FORMAT('WHERE v.ifreq = %s', _src_ifreq);
         ELSE
             _w1 := 'WHERE v.ifreq = 1';  -- default to Daily (1) if not specified!!

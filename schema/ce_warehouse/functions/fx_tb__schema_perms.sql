@@ -14,21 +14,24 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb_schema_perms(
     RETURNS TABLE (
         role        NAME,
         schema      NAME,
-        can_use     BOOLEAN,
-        can_create  BOOLEAN
+        can_login   BOOL,
+        can_use     BOOL,
+        can_create  BOOL,
+        owner       BOOL
     )
     LANGUAGE sql
 AS
 $$
     SELECT
-        r.rolname AS role,
-        n.nspname AS schema,
-        has_schema_privilege(r.rolname, n.nspname, 'USAGE') AS can_use,
-        has_schema_privilege(r.rolname, n.nspname, 'CREATE') AS can_create
+        r.rolname                                            AS role,
+        n.nspname                                            AS schema,
+		r.rolcanlogin                                        AS can_login,
+        has_schema_privilege(r.rolname, n.nspname, 'USAGE')  AS can_use,
+        has_schema_privilege(r.rolname, n.nspname, 'CREATE') AS can_create,
+		r.oid = n.nspowner                                   AS owner
     FROM pg_roles r
-    CROSS JOIN pg_namespace n
-    WHERE r.rolcanlogin = true
-    AND n.nspname NOT LIKE 'pg_%'
+    	CROSS JOIN pg_namespace n
+    WHERE n.nspname NOT LIKE 'pg_%'
     AND n.nspname != 'information_schema'
     ORDER BY role, schema;
 $$;

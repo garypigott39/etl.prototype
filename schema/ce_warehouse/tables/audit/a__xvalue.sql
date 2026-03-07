@@ -15,15 +15,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.a__xvalue
 
     fk_pk_series INT NOT NULL,
     lk_pk_pdi INT,
-    ifreq SMALLINT GENERATED ALWAYS
+    ifreq INT GENERATED ALWAYS
         AS (
             CASE
                 WHEN lk_pk_pdi > 0 THEN (lk_pk_pdi / 100000000)
                 ELSE NULL
             END
         ) STORED,
-    itype SMALLINT,
-    lk_pk_source SMALLINT,
+    itype INT,
+    lk_pk_source INT,
     value NUMERIC,
     new_value NUMERIC,  -- for updates, store the new value for debugging!
     is_realised BOOL,

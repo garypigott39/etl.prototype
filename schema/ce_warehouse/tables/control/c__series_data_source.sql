@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series_data_source
         CHECK (fk_pk_series > 0),
 
     -- Data source ID
-    lk_pk_data_source SMALLINT NOT NULL
+    lk_pk_data_source INT NOT NULL
         REFERENCES ce_warehouse.l__data_source (pk_data_source)
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,

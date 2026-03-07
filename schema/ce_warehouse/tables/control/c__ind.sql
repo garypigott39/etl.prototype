@@ -39,15 +39,15 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__ind
         CHECK (ce_warehouse.fx_val__is_name(name3_lower, 'c_ind.name3_lower.ignore_case') IS NULL),
     name4_lower TEXT
         CHECK (ce_warehouse.fx_val__is_name(name4_lower, 'c_ind.name4_lower.ignore_case') IS NULL),
-    lk_pk_ind_category_broad SMALLINT
+    lk_pk_ind_category_broad INT
         REFERENCES ce_warehouse.l__ind_category_broad (pk_ind_category_broad)
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
-    lk_pk_ind_category_narrow SMALLINT
+    lk_pk_ind_category_narrow INT
         REFERENCES ce_warehouse.l__ind_category_narrow (pk_ind_category_narrow)
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,
-    lk_pk_data_transformation SMALLINT NOT NULL
+    lk_pk_data_transformation INT NOT NULL
         REFERENCES ce_warehouse.l__data_transformation (pk_data_transformation)
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,

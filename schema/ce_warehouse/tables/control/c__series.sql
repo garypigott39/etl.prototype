@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__series
         CHECK (ce_warehouse.fx_val__is_name(name4, 'c_series.name4') IS NULL),
     description TEXT
         CHECK (ce_warehouse.fx_val__is_text(description, 'c_series.description') IS NULL),
-    lk_pk_units SMALLINT
+    lk_pk_units INT
         REFERENCES ce_warehouse.l__units (pk_units)
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED,

@@ -11,7 +11,7 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.l__freq
 (
-    pk_freq SMALLINT NOT NULL GENERATED ALWAYS AS (
+    pk_freq INT NOT NULL GENERATED ALWAYS AS (
         CASE code
             WHEN 'D' THEN 1
             WHEN 'W' THEN 2

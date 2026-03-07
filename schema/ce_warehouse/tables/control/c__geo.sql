@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
     ordering INT NOT NULL DEFAULT 0,
 
     -- COM specific fields (will be NULL for GEO)
-    lk_pk_commodity_type SMALLINT
+    lk_pk_commodity_type INT
         REFERENCES ce_warehouse.l__com_type(pk_com_type)
             ON UPDATE RESTRICT
             ON DELETE RESTRICT
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
             (code NOT LIKE 'G.%' AND long IS NULL)
             OR (code LIKE 'G.%' AND (long IS NULL OR long BETWEEN -180 AND 180))
         ),
-    lk_pk_central_bank SMALLINT
+    lk_pk_central_bank INT
         REFERENCES ce_warehouse.l__central_bank(pk_central_bank)
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
             (code NOT LIKE 'G.%' AND lk_pk_central_bank IS NULL)
             OR code LIKE 'G.%'
         ),
-    lk_pk_stock_market SMALLINT
+    lk_pk_stock_market INT
         REFERENCES ce_warehouse.l__stock_market(pk_stock_market)
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
             (code NOT LIKE 'G.%' AND lk_pk_stock_market IS NULL)
             OR code LIKE 'G.%'
         ),
-    lk_pk_political_alignment SMALLINT
+    lk_pk_political_alignment INT
         REFERENCES ce_warehouse.l__political_alignment(pk_political_alignment)
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
             (code NOT LIKE 'G.%' AND lk_pk_political_alignment IS NULL)
             OR code LIKE 'G.%'
         ),
-    lk_pk_currency_unit SMALLINT
+    lk_pk_currency_unit INT
         REFERENCES ce_warehouse.l__currency_unit(pk_currency_unit)
             ON DELETE SET NULL
             DEFERRABLE INITIALLY DEFERRED
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo
             (code NOT LIKE 'G.%' AND lk_pk_currency_unit IS NULL)
             OR code LIKE 'G.%'
         ),
-    lk_pk_geo_category SMALLINT
+    lk_pk_geo_category INT
         REFERENCES ce_warehouse.l__geo_category(pk_geo_category)
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED

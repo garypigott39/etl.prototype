@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.c__geo_group
     ),
 
     -- GEO Group ID
-    lk_pk_geo_group SMALLINT NOT NULL
+    lk_pk_geo_group INT NOT NULL
         REFERENCES ce_warehouse.l__geo_group (pk_geo_group)
             ON DELETE CASCADE
             DEFERRABLE INITIALLY DEFERRED,

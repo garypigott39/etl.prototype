@@ -25,13 +25,13 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.x__value
             DEFERRABLE INITIALLY DEFERRED,  -- prevent deletion of periods with values, see app logic!!
 
     -- These exist in l__freq & l__type, but aren't really worth the join
-    ifreq SMALLINT NOT NULL GENERATED ALWAYS
+    ifreq INT NOT NULL GENERATED ALWAYS
         AS (lk_pk_pdi / 100000000) STORED
         CHECK (ifreq IN (1, 2, 3 , 4, 5)),  -- extract frequency from period code
-    itype SMALLINT NOT NULL
+    itype INT NOT NULL
         CHECK (itype IN (1, 2)),  -- enforce valid types: 1=actual, 2=forecast
 
-    lk_pk_source SMALLINT NOT NULL
+    lk_pk_source INT NOT NULL
         REFERENCES ce_warehouse.l__source (pk_source)
             ON DELETE RESTRICT
             DEFERRABLE INITIALLY DEFERRED,

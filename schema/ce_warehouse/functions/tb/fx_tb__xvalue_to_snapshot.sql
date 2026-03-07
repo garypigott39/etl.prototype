@@ -14,11 +14,11 @@ CREATE OR REPLACE FUNCTION ce_warehouse.fx_tb__xvalue_to_snapshot(
     _src_ifreq INT DEFAULT NULL
 )
     RETURNS TABLE (
-       src_ifreq SMALLINT,
-       tgt_ifreq SMALLINT,
+       src_ifreq INT,
+       tgt_ifreq INT,
        fk_pk_series INT,
        lk_pk_pdi INT,
-       itype SMALLINT,
+       itype INT,
        last_pdi INT,
        last_value NUMERIC,
        sum_value NUMERIC,
@@ -80,15 +80,15 @@ BEGIN
                 1, 2, 3, 4, 5
         )
         SELECT
-            a.src_ifreq::SMALLINT,
-            a.tgt_ifreq::SMALLINT,  -- redundant but useful
-            a.fk_pk_series::INT,
-            a.lk_pk_pdi::INT,
-            a.itype::SMALLINT,
-            l.last_pdi::INT,
-            l.last_value::NUMERIC,
-            a.sum_value::NUMERIC,
-            a.num_periods::INT
+            a.src_ifreq,
+            a.tgt_ifreq,  -- redundant but useful
+            a.fk_pk_series,
+            a.lk_pk_pdi,
+            a.itype,
+            l.last_pdi,
+            l.last_value,
+            a.sum_value,
+            a.num_periods
         FROM _aggregated a
             LEFT JOIN _latest l
                 USING (src_ifreq, tgt_ifreq, fk_pk_series, lk_pk_pdi, itype)

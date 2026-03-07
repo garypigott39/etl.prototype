@@ -11,7 +11,7 @@
 
 CREATE TABLE IF NOT EXISTS ce_warehouse.l__type
 (
-    pk_type SMALLINT NOT NULL GENERATED ALWAYS AS (
+    pk_type INT NOT NULL GENERATED ALWAYS AS (
         CASE code
             WHEN 'AC' THEN 1
             ELSE 2

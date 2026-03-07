@@ -28,9 +28,9 @@ CREATE TABLE IF NOT EXISTS ce_warehouse.u__value
     -- Calculated
     pk_series INT,
     pdi INT,
-    ifreq SMALLINT,
-    itype SMALLINT,
-    isource SMALLINT,
+    ifreq INT,
+    itype INT,
+    isource INT,
     -- End
 
     is_api BOOL NOT NULL,  -- flag to indicate if the value is from an API (set via manual loader)

@@ -8,6 +8,7 @@
 django-stubs  # better type checking for Django (in linters)
 flake8  # will phase out flake in favour of ruff
 mypy
+pipdeptree
 psycopg
 ruff
 types-psycopg2
